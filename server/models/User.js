@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      select: false,
     },
     phone: {
       type: String,
@@ -31,6 +32,7 @@ const userSchema = new mongoose.Schema(
       city: { type: String, trim: true },
       state: { type: String, trim: true },
       country: { type: String, trim: true },
+      // GeoJSON point: coordinates are [longitude, latitude]
       coordinates: {
         type: {
           type: String,
@@ -38,7 +40,7 @@ const userSchema = new mongoose.Schema(
         },
         coordinates: {
           type: [Number],
-          index: "2dsphere",
+          default: undefined,
         },
       },
     },
@@ -57,5 +59,7 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+userSchema.index({ "location.coordinates": "2dsphere" });
 
 module.exports = mongoose.model("User", userSchema);

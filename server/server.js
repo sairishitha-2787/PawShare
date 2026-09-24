@@ -1,21 +1,13 @@
-const express = require("express");
-const cors = require("cors");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const connectDB = require("./config/db");
-const authRoutes = require("./routes/authRoutes");
+const app = require("./app");
 
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok" });
-});
-
-app.use("/api/auth", authRoutes);
+if (!process.env.JWT_SECRET) {
+  console.error("JWT_SECRET is not set. Add it to server/.env");
+  process.exit(1);
+}
 
 const PORT = process.env.PORT || 5000;
 
