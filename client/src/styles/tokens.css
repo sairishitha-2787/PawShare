@@ -1,0 +1,8 @@
+:root {
+  color-scheme: light;
+  --cream:#FDF6E9; --paper:#FFFDF8; --lav:#B8A6E0; --lav-soft:#E7DEFA;
+  --pink:#FF9EBB; --pink-soft:#FFE1EA; --mint:#A8D8B9; --mint-soft:#DDF2E4;
+  --sun:#FFD873; --ink:#3A3355; --ink-soft:#6D6588; --grid:#EADCF2; --hot:#E9668E;
+  --pixel:"Silkscreen","Courier New",monospace;
+  --body:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+}

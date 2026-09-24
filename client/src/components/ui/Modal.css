@@ -1,0 +1,6 @@
+.scrim { position: fixed; inset: 0; background: rgba(58, 51, 85, .38); display: grid; place-items: center; padding: 16px; z-index: 10; }
+
+/* The Window inside scrolls; the wrapper stays unclipped so the offset shadow shows. */
+.modal { width: min(560px, 100%); max-height: calc(100vh - 48px); display: flex; flex-direction: column; }
+.modal:focus { outline: none; }
+.modal > .win { min-height: 0; overflow: auto; }

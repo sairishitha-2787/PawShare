@@ -1,0 +1,213 @@
+# PawShare frontend — Claude Code session prompts
+
+Build the Neighborhood map page in React so it matches the approved mockup, one session at a time.
+
+## Before session 1
+
+1. Put these files in the root of your repo:
+   - `CLAUDE.md` (Claude Code reads it automatically at the start of every session)
+   - `design/neighborhood-reference.html` (the mockup; open it in Chrome to see the target)
+2. Commit them: `git add CLAUDE.md design && git commit -m "docs: add design reference"`.
+
+## How to run the sessions
+
+- **Start a fresh Claude Code session for each prompt** (`/clear` or a new terminal). Paste the whole prompt.
+- Don't move on until every item in that session's "Done when" list is true. If something is off, stay in the
+  same session and describe what's wrong ("the cat tower roof is flatter than the reference").
+- Commit at the end of each session. If a session goes badly, `git reset --hard` and rerun the prompt.
+- Sessions 1–7 build the page with mock data. Session 8 connects it to Poojitha's API, so run it once
+  `GET /api/animals` exists.
+
+---
+
+## Session 1 — Project setup and design tokens
+
+```text
+Read CLAUDE.md and open design/neighborhood-reference.html (read the <style> block carefully).
+
+Set up the frontend in client/:
+1. If client/ doesn't exist, scaffold it with Vite (React, JavaScript). If it exists, keep what's there and only add.
+2. Install react-router-dom. Don't install any UI or CSS framework.
+3. Add the Google Fonts link for Silkscreen (400,700) and Fredoka (400,500,600) in client/index.html, with preconnect.
+4. Create src/styles/tokens.css with the exact CSS variables from CLAUDE.md.
+5. Create src/styles/global.css: box-sizing, [hidden]{display:none!important}, the body background (28px grid
+   lines in --grid over the linear gradient #D8F1EC → #F7EFFA 40% → #FFF3DC), body font Fredoka 15px/1.5,
+   color --ink, padding-inline 16px, :focus-visible ring. Copy values from the reference body rule.
+6. Routes: "/" → AdoptPage (placeholder for now that shows the "PAWSHARE OS" header exactly like the
+   reference .brand block), "/dev/kit" → DevKit (empty page for now).
+7. Delete Vite's demo CSS/logo files.
+
+Done when: `npm run dev` shows the grid background and the PAWSHARE OS header (SHARE in #E9668E) in the right
+fonts; `npm run build` passes. Commit: "chore(client): vite setup, tokens, global styles".
+```
+
+## Session 2 — Window UI kit
+
+```text
+Read CLAUDE.md. Look at these parts of design/neighborhood-reference.html: .win, .bar (+ .pink/.mint/.sun),
+.dots, .xbtn, .chip, .seg, .btn, .pill, .urgent, .err, .scrim, .taskbar, .start, .task, .clock.
+
+Build these components in src/components/ui/, each with its own .css file, copying the reference styles exactly:
+- Window({ title, barColor: 'lav'|'pink'|'mint'|'sun', dots=true, onClose, children, className })
+  onClose renders the X button instead of the dots. Title is uppercase Silkscreen.
+- Chip({ pressed, onClick, children })            – aria-pressed, yellow when pressed
+- SegToggle({ options:[{value,label}], value, onChange })  – the pill-shaped Map / Full list switch
+- Button({ variant:'default'|'primary', ...props })
+- Pill({ status })                                 – uses status colors from CLAUDE.md, label text in caps
+- ErrorDialog({ message, onOk })                   – pink ERROR window, centered, role="alertdialog"
+- Modal({ open, onClose, labelledBy, children })   – dim scrim rgba(58,51,85,.38); closes on Esc and on scrim
+  click; moves focus to the close button on open and returns focus to the trigger on close
+- Taskbar({ items })                               – "start" button, task tabs, live clock (HH:MM, updates every 30s)
+
+Fill /dev/kit with every component in every variant, so we can eyeball them next to the reference.
+
+Done when: /dev/kit looks the same as the matching pieces of the reference (borders, offset shadows, pressed
+effect, fonts, sizes). Build and lint pass. Commit: "feat(ui): window ui kit".
+```
+
+## Session 3 — Pet faces, houses and pins (SVG components)
+
+```text
+Read CLAUDE.md. In design/neighborhood-reference.html, study the JS functions face(), houseShape(), houseSVG(),
+and the PETS array.
+
+1. Create src/data/mockPets.js with the 9 pets from the reference PETS array. Convert them to the pet shape in
+   CLAUDE.md: move fur/dark/bg into `colors`, drop x/y and house (house is derived).
+2. src/utils/pets.js: houseTypeFor(species), STATUS_COLOR, STATUS_LABEL, SPECIES_LABEL (copy from reference).
+3. Port to React SVG components in src/components/pets/, keeping every coordinate, color and stroke identical:
+   - PetFace({ pet, size })  – the 60×60 face for dog, cat, bunny, guinea. Use React's useId() for the clipPath
+     id so faces never clash. If pet.photoUrl exists, show the photo clipped to the same circle instead.
+   - House({ type, x, y })   – returns the <g> for dog / cat / hutch plus the shadow ellipse. Export a
+     peakY(type, y) helper (dog y-80, cat y-106, hutch y-72).
+   - Pin({ pet, x, cy })     – drop pointer + ring circle in status color + nested 40×40 PetFace + inner outline.
+   - HouseMarker({ pet, x, y, onOpen, dimmed }) – House + name plate + Pin, exactly like houseSVG(). It's a
+     role="button" with tabindex, aria-label "Mochi, Cat, Urgent foster. Open profile", opens on click,
+     Enter and Space. Hover/focus lifts the pin 7px; urgent pins bob (2.4s). Both off under reduced motion.
+     dimmed → opacity .2, no pointer events, tabindex -1.
+4. On /dev/kit add a row with each face at 64px and each house type with a pin, inside an <svg viewBox>.
+
+Watch out: nested <svg> inside the map must NOT pick up width rules meant for the outer svg (scope CSS with
+a direct-child selector).
+
+Done when: the faces and houses on /dev/kit match the reference pixel for pixel by eye. Commit:
+"feat(pets): svg faces, houses, pins".
+```
+
+## Session 4 — The neighborhood scene
+
+```text
+Read CLAUDE.md. In design/neighborhood-reference.html study drawScene(), sparkle(), cloud(), tree(), flowers(),
+.mapwrap and the house coordinates in PETS.
+
+1. src/components/map/SceneBackdrop.jsx: port everything drawScene() draws except the houses – sky gradient,
+   smiling sun, clouds, sparkles, two hill layers, the dirt path with dashed centre line, pond, trees, flowers,
+   and the PAWSHARE LN signpost. Same coordinates, viewBox 0 0 1000 560.
+2. src/components/map/lots.js: export LOTS, the 9 {x,y} positions taken from the reference PETS (Biscuit 140,318;
+   Mochi 290,268; ... Peanut 780,478), in that order.
+3. src/components/map/Neighborhood.jsx({ pets, isDimmed, onOpen }):
+   - outer <svg viewBox="0 0 1000 560"> with SceneBackdrop, then one HouseMarker per pet placed on LOTS[i]
+   - render markers sorted by y so nearer houses draw on top
+   - wrapper .mapwrap: 2px ink border, radius 10px, overflow-x auto; the svg has min-width 720px
+   - if there are more than 9 pets, show only 9 and add a "Next street →" / "← Previous street" pair of Buttons
+     under the map (page through in groups of 9)
+   - hint line under the map: "Click a house to open that pet's profile. On a small screen, swipe the map sideways."
+4. Put it inside a Window titled "NEIGHBORHOOD.EXE — 9 pets nearby" on AdoptPage, using mockPets.
+   For now onOpen just console.logs the id.
+
+Done when: the page at 1200px looks like the reference map, houses are clickable and keyboard-focusable, and at
+400px the map scrolls sideways inside its box while the page itself doesn't. Commit: "feat(map): neighborhood scene".
+```
+
+## Session 5 — Filters, legend, list view, favorites panel
+
+```text
+Read CLAUDE.md. In design/neighborhood-reference.html study .toolbar, .main grid, the KEY.TXT and FAVORITES/
+windows, keyRow(), matches(), update(), renderList(), renderFavs() and the empty-results ERROR.
+
+Build the rest of AdoptPage around the map:
+1. Toolbar: species Chips (All / Dogs / Cats / Small pets – small = bunny + guinea), the "Needs a foster urgently"
+   checkbox, and SegToggle Map / Full list on the right. Keep filter state in AdoptPage; the selected view in the
+   URL hash (#list) so it survives refresh.
+2. Filtering dims non-matching houses on the map (don't remove them). The title bar count updates.
+3. Legend.jsx (KEY.TXT window, sun title bar): "HOUSE = SPECIES" rows with a mini house SVG, label, sub-label and a
+   count badge; "PIN RING = STATUS" rows with ring swatches and counts. Counts reflect the current filter.
+4. FavoritesContext: a Set of pet ids saved in localStorage key "pawshare-favs" (wrap in try/catch). The
+   FAVORITES/ window lists saved pets as pink pill buttons that open the profile; empty text:
+   "Folder is empty. Tap the heart on a profile to save a pet here." Taskbar shows "Favorites (n)".
+5. List view: PetCard grid (auto-fill, min 210px) like renderList() – title bar "MOCHI.CAT", face, name, age · breed,
+   area, Pill, Open button. Title bar color by house type (dog pink, cat lavender, hutch sun).
+6. When nothing matches, show ErrorDialog over the map: "NO CATS NEED AN URGENT FOSTER RIGHT NOW." (species word
+   changes). OK unticks the urgent checkbox.
+7. Layout: map + 250px sidebar; below 860px the sidebar goes under the map. Taskbar at the bottom of the page.
+
+Done when: every filter combination behaves like the reference, Small pets + urgent shows the ERROR, and the list
+view shows the same pets as the map. Commit: "feat(adopt): filters, legend, list view, favorites".
+```
+
+## Session 6 — Profile window
+
+```text
+Read CLAUDE.md. In design/neighborhood-reference.html study openPet(), .profile, .phead, .stats, .tags, .actions, .note.
+
+Build src/components/pets/ProfileWindow.jsx inside the Modal from session 2:
+- Title bar "<NAME>.PROFILE" with the X close button.
+- Header: 120px PetFace in a circle, name (Silkscreen 26px), "Cat · Whisker Walk Rescue, Indiranagar", Pill.
+- Stats grid (3 columns, 2 on phones): AGE, SEX, SIZE, BREED (spans 2), VACCINES.
+- Tag chips in mint, the blurb, then actions:
+  primary button text: urgent → "Offer to foster", available → "Start adoption application",
+  pending → "Join the waitlist". Clicking shows the dashed mint note with the matching sentence from the
+  reference (for now; session 8 wires the real application).
+  Favorite button: "♡ Add to favorites" / "♥ Saved to favorites", aria-pressed, uses FavoritesContext.
+- Opens from map houses, list cards and the favorites panel. Esc, X and scrim click close it; focus returns to
+  the house that opened it.
+- Add a deep link: /adopt/:petId opens the page with that profile already open.
+
+Done when: opening Mochi looks like the reference profile at 1200px and 400px, and favorites update everywhere
+instantly. Commit: "feat(pets): profile window".
+```
+
+## Session 7 — Polish and match check
+
+```text
+Read CLAUDE.md. Open design/neighborhood-reference.html and our app side by side at 1200px, 860px and 400px.
+
+1. Go section by section (header, toolbar, map, legend, favorites, list, profile, error, taskbar) and list every
+   visual difference: spacing, font size, border, shadow, color, radius, wrapping. Show me the list first.
+2. Then fix them all.
+3. Accessibility pass: every control reachable by Tab in a sensible order, visible focus, aria-labels on houses,
+   Modal traps focus, reduced motion respected, colour isn't the only status signal (pills have text).
+4. Check there's no horizontal page scroll at 400px and no console warnings (keys, useId, etc.).
+
+Done when: I can't tell the two apart at a glance. Build and lint pass. Commit: "fix(ui): match reference".
+```
+
+## Session 8 — Connect to the backend (run once the API exists)
+
+```text
+Read CLAUDE.md. Look at server/ to find the animals routes and the Animal model (read only, don't edit server/).
+
+1. src/api/client.js: fetch wrapper with VITE_API_URL, JSON parsing, and an Error that carries the server message.
+2. src/api/animals.js: getAnimals(filters), getAnimal(id). Write a toPet(apiAnimal) mapper from the Mongo document
+   to our pet shape in CLAUDE.md. Map species values we don't draw yet to 'guinea' (hutch) and tell me which
+   ones you mapped. If the API has no fur colors, pick colors from a fixed palette by hashing the id so each pet
+   always gets the same colors. Use the first photo as photoUrl.
+3. Map status from the API (e.g. available / needs_foster / pending / adopted) to available / urgent / pending;
+   don't show adopted animals on the map.
+4. AdoptPage loads from the API with a loading state (a Window titled "LOADING..." with a pixel progress bar) and
+   an error state using ErrorDialog ("COULDN'T REACH THE SHELTER SERVER." + Retry). Keep mockPets as the fallback
+   when VITE_USE_MOCK=true.
+5. Send species/urgent filters as query params if the API supports them; otherwise filter on the client.
+6. The profile's primary button navigates to /apply/:petId (create an empty placeholder page for now).
+
+Done when: with the server running, real animals appear in the houses and profiles; with the server off, the
+error window shows and Retry works. Commit: "feat(api): load animals from backend".
+```
+
+---
+
+## Tips
+
+- If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."
+- Ask it to take its time on SVG sessions (3 and 4): "Copy the coordinates exactly from the reference; don't
+  redraw them."
+- Keep this file in the repo too (`docs/claude-prompts.md`) so Poojitha and Vedha can see how the UI was built.

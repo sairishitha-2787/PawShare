@@ -1,0 +1,26 @@
+* { box-sizing: border-box; }
+/* Page background sizes against the root box; keep it at least one screen tall so the gradient doesn't tile */
+html { min-height: 100%; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.5;
+  background-color: #F7EFFA;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(180deg, #D8F1EC 0%, #F7EFFA 40%, #FFF3DC 100%);
+  background-size: 28px 28px, 28px 28px, 100% 100%;
+  padding-inline: 16px;
+  padding-block: 20px 28px;
+  min-height: 100%;
+}
+
+:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+
+/* Page shell shared by every page (reference .desk) */
+.desk { max-width: 1120px; margin: 0 auto; display: grid; gap: 18px; }

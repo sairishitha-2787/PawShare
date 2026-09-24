@@ -1,0 +1,8 @@
+.kit-h { margin: 0; font-family: var(--pixel); font-size: 11px; letter-spacing: .08em; color: var(--ink-soft); font-weight: 400; }
+.kit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.kit-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 14px; }
+.kit-body { padding: 12px 14px; margin: 0; font-size: 14px; }
+.kit-stage { position: relative; height: 200px; margin: 14px; border: 2px solid var(--ink); border-radius: 10px; background: #BFE3FF; }
+.kit-modal { padding: 16px; display: grid; gap: 14px; }
+.kit-modal h2 { margin: 0; font-family: var(--pixel); font-size: 26px; letter-spacing: .03em; line-height: 1.1; }
+.kit-modal p { margin: 0; }

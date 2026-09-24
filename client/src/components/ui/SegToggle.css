@@ -1,0 +1,13 @@
+.seg { margin-left: auto; display: flex; gap: 0; }
+.seg button {
+  font-family: var(--pixel); font-size: 12px; letter-spacing: .03em; color: var(--ink);
+  border: 2px solid var(--ink); padding: 5px 12px; background: var(--paper); cursor: pointer;
+  transition: transform .08s;
+  border-radius: 0; box-shadow: none;
+}
+.seg button:active { transform: translate(2px, 2px); box-shadow: none; }
+.seg button:first-child { border-radius: 999px 0 0 999px; }
+.seg button:last-child { border-radius: 0 999px 999px 0; border-left: 0; }
+.seg button[aria-pressed="true"] { background: var(--lav); }
+
+@media (max-width: 520px) { .seg { margin-left: 0; } }
