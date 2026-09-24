@@ -48,7 +48,12 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Average of this shelter's reviews; kept up to date by Review.refreshShelterRating.
     rating: {
+      type: Number,
+      default: 0,
+    },
+    ratingCount: {
       type: Number,
       default: 0,
     },

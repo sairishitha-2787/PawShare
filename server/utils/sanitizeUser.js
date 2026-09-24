@@ -7,6 +7,7 @@ const sanitizeUser = (user) => ({
   location: user.location,
   isVerified: user.isVerified,
   rating: user.rating,
+  ratingCount: user.ratingCount,
   adoptionHistory: user.adoptionHistory,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,

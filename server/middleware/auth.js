@@ -26,6 +26,20 @@ const protect = async (req, res, next) => {
   next();
 };
 
+// Loads req.user when a valid token is sent, but lets anonymous requests through.
+const optionalAuth = async (req, res, next) => {
+  const [scheme, token] = (req.headers.authorization || "").split(" ");
+  if (scheme === "Bearer" && token) {
+    try {
+      const payload = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = (await User.findById(payload.id)) || undefined;
+    } catch (err) {
+      // Bad token on a public route: treat as anonymous.
+    }
+  }
+  next();
+};
+
 // Usage: authorize("shelter", "admin") — must come after protect.
 const authorize = (...roles) => (req, res, next) => {
   if (!roles.includes(req.user.role)) {
@@ -34,4 +48,4 @@ const authorize = (...roles) => (req, res, next) => {
   next();
 };
 
-module.exports = { protect, authorize };
+module.exports = { protect, optionalAuth, authorize };
