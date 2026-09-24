@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { HTTP_URL } = require("../utils/validators");
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -16,7 +17,10 @@ const healthUpdateSchema = new mongoose.Schema(
     eatingWell: { type: Boolean },
     vetVisit: { type: Boolean },
     notes: { type: String, trim: true, maxlength: 2000 },
-    photos: { type: [{ type: String, trim: true }], default: [] },
+    photos: {
+      type: [{ type: String, trim: true, maxlength: 500, match: HTTP_URL }],
+      default: [],
+    },
   },
   { _id: false }
 );

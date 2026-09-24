@@ -11,11 +11,13 @@ const userRoutes = require("./routes/userRoutes");
 const verificationRoutes = require("./routes/verificationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
+const rejectOperators = require("./middleware/rejectOperators");
 
 const app = express();
 
 app.use(cors({ origin: process.env.CLIENT_URL || "*" }));
-app.use(express.json());
+app.use(express.json({ limit: "100kb" }));
+app.use(rejectOperators);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });

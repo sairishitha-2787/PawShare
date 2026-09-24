@@ -18,8 +18,9 @@ const signup = async (req, res) => {
     return res.status(400).json({ message: "name, email, and password are required" });
   }
 
-  if (String(password).length < 6) {
-    return res.status(400).json({ message: "password must be at least 6 characters" });
+  // bcrypt ignores everything after 72 bytes, so longer passwords are rejected rather than truncated.
+  if (typeof password !== "string" || password.length < 6 || Buffer.byteLength(password) > 72) {
+    return res.status(400).json({ message: "password must be a string of 6 to 72 characters" });
   }
 
   if (role && !SIGNUP_ROLES.includes(role)) {
