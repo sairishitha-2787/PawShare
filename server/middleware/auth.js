@@ -48,4 +48,15 @@ const authorize = (...roles) => (req, res, next) => {
   next();
 };
 
-module.exports = { protect, optionalAuth, authorize };
+// Shelters must be verified by an admin before this action; admins always pass.
+const requireVerified = (req, res, next) => {
+  if (req.user.role !== "admin" && !req.user.isVerified) {
+    return res.status(403).json({
+      message: "Your shelter must be verified before you can do this",
+      verificationStatus: req.user.verification?.status,
+    });
+  }
+  next();
+};
+
+module.exports = { protect, optionalAuth, authorize, requireVerified };

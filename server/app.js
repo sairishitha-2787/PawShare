@@ -8,6 +8,8 @@ const threadRoutes = require("./routes/threadRoutes");
 const checkInRoutes = require("./routes/checkInRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const userRoutes = require("./routes/userRoutes");
+const verificationRoutes = require("./routes/verificationRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -26,6 +28,8 @@ app.use("/api/threads", threadRoutes);
 app.use("/api/checkins", checkInRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/verification", verificationRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

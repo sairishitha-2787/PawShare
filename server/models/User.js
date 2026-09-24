@@ -57,9 +57,21 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    adoptionHistory: {
-      type: [mongoose.Schema.Types.Mixed],
-      default: [],
+    // Shelter verification request; isVerified mirrors status === "approved".
+    verification: {
+      status: {
+        type: String,
+        enum: ["unsubmitted", "pending", "approved", "rejected"],
+        default: "unsubmitted",
+      },
+      registrationNumber: { type: String, trim: true, maxlength: 100 },
+      about: { type: String, trim: true, maxlength: 2000 },
+      website: { type: String, trim: true, maxlength: 300 },
+      documentUrl: { type: String, trim: true, maxlength: 500 },
+      submittedAt: { type: Date },
+      reviewedAt: { type: Date },
+      reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      note: { type: String, trim: true, maxlength: 1000 },
     },
   },
   { timestamps: true }

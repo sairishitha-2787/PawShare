@@ -8,7 +8,7 @@ const sanitizeUser = (user) => ({
   isVerified: user.isVerified,
   rating: user.rating,
   ratingCount: user.ratingCount,
-  adoptionHistory: user.adoptionHistory,
+  verificationStatus: user.role === "shelter" ? user.verification?.status : undefined,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });
