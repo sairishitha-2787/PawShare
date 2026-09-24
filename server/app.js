@@ -3,6 +3,7 @@ const cors = require("cors");
 
 const authRoutes = require("./routes/authRoutes");
 const animalRoutes = require("./routes/animalRoutes");
+const applicationRoutes = require("./routes/applicationRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -16,6 +17,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/animals", animalRoutes);
+app.use("/api/applications", applicationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
