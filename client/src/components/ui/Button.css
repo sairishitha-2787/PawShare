@@ -1,0 +1,7 @@
+.btn {
+  font-family: var(--pixel); font-size: 12px; letter-spacing: .03em; color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 8px; padding: 5px 12px; background: var(--lav-soft); cursor: pointer;
+  box-shadow: 2px 2px 0 var(--ink); transition: transform .08s;
+}
+.btn:active { transform: translate(2px, 2px); box-shadow: none; }
+.btn.primary { background: var(--pink); }

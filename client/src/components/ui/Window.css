@@ -1,0 +1,21 @@
+.win { background: var(--paper); border: 2px solid var(--ink); border-radius: 14px; box-shadow: 5px 5px 0 var(--ink); overflow: hidden; }
+.bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 10px 7px 12px;
+  background: var(--lav); border-bottom: 2px solid var(--ink); font-family: var(--pixel); font-size: 13px; letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.bar.pink { background: var(--pink); }
+.bar.mint { background: var(--mint); }
+.bar.sun { background: var(--sun); }
+
+.dots { display: flex; gap: 6px; flex: none; }
+.dots i { width: 13px; height: 13px; border: 2px solid var(--ink); border-radius: 50%; display: block; }
+.dots i:nth-child(1) { background: var(--sun); }
+.dots i:nth-child(2) { background: var(--mint); }
+.dots i:nth-child(3) { background: var(--pink); }
+
+.xbtn {
+  width: 24px; height: 24px; border: 2px solid var(--ink); border-radius: 7px; background: var(--pink-soft);
+  font-family: var(--pixel); font-size: 12px; line-height: 1; cursor: pointer; color: var(--ink); padding: 0;
+}
+.xbtn:hover { background: var(--pink); }

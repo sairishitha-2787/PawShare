@@ -1,0 +1,6 @@
+.taskbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--lav); border: 2px solid var(--ink); border-radius: 12px; padding: 6px 8px; box-shadow: 4px 4px 0 var(--ink); }
+.start { font-family: var(--pixel); font-weight: 700; font-size: 13px; background: var(--mint); border: 2px solid var(--ink); border-radius: 8px; padding: 3px 12px; }
+.task { font-family: var(--pixel); font-size: 11px; background: var(--paper); border: 2px solid var(--ink); border-radius: 8px; padding: 3px 10px; }
+.clock { margin-left: auto; font-family: var(--pixel); font-size: 12px; font-variant-numeric: tabular-nums; background: var(--lav-soft); border: 2px solid var(--ink); border-radius: 8px; padding: 3px 10px; }
+
+@media (max-width: 520px) { .task.hide-s { display: none; } }
