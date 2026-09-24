@@ -37,6 +37,21 @@ npm run dev                 # http://localhost:5000/api/health → {"status":"ok
 | `npm start` | Start for production |
 | `npm test` | Run the test suite on an in-memory MongoDB — no Atlas needed |
 | `npm run create-admin -- <email> <password> ["Name"]` | Create an admin, or promote an existing user. Admins can't sign up through the API. |
+| `npm run seed` | Load demo data (see below). Safe to re-run. |
+
+### Demo data
+
+`npm run seed` adds 4 verified shelters (Bengaluru, Hyderabad, Chennai, Pune), 1 admin, 1 adopter and 18 animals (dogs, cats and rabbits across every age group, size and listing type; 2 already adopted, with matching applications and check-ins). Photos are placeholder URLs.
+
+All seed accounts use the password `PawShare@123`:
+
+| Role | Email |
+|---|---|
+| Admin | `admin@seed.pawshare.test` |
+| Adopter | `adopter@seed.pawshare.test` |
+| Shelters | `shelter.bengaluru@seed.pawshare.test`, `shelter.hyderabad@…`, `shelter.chennai@…`, `shelter.pune@…` |
+
+Re-running replaces only seed data — accounts on the `seed.pawshare.test` domain and everything linked to them. Other users are never touched. It refuses to run with `NODE_ENV=production` unless `--force` is passed.
 
 ---
 
@@ -212,4 +227,4 @@ cd server
 npm test
 ```
 
-69 tests across auth, animals, applications, messaging, check-ins, reviews, verification and robustness. They start a throwaway in-memory MongoDB (downloaded automatically on the first run), so they never touch your real database.
+76 tests across auth, animals, applications, messaging, check-ins, reviews, verification, seed data and robustness. They start a throwaway in-memory MongoDB (downloaded automatically on the first run), so they never touch your real database.
