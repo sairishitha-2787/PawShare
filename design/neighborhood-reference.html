@@ -1,0 +1,437 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PawShare Neighborhood</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Fredoka:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --cream:#FDF6E9; --paper:#FFFDF8; --lav:#B8A6E0; --lav-soft:#E7DEFA;
+  --pink:#FF9EBB; --pink-soft:#FFE1EA; --mint:#A8D8B9; --mint-soft:#DDF2E4;
+  --sun:#FFD873; --ink:#3A3355; --ink-soft:#6D6588; --grid:#EADCF2;
+  --pixel:"Silkscreen", "Courier New", monospace;
+  --body:"Fredoka", "Trebuchet MS", system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  margin:0; color:var(--ink); font-family:var(--body); font-size:15px; line-height:1.5;
+  background-color:#F7EFFA;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(180deg, #D8F1EC 0%, #F7EFFA 40%, #FFF3DC 100%);
+  background-size:28px 28px, 28px 28px, 100% 100%;
+  padding-inline:16px; padding-block:20px 28px; min-height:100%;
+}
+.desk{max-width:1120px; margin:0 auto; display:grid; gap:18px}
+.brand{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 16px}
+.brand h1{margin:0; font-family:var(--pixel); font-weight:700; font-size:clamp(20px,3.4vw,28px); letter-spacing:.04em}
+.brand h1 span{color:#E9668E}
+.brand p{margin:0; color:var(--ink-soft); font-size:14px}
+
+.win{background:var(--paper); border:2px solid var(--ink); border-radius:14px; box-shadow:5px 5px 0 var(--ink); overflow:hidden}
+.bar{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 10px 7px 12px;
+  background:var(--lav); border-bottom:2px solid var(--ink); font-family:var(--pixel); font-size:13px; letter-spacing:.04em}
+.bar.pink{background:var(--pink)} .bar.mint{background:var(--mint)} .bar.sun{background:var(--sun)}
+.dots{display:flex; gap:6px; flex:none}
+.dots i{width:13px; height:13px; border:2px solid var(--ink); border-radius:50%; display:block}
+.dots i:nth-child(1){background:var(--sun)} .dots i:nth-child(2){background:var(--mint)} .dots i:nth-child(3){background:var(--pink)}
+.xbtn{width:24px; height:24px; border:2px solid var(--ink); border-radius:7px; background:var(--pink-soft);
+  font-family:var(--pixel); font-size:12px; line-height:1; cursor:pointer; color:var(--ink); padding:0}
+.xbtn:hover{background:var(--pink)}
+
+.toolbar{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; padding:12px 14px; border-bottom:2px dashed var(--lav)}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip, .seg button, .btn{font-family:var(--pixel); font-size:12px; letter-spacing:.03em; color:var(--ink);
+  border:2px solid var(--ink); border-radius:999px; padding:5px 12px; background:var(--paper); cursor:pointer;
+  box-shadow:2px 2px 0 var(--ink); transition:transform .08s}
+.chip:active,.seg button:active,.btn:active{transform:translate(2px,2px); box-shadow:none}
+.chip[aria-pressed="true"]{background:var(--sun)}
+.urgent{display:flex; align-items:center; gap:7px; font-size:14px; cursor:pointer}
+.urgent input{width:18px; height:18px; accent-color:#E9668E}
+.seg{margin-left:auto; display:flex; gap:0}
+.seg button{border-radius:0; box-shadow:none}
+.seg button:first-child{border-radius:999px 0 0 999px}
+.seg button:last-child{border-radius:0 999px 999px 0; border-left:0}
+.seg button[aria-pressed="true"]{background:var(--lav)}
+:focus-visible{outline:3px solid #E9668E; outline-offset:2px}
+
+.main{display:grid; grid-template-columns:minmax(0,1fr) 250px; gap:16px; padding:14px}
+.mapwrap{position:relative; border:2px solid var(--ink); border-radius:10px; overflow-x:auto; overflow-y:hidden; background:#BFE3FF}
+.mapwrap > svg{display:block; width:100%; min-width:720px; height:auto}
+.hint{margin:8px 2px 0; font-size:13px; color:var(--ink-soft)}
+
+.house{cursor:pointer; transition:opacity .25s}
+.house .pin{transition:transform .2s ease}
+.house:hover .pin, .house:focus-visible .pin{transform:translateY(-7px)}
+.house:focus{outline:none}
+.house:focus-visible .plate{stroke:#E9668E; stroke-width:3}
+.house.off{opacity:.2; pointer-events:none}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.house.urgent-pin .pin{animation:bob 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.house .pin,.house.urgent-pin .pin{animation:none; transition:none}}
+
+.side{display:grid; gap:14px; align-content:start}
+.side .win{box-shadow:4px 4px 0 var(--ink)}
+.key{padding:10px 12px 12px; display:grid; gap:10px}
+.key h3{margin:0; font-family:var(--pixel); font-size:11px; letter-spacing:.08em; color:var(--ink-soft); font-weight:400}
+.krow{display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:8px; font-size:14px}
+.krow svg{width:44px; height:38px}
+.krow b{font-weight:500}
+.krow small{display:block; color:var(--ink-soft); font-size:12px; line-height:1.3}
+.count{font-family:var(--pixel); font-size:12px; font-variant-numeric:tabular-nums; background:var(--lav-soft); border:2px solid var(--ink); border-radius:8px; padding:0 6px}
+.ring{width:22px; height:22px; border-radius:50%; border:4px solid; box-shadow:0 0 0 2px var(--ink); margin-inline:auto 10px; background:var(--paper)}
+.favs{padding:10px 12px 12px; font-size:14px}
+.favs ul{margin:6px 0 0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:6px}
+.favs li button{font-family:var(--body); font-size:13px; border:2px solid var(--ink); border-radius:999px; background:var(--pink-soft); padding:1px 10px; cursor:pointer; color:var(--ink)}
+.favs p{margin:0; color:var(--ink-soft)}
+
+.list{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:16px; padding:14px}
+.card .bar{font-size:12px}
+.card .inner{display:grid; grid-template-columns:64px 1fr; gap:10px; padding:12px; align-items:center}
+.card svg{width:64px; height:64px}
+.card h4{margin:0; font-family:var(--pixel); font-size:15px}
+.card p{margin:0; font-size:13px; color:var(--ink-soft)}
+.card .foot{display:flex; justify-content:space-between; align-items:center; padding:0 12px 12px}
+.pill{font-family:var(--pixel); font-size:10px; letter-spacing:.04em; border:2px solid var(--ink); border-radius:999px; padding:1px 8px}
+
+.err{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(330px,calc(100% - 32px)); z-index:3}
+.err .body{padding:16px; text-align:center; display:grid; gap:12px; justify-items:center}
+.err p{margin:0; font-family:var(--pixel); font-size:13px; line-height:1.6}
+.btn{border-radius:8px; background:var(--lav-soft)}
+.btn.primary{background:var(--pink)}
+
+.scrim{position:fixed; inset:0; background:rgba(58,51,85,.38); display:grid; place-items:center; padding:16px; z-index:10}
+.profile{width:min(560px,100%); max-height:calc(100% - 16px); overflow:auto}
+.pbody{padding:16px; display:grid; gap:14px}
+.phead{display:grid; grid-template-columns:120px 1fr; gap:16px; align-items:center}
+.phead svg{width:120px; height:120px; border:2px solid var(--ink); border-radius:50%}
+.phead h2{margin:0; font-family:var(--pixel); font-size:26px; letter-spacing:.03em; line-height:1.1}
+.phead .sub{margin:4px 0 8px; color:var(--ink-soft)}
+.stats{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:0}
+.stats div{background:var(--cream); border:2px solid var(--ink); border-radius:10px; padding:6px 10px}
+.stats dt{font-family:var(--pixel); font-size:10px; letter-spacing:.06em; color:var(--ink-soft)}
+.stats dd{margin:0; font-weight:500; font-variant-numeric:tabular-nums}
+.tags{display:flex; flex-wrap:wrap; gap:6px}
+.tags span{font-size:13px; background:var(--mint-soft); border:2px solid var(--ink); border-radius:999px; padding:0 10px}
+.blurb{margin:0; max-width:62ch}
+.actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.note{margin:0; font-size:14px; background:var(--mint-soft); border:2px dashed var(--ink); border-radius:10px; padding:8px 12px}
+
+.taskbar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:var(--lav); border:2px solid var(--ink); border-radius:12px; padding:6px 8px; box-shadow:4px 4px 0 var(--ink)}
+.start{font-family:var(--pixel); font-weight:700; font-size:13px; background:var(--mint); border:2px solid var(--ink); border-radius:8px; padding:3px 12px}
+.task{font-family:var(--pixel); font-size:11px; background:var(--paper); border:2px solid var(--ink); border-radius:8px; padding:3px 10px}
+.clock{margin-left:auto; font-family:var(--pixel); font-size:12px; font-variant-numeric:tabular-nums; background:var(--lav-soft); border:2px solid var(--ink); border-radius:8px; padding:3px 10px}
+
+@media (max-width:860px){ .main{grid-template-columns:1fr} .side{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))} }
+@media (max-width:520px){ .seg{margin-left:0} .phead{grid-template-columns:84px 1fr} .phead svg{width:84px;height:84px} .phead h2{font-size:21px} .stats{grid-template-columns:repeat(2,minmax(0,1fr))} .task.hide-s{display:none} }
+</style>
+
+<div class="desk">
+  <header class="brand">
+    <h1>PAW<span>SHARE</span> OS</h1>
+    <p>Mockup · Neighborhood view · sample pets from Bengaluru shelters</p>
+  </header>
+
+  <section class="win" aria-label="Neighborhood">
+    <div class="bar"><span>NEIGHBORHOOD.EXE — <span id="shown">9</span> pets nearby</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+    <div class="toolbar">
+      <div class="chips" role="group" aria-label="Species">
+        <button class="chip" data-f="all" aria-pressed="true">All</button>
+        <button class="chip" data-f="dog" aria-pressed="false">Dogs</button>
+        <button class="chip" data-f="cat" aria-pressed="false">Cats</button>
+        <button class="chip" data-f="small" aria-pressed="false">Small pets</button>
+      </div>
+      <label class="urgent"><input type="checkbox" id="urgentOnly"> Needs a foster urgently</label>
+      <div class="seg" role="group" aria-label="View">
+        <button id="vMap" aria-pressed="true">Map</button>
+        <button id="vList" aria-pressed="false">Full list</button>
+      </div>
+    </div>
+
+    <div id="mapView" class="main">
+      <div>
+        <div class="mapwrap" id="mapwrap">
+          <svg id="scene" viewBox="0 0 1000 560" role="img" aria-label="Neighborhood map of adoptable pets"></svg>
+          <div class="win err" id="err" hidden role="alertdialog" aria-labelledby="errMsg">
+            <div class="bar pink"><span>ERROR</span><span class="dots" aria-hidden="true"><i></i></span></div>
+            <div class="body"><p id="errMsg">NO PETS MATCH.</p><button class="btn" id="errOk">OK</button></div>
+          </div>
+        </div>
+        <p class="hint">Click a house to open that pet's profile. On a small screen, swipe the map sideways.</p>
+      </div>
+      <aside class="side">
+        <div class="win">
+          <div class="bar sun"><span>KEY.TXT</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+          <div class="key">
+            <h3>HOUSE = SPECIES</h3>
+            <div class="krow" id="kDog"></div>
+            <div class="krow" id="kCat"></div>
+            <div class="krow" id="kHutch"></div>
+            <h3>PIN RING = STATUS</h3>
+            <div class="krow"><span class="ring" style="border-color:#A8D8B9"></span><b>Available</b><span class="count" data-s="available">0</span></div>
+            <div class="krow"><span class="ring" style="border-color:#FF9EBB"></span><div><b>Urgent foster</b><small>Pin bounces</small></div><span class="count" data-s="urgent">0</span></div>
+            <div class="krow"><span class="ring" style="border-color:#FFD873"></span><b>Adoption pending</b><span class="count" data-s="pending">0</span></div>
+          </div>
+        </div>
+        <div class="win">
+          <div class="bar pink"><span>FAVORITES/</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+          <div class="favs" id="favs"></div>
+        </div>
+      </aside>
+    </div>
+
+    <div id="listView" class="list" hidden></div>
+  </section>
+
+  <footer class="taskbar">
+    <span class="start">start</span>
+    <span class="task">Neighborhood.exe</span>
+    <span class="task hide-s">Key.txt</span>
+    <span class="task hide-s" id="taskFav">Favorites (0)</span>
+    <span class="clock" id="clock">--:--</span>
+  </footer>
+</div>
+
+<div class="scrim" id="scrim" hidden>
+  <div class="win profile" role="dialog" aria-modal="true" aria-labelledby="pName">
+    <div class="bar"><span id="pFile">PET.PROFILE</span><button class="xbtn" id="pClose" aria-label="Close profile">X</button></div>
+    <div class="pbody" id="pBody"></div>
+  </div>
+</div>
+
+<script>
+const INK = '#3A3355';
+const RING = {available:'#A8D8B9', urgent:'#FF9EBB', pending:'#FFD873'};
+const STATUS_LABEL = {available:'Available', urgent:'Urgent foster', pending:'Adoption pending'};
+const PETS = [
+  {id:'biscuit', name:'Biscuit', species:'dog', house:'dog', status:'available', x:140, y:318, age:'2 yrs', breed:'Beagle mix', sex:'Male', size:'Medium', shelter:'Happy Tails Shelter', area:'Koramangala', vax:'Up to date', fur:'#E8B77A', dark:'#9A6A3C', bg:'#FFE8C7', tags:['Loves fetch','Good with kids','House-trained'], blurb:'Biscuit follows his nose everywhere and will sit for a single treat. He does best with a family that walks him twice a day.'},
+  {id:'mochi', name:'Mochi', species:'cat', house:'cat', status:'urgent', x:290, y:268, age:'8 mos', breed:'Indie (domestic short-hair)', sex:'Female', size:'Small', shelter:'Whisker Walk Rescue', area:'Indiranagar', vax:'1st dose done', fur:'#F4F1EC', dark:'#C9C1B5', bg:'#E7DEFA', tags:['Lap cat','Shy at first','Indoor only'], blurb:'Mochi was found in a parking lot during the monsoon. Her foster family is moving out soon, so she needs a new home quickly.'},
+  {id:'clover', name:'Clover', species:'bunny', house:'hutch', status:'available', x:425, y:345, age:'1 yr', breed:'Dutch rabbit', sex:'Female', size:'Small', shelter:'Happy Tails Shelter', area:'Koramangala', vax:'Not required', fur:'#FFFFFF', dark:'#7B6F8F', bg:'#DDF2E4', tags:['Litter-trained','Quiet','Likes coriander'], blurb:'Clover spends her mornings doing laps and her afternoons asleep in a cardboard box. Apartment-friendly.'},
+  {id:'pepper', name:'Pepper', species:'dog', house:'dog', status:'pending', x:565, y:282, age:'4 yrs', breed:'Indie', sex:'Female', size:'Medium', shelter:'Stray Hearts Trust', area:'HSR Layout', vax:'Up to date', fur:'#4A3F45', dark:'#2A2328', bg:'#FFE1EA', tags:['Calm','Leash-trained','Spayed'], blurb:'Pepper already has an application in review. You can still favorite her in case it falls through.'},
+  {id:'luna', name:'Luna', species:'cat', house:'cat', status:'available', x:705, y:330, age:'3 yrs', breed:'Persian mix', sex:'Female', size:'Medium', shelter:'Whisker Walk Rescue', area:'Indiranagar', vax:'Up to date', fur:'#B9B3C9', dark:'#8C84A3', bg:'#FFF3D6', tags:['Needs grooming','Gentle','Sleeps a lot'], blurb:'Luna needs brushing three times a week and likes to supervise from the top of the fridge.'},
+  {id:'rocky', name:'Rocky', species:'dog', house:'dog', status:'urgent', x:860, y:262, age:'9 yrs', breed:'Labrador', sex:'Male', size:'Large', shelter:'Stray Hearts Trust', area:'HSR Layout', vax:'Up to date', fur:'#F2D089', dark:'#C99A45', bg:'#DDF2E4', tags:['Senior','Arthritis meds','Very gentle'], blurb:'Rocky was surrendered when his family moved abroad. He needs a ground-floor foster while the shelter is full.'},
+  {id:'tofu', name:'Tofu', species:'bunny', house:'hutch', status:'pending', x:220, y:470, age:'6 mos', breed:'Lionhead', sex:'Male', size:'Small', shelter:'Happy Tails Shelter', area:'Koramangala', vax:'Not required', fur:'#EFE4D3', dark:'#B79E7E', bg:'#FFE1EA', tags:['Playful','Chews cables','Neutered'], blurb:'Tofu is fluffy and busy. Bunny-proof your wires before he visits.'},
+  {id:'sushi', name:'Sushi', species:'cat', house:'cat', status:'available', x:520, y:482, age:'2 yrs', breed:'Calico Indie', sex:'Female', size:'Small', shelter:'Whisker Walk Rescue', area:'Indiranagar', vax:'Up to date', fur:'#F7E7CF', dark:'#D08A47', bg:'#E7DEFA', tags:['Chatty','Good with cats','Spayed'], blurb:'Sushi will tell you about her day, loudly. She shares her space well with other cats.'},
+  {id:'peanut', name:'Peanut', species:'guinea', house:'hutch', status:'available', x:780, y:478, age:'1.5 yrs', breed:'Guinea pig (American)', sex:'Male', size:'Small', shelter:'Stray Hearts Trust', area:'HSR Layout', vax:'Not required', fur:'#F3DEC0', dark:'#A26A3B', bg:'#FFF3D6', tags:['Squeaks at dinner','Needs a buddy','Hay lover'], blurb:'Peanut should go home with another guinea pig, or to a home that already has one.'}
+];
+const SPECIES_LABEL = {dog:'Dog', cat:'Cat', bunny:'Rabbit', guinea:'Guinea pig'};
+
+function face(p, uid){
+  const f=p.fur, d=p.dark;
+  const eyes = `<circle cx="24" cy="34" r="2.4" fill="${INK}"/><circle cx="36" cy="34" r="2.4" fill="${INK}"/>
+    <ellipse cx="19.5" cy="39.5" rx="3" ry="1.8" fill="#FF9EBB" opacity=".75"/><ellipse cx="40.5" cy="39.5" rx="3" ry="1.8" fill="#FF9EBB" opacity=".75"/>`;
+  let s='';
+  if(p.species==='dog'){
+    s=`<ellipse cx="16" cy="33" rx="7" ry="12" fill="${d}" transform="rotate(18 16 33)"/><ellipse cx="44" cy="33" rx="7" ry="12" fill="${d}" transform="rotate(-18 44 33)"/>
+      <circle cx="30" cy="35" r="15" fill="${f}"/><ellipse cx="30" cy="41" rx="7.5" ry="5.5" fill="#FFF6EA"/>${eyes}
+      <ellipse cx="30" cy="38.5" rx="3" ry="2.2" fill="${INK}"/><path d="M27 42.5q3 2.4 6 0" stroke="${INK}" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
+  } else if(p.species==='cat'){
+    s=`<polygon points="15,30 18,11 29,22" fill="${d}"/><polygon points="45,30 42,11 31,22" fill="${d}"/>
+      <polygon points="18,25 19.5,16 24.5,21" fill="#FFB8CB"/><polygon points="42,25 40.5,16 35.5,21" fill="#FFB8CB"/>
+      <circle cx="30" cy="35" r="15" fill="${f}"/>${eyes}
+      <path d="M28.5 38.5h3l-1.5 1.8z" fill="#E9668E"/>
+      <path d="M12 38h8M12 42h8M40 38h8M40 42h8" stroke="${INK}" stroke-width=".9" opacity=".6"/>`;
+  } else if(p.species==='bunny'){
+    s=`<ellipse cx="23" cy="15" rx="5.5" ry="13" fill="${f}" stroke="${d}" stroke-width="1"/><ellipse cx="37" cy="15" rx="5.5" ry="13" fill="${f}" stroke="${d}" stroke-width="1"/>
+      <ellipse cx="23" cy="16" rx="2.4" ry="9" fill="#FFB8CB"/><ellipse cx="37" cy="16" rx="2.4" ry="9" fill="#FFB8CB"/>
+      <circle cx="30" cy="37" r="14" fill="${f}" stroke="${d}" stroke-width="1"/>${eyes}
+      <path d="M28.5 39h3l-1.5 1.6z" fill="#E9668E"/>`;
+  } else {
+    s=`<circle cx="15" cy="27" r="4.5" fill="${d}"/><circle cx="45" cy="27" r="4.5" fill="${d}"/>
+      <ellipse cx="30" cy="37" rx="18" ry="14.5" fill="${f}"/><ellipse cx="22" cy="32" rx="7.5" ry="9" fill="${d}" opacity=".85"/>${eyes}
+      <path d="M28.5 39.5h3l-1.5 1.6z" fill="#E9668E"/>`;
+  }
+  return `<defs><clipPath id="c-${uid}"><circle cx="30" cy="30" r="29"/></clipPath></defs>
+    <g clip-path="url(#c-${uid})"><rect width="60" height="60" fill="${p.bg}"/>${s}</g>`;
+}
+function avatarSVG(p, uid, cls=''){ return `<svg viewBox="0 0 60 60" class="${cls}" aria-hidden="true">${face(p,uid)}</svg>`; }
+
+const SW = `stroke="${INK}" stroke-width="2" stroke-linejoin="round"`;
+function houseShape(type, x, y){
+  if(type==='dog') return {peak:y-80, svg:`
+    <rect x="${x-35}" y="${y-45}" width="70" height="45" rx="3" fill="#FCE3B8" ${SW}/>
+    <path d="M${x-35} ${y-22}h70" stroke="#E2BE85" stroke-width="2"/>
+    <path d="M${x-45} ${y-41} L${x} ${y-80} L${x+45} ${y-41} Z" fill="#F4877F" ${SW}/>
+    <path d="M${x-13} ${y} V${y-19} A13 13 0 0 1 ${x+13} ${y-19} V${y} Z" fill="${INK}"/>`};
+  if(type==='cat') return {peak:y-106, svg:`
+    <rect x="${x-28}" y="${y-72}" width="56" height="72" rx="3" fill="#E9E0FF" ${SW}/>
+    <path d="M${x-37} ${y-68} L${x-25} ${y-106} L${x-12} ${y-88} L${x+12} ${y-88} L${x+25} ${y-106} L${x+37} ${y-68} Z" fill="#8FB8F0" ${SW}/>
+    <circle cx="${x}" cy="${y-48}" r="9" fill="#FFF7D6" ${SW}/><path d="M${x-9} ${y-48}h18M${x} ${y-57}v18" stroke="${INK}" stroke-width="1.5"/>
+    <path d="M${x-11} ${y} V${y-12} A11 11 0 0 1 ${x+11} ${y-12} V${y} Z" fill="${INK}"/>`};
+  let mesh=''; for(let i=1;i<5;i++) mesh+=`M${x-36+i*8} ${y-46}v28`;
+  return {peak:y-72, svg:`
+    <rect x="${x-37}" y="${y-14}" width="6" height="14" fill="#C9A06A" ${SW}/><rect x="${x+31}" y="${y-14}" width="6" height="14" fill="#C9A06A" ${SW}/>
+    <rect x="${x-42}" y="${y-52}" width="84" height="40" rx="3" fill="#FFF3D6" ${SW}/>
+    <rect x="${x-36}" y="${y-46}" width="42" height="28" fill="#FFFFFF" stroke="${INK}" stroke-width="1.5"/>
+    <path d="${mesh}M${x-36} ${y-32}h42" stroke="${INK}" stroke-width="1" opacity=".55"/>
+    <rect x="${x+12}" y="${y-46}" width="24" height="28" rx="2" fill="#F2D9A8" stroke="${INK}" stroke-width="1.5"/>
+    <path d="M${x-50} ${y-50} L${x-30} ${y-72} L${x+30} ${y-72} L${x+50} ${y-50} Z" fill="#FFD873" ${SW}/>`};
+}
+
+function houseSVG(p){
+  const {x,y}=p; const h=houseShape(p.house,x,y); const cy=h.peak-34;
+  return `<g class="house ${p.status==='urgent'?'urgent-pin':''}" data-id="${p.id}" tabindex="0" role="button" aria-label="${p.name}, ${SPECIES_LABEL[p.species]}, ${STATUS_LABEL[p.status]}. Open profile">
+    <ellipse cx="${x}" cy="${y+2}" rx="48" ry="7" fill="${INK}" opacity=".14"/>
+    ${h.svg}
+    <rect class="plate" x="${x-34}" y="${y+7}" width="68" height="18" rx="9" fill="#FFFDF8" stroke="${INK}" stroke-width="2"/>
+    <text x="${x}" y="${y+20}" text-anchor="middle" font-family="Silkscreen, monospace" font-size="11" fill="${INK}">${p.name.toUpperCase()}</text>
+    <g class="pin">
+      <path d="M${x-10} ${cy+18} L${x} ${cy+33} L${x+10} ${cy+18} Z" fill="${RING[p.status]}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="${x}" cy="${cy}" r="25" fill="${RING[p.status]}" stroke="${INK}" stroke-width="2"/>
+      <svg x="${x-20}" y="${cy-20}" width="40" height="40" viewBox="0 0 60 60">${face(p,'m-'+p.id)}</svg>
+      <circle cx="${x}" cy="${cy}" r="20" fill="none" stroke="${INK}" stroke-width="1.5"/>
+    </g>
+  </g>`;
+}
+
+function sparkle(x,y,s,c){ return `<path d="M${x} ${y-s}L${x+s*.28} ${y-s*.28}L${x+s} ${y}L${x+s*.28} ${y+s*.28}L${x} ${y+s}L${x-s*.28} ${y+s*.28}L${x-s} ${y}L${x-s*.28} ${y-s*.28}Z" fill="${c}"/>`; }
+function cloud(x,y,k){ return `<g fill="#FFFFFF" opacity=".95"><ellipse cx="${x}" cy="${y}" rx="${40*k}" ry="${16*k}"/><circle cx="${x-14*k}" cy="${y-10*k}" r="${16*k}"/><circle cx="${x+12*k}" cy="${y-14*k}" r="${20*k}"/></g>`; }
+function tree(x,y,k=1){ return `<rect x="${x-4*k}" y="${y-22*k}" width="${8*k}" height="${22*k}" fill="#B98B5E" ${SW}/><circle cx="${x}" cy="${y-38*k}" r="${22*k}" fill="#7FC79A" ${SW}/><circle cx="${x-7*k}" cy="${y-44*k}" r="${5*k}" fill="#A8E0BA"/>`; }
+function flowers(x,y,c){ return `<g>${[0,14,28].map((d,i)=>`<circle cx="${x+d}" cy="${y+(i%2)*6}" r="4" fill="${c}" stroke="${INK}" stroke-width="1.2"/><circle cx="${x+d}" cy="${y+(i%2)*6}" r="1.4" fill="#FFD873"/>`).join('')}</g>`; }
+
+function drawScene(){
+  const s = `
+  <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE3FF"/><stop offset=".55" stop-color="#E9E3FF"/><stop offset="1" stop-color="#FFE3EE"/></linearGradient></defs>
+  <rect width="1000" height="560" fill="url(#sky)"/>
+  <circle cx="905" cy="78" r="36" fill="#FFD873" stroke="${INK}" stroke-width="2"/>
+  <path d="M891 76q4-5 8 0M911 76q4-5 8 0M897 88q8 6 16 0" stroke="${INK}" stroke-width="2" fill="none" stroke-linecap="round"/>
+  ${cloud(130,70,1)}${cloud(470,52,.8)}${cloud(700,95,1.1)}${cloud(300,120,.6)}
+  ${sparkle(230,40,9,'#FFFFFF')}${sparkle(610,30,7,'#FFD873')}${sparkle(820,150,8,'#FFFFFF')}${sparkle(60,150,6,'#FF9EBB')}
+  <path d="M0 215 Q180 150 380 205 T760 180 T1000 195 V560 H0Z" fill="#CDEBC8" ${SW}/>
+  <path d="M0 290 Q260 235 520 285 T1000 275 V560 H0Z" fill="#A8D8B9" ${SW}/>
+  <path d="M-20 540 C180 500 250 400 470 395 S780 380 1020 330" stroke="#F5E3C0" stroke-width="34" fill="none" stroke-linecap="round"/>
+  <path d="M-20 540 C180 500 250 400 470 395 S780 380 1020 330" stroke="#E6CC9C" stroke-width="2" stroke-dasharray="4 14" fill="none"/>
+  <ellipse cx="930" cy="520" rx="70" ry="26" fill="#9FD3F0" ${SW}/><path d="M905 515q10-6 20 0M935 525q10-6 20 0" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+  ${tree(40,300,.9)}${tree(370,230,.7)}${tree(640,215,.7)}${tree(960,300,.9)}${tree(345,515,.8)}${tree(650,540,.7)}
+  ${flowers(60,420,'#FF9EBB')}${flowers(600,380,'#FFFFFF')}${flowers(900,410,'#B8A6E0')}${flowers(400,450,'#FFD873')}
+  <g><rect x="20" y="462" width="6" height="40" fill="#B98B5E" ${SW}/><rect x="-4" y="444" width="118" height="26" rx="6" fill="#FFFDF8" ${SW}/>
+  <text x="55" y="462" text-anchor="middle" font-family="Silkscreen, monospace" font-size="11" fill="${INK}">PAWSHARE LN</text></g>
+  ${[...PETS].sort((a,b)=>a.y-b.y).map(houseSVG).join('')}`;
+  document.getElementById('scene').innerHTML = s;
+}
+
+function keyRow(type, label, sub, count){
+  const h = houseShape(type, 22, 36);
+  return `<svg viewBox="-24 ${36+ (h.peak-36) - 4} 92 ${36-h.peak+10}" aria-hidden="true">${h.svg}</svg><div><b>${label}</b><small>${sub}</small></div><span class="count">${count}</span>`;
+}
+
+let state = {species:'all', urgent:false, view:'map'};
+let favs = new Set();
+try{ favs = new Set(JSON.parse(localStorage.getItem('pawshare-favs')||'["mochi","clover"]')); }catch(e){ favs = new Set(['mochi','clover']); }
+function saveFavs(){ try{ localStorage.setItem('pawshare-favs', JSON.stringify([...favs])); }catch(e){} }
+
+function matches(p){
+  const sp = state.species==='all' || (state.species==='small' ? (p.species==='bunny'||p.species==='guinea') : p.species===state.species);
+  return sp && (!state.urgent || p.status==='urgent');
+}
+
+function update(){
+  const shown = PETS.filter(matches);
+  document.getElementById('shown').textContent = shown.length;
+  document.querySelectorAll('.house').forEach(g=>{
+    const on = matches(PETS.find(p=>p.id===g.dataset.id));
+    g.classList.toggle('off', !on); g.setAttribute('tabindex', on?'0':'-1');
+  });
+  document.querySelectorAll('.count[data-s]').forEach(c=> c.textContent = shown.filter(p=>p.status===c.dataset.s).length);
+  const n = t => shown.filter(p=>p.house===t).length;
+  document.getElementById('kDog').innerHTML = keyRow('dog','Doghouse','Dogs', n('dog'));
+  document.getElementById('kCat').innerHTML = keyRow('cat','Cat tower','Cats', n('cat'));
+  document.getElementById('kHutch').innerHTML = keyRow('hutch','Hutch','Rabbits, guinea pigs', n('hutch'));
+  const err = document.getElementById('err');
+  if(!shown.length){
+    const what = {all:'PETS',dog:'DOGS',cat:'CATS',small:'SMALL PETS'}[state.species];
+    document.getElementById('errMsg').textContent = `NO ${what} NEED AN URGENT FOSTER RIGHT NOW.`;
+    err.hidden = false;
+  } else err.hidden = true;
+  renderList(shown); renderFavs();
+}
+
+function pill(p){ return `<span class="pill" style="background:${RING[p.status]}">${STATUS_LABEL[p.status].toUpperCase()}</span>`; }
+function renderList(shown){
+  const el = document.getElementById('listView');
+  el.innerHTML = shown.length ? shown.map(p=>`
+    <article class="win card">
+      <div class="bar ${p.house==='dog'?'pink':p.house==='cat'?'':'sun'}"><span>${p.name.toUpperCase()}.${p.species==='guinea'?'PIG':p.species.toUpperCase()}</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+      <div class="inner">${avatarSVG(p,'l-'+p.id)}<div><h4>${p.name}</h4><p>${p.age} · ${p.breed}</p><p>${p.area}</p></div></div>
+      <div class="foot">${pill(p)}<button class="btn" data-open="${p.id}">Open</button></div>
+    </article>`).join('')
+    : `<div class="win" style="grid-column:1/-1;max-width:360px;justify-self:center"><div class="bar pink"><span>ERROR</span></div><div class="body" style="padding:16px;font-family:var(--pixel);font-size:13px">NO PETS MATCH THESE FILTERS.</div></div>`;
+}
+
+function renderFavs(){
+  const el = document.getElementById('favs');
+  const list = PETS.filter(p=>favs.has(p.id));
+  el.innerHTML = list.length ? `<span>${list.length} saved</span><ul>${list.map(p=>`<li><button data-open="${p.id}">${p.name}</button></li>`).join('')}</ul>` : `<p>Folder is empty. Tap the heart on a profile to save a pet here.</p>`;
+  document.getElementById('taskFav').textContent = `Favorites (${list.length})`;
+}
+
+let lastFocus=null;
+function openPet(id){
+  const p = PETS.find(q=>q.id===id); if(!p) return;
+  lastFocus = document.activeElement;
+  document.getElementById('pFile').textContent = `${p.name.toUpperCase()}.PROFILE`;
+  const fav = favs.has(p.id);
+  const canApply = p.status!=='pending';
+  document.getElementById('pBody').innerHTML = `
+    <div class="phead">${avatarSVG(p,'p-'+p.id)}
+      <div><h2 id="pName">${p.name}</h2><p class="sub">${SPECIES_LABEL[p.species]} · ${p.shelter}, ${p.area}</p>${pill(p)}</div>
+    </div>
+    <dl class="stats">
+      <div><dt>AGE</dt><dd>${p.age}</dd></div><div><dt>SEX</dt><dd>${p.sex}</dd></div><div><dt>SIZE</dt><dd>${p.size}</dd></div>
+      <div style="grid-column:span 2"><dt>BREED</dt><dd>${p.breed}</dd></div><div><dt>VACCINES</dt><dd>${p.vax}</dd></div>
+    </dl>
+    <div class="tags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+    <p class="blurb">${p.blurb}</p>
+    <div class="actions">
+      <button class="btn primary" id="apply">${p.status==='urgent'?'Offer to foster':canApply?'Start adoption application':'Join the waitlist'}</button>
+      <button class="btn" id="favBtn" aria-pressed="${fav}">${fav?'♥ Saved to favorites':'♡ Add to favorites'}</button>
+    </div>
+    <p class="note" id="applyNote" hidden></p>`;
+  document.getElementById('apply').onclick = ()=>{
+    const n = document.getElementById('applyNote');
+    n.textContent = p.status==='urgent' ? `Foster request drafted for ${p.name}. Next step: ${p.shelter} confirms a home visit.` :
+      canApply ? `Application started for ${p.name}. Next step: a short form about your home and routine.` :
+      `You're on the waitlist for ${p.name}. We'll tell you if the current application falls through.`;
+    n.hidden = false;
+  };
+  document.getElementById('favBtn').onclick = e=>{
+    if(favs.has(p.id)) favs.delete(p.id); else favs.add(p.id);
+    saveFavs(); const on=favs.has(p.id);
+    e.currentTarget.setAttribute('aria-pressed',on); e.currentTarget.textContent = on?'♥ Saved to favorites':'♡ Add to favorites';
+    renderFavs();
+  };
+  document.getElementById('scrim').hidden = false;
+  document.getElementById('pClose').focus();
+}
+function closePet(){ document.getElementById('scrim').hidden = true; if(lastFocus) lastFocus.focus(); }
+
+drawScene(); update();
+
+document.getElementById('scene').addEventListener('click', e=>{ const g=e.target.closest('.house'); if(g) openPet(g.dataset.id); });
+document.getElementById('scene').addEventListener('keydown', e=>{ const g=e.target.closest('.house'); if(g && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); openPet(g.dataset.id);} });
+document.addEventListener('click', e=>{ const b=e.target.closest('[data-open]'); if(b) openPet(b.dataset.open); });
+document.getElementById('pClose').onclick = closePet;
+document.getElementById('scrim').addEventListener('click', e=>{ if(e.target.id==='scrim') closePet(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !document.getElementById('scrim').hidden) closePet(); });
+
+document.querySelectorAll('.chip').forEach(c=> c.onclick = ()=>{
+  state.species = c.dataset.f;
+  document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed', x===c)); update();
+});
+document.getElementById('urgentOnly').onchange = e=>{ state.urgent = e.target.checked; update(); };
+document.getElementById('errOk').onclick = ()=>{ state.urgent=false; document.getElementById('urgentOnly').checked=false; update(); };
+
+function setView(v){
+  state.view=v;
+  document.getElementById('mapView').hidden = v!=='map';
+  document.getElementById('listView').hidden = v!=='list';
+  document.getElementById('vMap').setAttribute('aria-pressed', v==='map');
+  document.getElementById('vList').setAttribute('aria-pressed', v==='list');
+}
+document.getElementById('vMap').onclick = ()=>setView('map');
+document.getElementById('vList').onclick = ()=>setView('list');
+
+function tick(){ const d=new Date(); document.getElementById('clock').textContent = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+tick(); setInterval(tick, 30000);
+</script>
