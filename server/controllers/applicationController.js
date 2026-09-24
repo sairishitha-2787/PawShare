@@ -1,5 +1,6 @@
 const Application = require("../models/Application");
 const Animal = require("../models/Animal");
+const CheckIn = require("../models/CheckIn");
 
 // Animals can receive applications while available or while others are pending.
 const OPEN_STATUSES = ["available", "pending"];
@@ -159,6 +160,8 @@ const decideApplication = async (req, res) => {
     await releaseAnimalIfIdle(animal._id);
     throw httpError(409, "Application was already decided");
   }
+
+  await CheckIn.scheduleFor(updated);
 
   // Everyone else waiting on this animal is turned down.
   await Application.updateMany(

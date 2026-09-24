@@ -5,6 +5,7 @@ const authRoutes = require("./routes/authRoutes");
 const animalRoutes = require("./routes/animalRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const threadRoutes = require("./routes/threadRoutes");
+const checkInRoutes = require("./routes/checkInRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -20,6 +21,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/animals", animalRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/threads", threadRoutes);
+app.use("/api/checkins", checkInRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
