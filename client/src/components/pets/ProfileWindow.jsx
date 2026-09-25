@@ -1,4 +1,5 @@
-import { useId, useState } from 'react'
+import { useId } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Modal from '../ui/Modal.jsx'
 import Window from '../ui/Window.jsx'
 import Pill from '../ui/Pill.jsx'
@@ -8,29 +9,19 @@ import { useFavorites } from '../../context/FavoritesContext.jsx'
 import { SPECIES_LABEL } from '../../utils/pets.js'
 import './ProfileWindow.css'
 
-const ACTION = {
-  urgent: {
-    label: 'Offer to foster',
-    note: (p) => `Foster request drafted for ${p.name}. Next step: ${p.shelter} confirms a home visit.`,
-  },
-  available: {
-    label: 'Start adoption application',
-    note: (p) => `Application started for ${p.name}. Next step: a short form about your home and routine.`,
-  },
-  pending: {
-    label: 'Join the waitlist',
-    note: (p) => `You're on the waitlist for ${p.name}. We'll tell you if the current application falls through.`,
-  },
+// primary button label per status; every one goes to the application page
+const ACTION_LABEL = {
+  urgent: 'Offer to foster',
+  available: 'Start adoption application',
+  pending: 'Join the waitlist',
 }
 
 // <NAME>.PROFILE dialog. Port of openPet() in the reference.
-// Render with key={pet.id} so the note resets when a different pet opens.
 // fallbackFocus: see Modal (used when the button that opened it is gone by close time).
 export default function ProfileWindow({ pet, onClose, fallbackFocus }) {
   const titleId = useId()
   const { isFav, toggleFav } = useFavorites()
-  const [noteShown, setNoteShown] = useState(false)
-  const action = ACTION[pet.status]
+  const navigate = useNavigate()
   const fav = isFav(pet.id)
 
   return (
@@ -60,13 +51,11 @@ export default function ProfileWindow({ pet, onClose, fallbackFocus }) {
           <p className="blurb">{pet.blurb}</p>
 
           <div className="actions">
-            {/* session 8 replaces the note with the real application flow */}
-            <Button variant="primary" onClick={() => setNoteShown(true)}>{action.label}</Button>
+            <Button variant="primary" onClick={() => navigate(`/apply/${pet.id}`)}>{ACTION_LABEL[pet.status]}</Button>
             <Button aria-pressed={fav} onClick={() => toggleFav(pet.id)}>
               {fav ? '♥ Saved to favorites' : '♡ Add to favorites'}
             </Button>
           </div>
-          <p className="note" role="status" hidden={!noteShown}>{noteShown && action.note(pet)}</p>
         </div>
       </Window>
     </Modal>

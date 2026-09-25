@@ -5,6 +5,7 @@ import './styles/tokens.css'
 import './styles/global.css'
 import AdoptPage from './pages/AdoptPage.jsx'
 import DevKit from './pages/DevKit.jsx'
+import ApplyPage from './pages/ApplyPage.jsx'
 import { FavoritesProvider } from './context/FavoritesContext.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="adopt" element={null} />
             <Route path="adopt/:petId" element={null} />
           </Route>
+          <Route path="/apply/:petId" element={<ApplyPage />} />
           <Route path="/dev/kit" element={<DevKit />} />
         </Routes>
       </BrowserRouter>
