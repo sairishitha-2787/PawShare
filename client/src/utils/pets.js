@@ -17,3 +17,9 @@ export function peakY(type, y) {
   if (type === 'cat') return y - 106
   return y - 72
 }
+
+// Species filter: 'all' | 'dog' | 'cat' | 'small' (bunny + guinea). urgent keeps only urgent-foster pets.
+export function matchesFilter(pet, { species, urgent }) {
+  const sp = species === 'all' || (species === 'small' ? pet.species === 'bunny' || pet.species === 'guinea' : pet.species === species)
+  return sp && (!urgent || pet.status === 'urgent')
+}

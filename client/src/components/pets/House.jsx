@@ -47,12 +47,12 @@ function Hutch({ x, y }) {
 
 const SHAPES = { dog: DogHouse, cat: CatTower, hutch: Hutch }
 
-// Ground shadow + house, standing on ground line y and centred on x.
-export default function House({ type, x, y }) {
+// Ground shadow + house, standing on ground line y and centred on x. The legend draws them without the shadow.
+export default function House({ type, x, y, shadow = true }) {
   const Shape = SHAPES[type] ?? Hutch
   return (
     <g>
-      <ellipse cx={x} cy={y + 2} rx="48" ry="7" fill={INK} opacity=".14" />
+      {shadow && <ellipse cx={x} cy={y + 2} rx="48" ry="7" fill={INK} opacity=".14" />}
       <Shape x={x} y={y} />
     </g>
   )

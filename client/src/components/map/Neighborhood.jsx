@@ -6,7 +6,8 @@ import { LOTS } from './lots.js'
 import './Neighborhood.css'
 
 // The map: backdrop plus one house per pet. More pets than lots → page through "streets" of LOTS.length.
-export default function Neighborhood({ pets, isDimmed, onOpen }) {
+// children render inside the map box, above the scene (the empty-results ERROR window).
+export default function Neighborhood({ pets, isDimmed, onOpen, children }) {
   const [street, setStreet] = useState(0)
   const streets = Math.max(1, Math.ceil(pets.length / LOTS.length))
   const current = Math.min(street, streets - 1)
@@ -25,6 +26,7 @@ export default function Neighborhood({ pets, isDimmed, onOpen }) {
             <HouseMarker key={pet.id} pet={pet} x={x} y={y} onOpen={onOpen} dimmed={isDimmed?.(pet) ?? false} />
           ))}
         </svg>
+        {children}
       </div>
       {streets > 1 && (
         <div className="streets">
