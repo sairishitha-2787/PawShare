@@ -1,0 +1,2 @@
+/* room for the centered LOADING... window while a saved login is checked */
+.auth-check { position: relative; min-height: 60vh; }

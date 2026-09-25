@@ -1,0 +1,22 @@
+/* LOGIN.EXE / NEW_USER.EXE: one window, centered on the grid */
+.auth-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr; }
+.auth { max-width: 420px; width: 100%; justify-self: center; align-self: center; }
+.auth form { padding: 18px; display: grid; gap: 14px; }
+.auth .intro { margin: 0; font-size: 15px; color: var(--ink-soft); }
+.auth .btn.primary { justify-self: start; font-size: 13px; padding: 7px 16px; }
+.auth .btn:disabled { cursor: progress; opacity: .75; }
+.auth .btn:disabled:active { transform: none; box-shadow: 2px 2px 0 var(--ink); }
+.auth .switch { margin: 0; font-size: 14px; }
+.auth .switch a { color: var(--ink); font-weight: 600; text-decoration-color: var(--hot); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+.auth .roles { display: grid; gap: 6px; }
+.auth .roles .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.auth .note {
+  margin: 0; font-size: 14px; line-height: 1.45; padding: 8px 10px;
+  background: var(--sun); border: 2px solid var(--ink); border-radius: 8px;
+}
+
+.form-err { box-shadow: 3px 3px 0 var(--ink); }
+.form-err .body { padding: 10px 12px; }
+.form-err p { margin: 0; font-family: var(--pixel); font-size: 12px; line-height: 1.6; text-transform: uppercase; }
+.form-err ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; }
