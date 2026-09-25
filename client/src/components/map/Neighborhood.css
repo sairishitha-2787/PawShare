@@ -1,0 +1,5 @@
+.mapwrap { position: relative; border: 2px solid var(--ink); border-radius: 10px; overflow-x: auto; overflow-y: hidden; background: #BFE3FF; }
+.mapwrap > svg { display: block; width: 100%; min-width: 720px; height: auto; }
+.hint { margin: 8px 2px 0; font-size: 13px; color: var(--ink-soft); }
+.streets { display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.streets .btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 2px 2px 0 var(--ink); }
