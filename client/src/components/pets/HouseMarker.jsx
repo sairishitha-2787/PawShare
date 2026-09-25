@@ -1,6 +1,6 @@
-import House, { peakY } from './House.jsx'
+import House from './House.jsx'
 import Pin from './Pin.jsx'
-import { INK, SPECIES_LABEL, STATUS_LABEL, houseTypeFor } from '../../utils/pets.js'
+import { INK, SPECIES_LABEL, STATUS_LABEL, houseTypeFor, peakY } from '../../utils/pets.js'
 import './HouseMarker.css'
 
 // House + name plate + pin for one pet, standing on ground line y. Port of houseSVG() in the reference.

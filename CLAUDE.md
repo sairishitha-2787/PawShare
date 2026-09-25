@@ -43,6 +43,7 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 - One joke only: the empty-results state is an `ERROR` window with an `OK` button. No other gags.
 - No emoji in UI. The only glyphs allowed are ♥ / ♡ on the favorite button.
 - Visible focus ring: `outline:3px solid var(--hot)`. Respect `prefers-reduced-motion` (turn off pin bob/hover lift).
+- Exception: houses show focus as a hot-pink name-plate outline (as in the reference), not the global outline.
 - Must work at 400px wide: the map scrolls sideways inside its own container; the page never scrolls sideways.
 
 ## Folder layout
