@@ -1,0 +1,13 @@
+.house { cursor: pointer; transition: opacity .25s; }
+.house .pin { transition: transform .2s ease; }
+.house:hover .pin, .house:focus-visible .pin { transform: translateY(-7px); }
+.house:focus { outline: none; }
+.house:focus-visible .plate { stroke: #E9668E; stroke-width: 3; }
+.house.off { opacity: .2; pointer-events: none; }
+
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.house.urgent-pin .pin { animation: bob 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .house .pin, .house.urgent-pin .pin { animation: none; transition: none; }
+}
