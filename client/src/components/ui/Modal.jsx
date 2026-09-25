@@ -5,12 +5,16 @@ import './Modal.css'
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 // Children are usually a <Window onClose>; its X button is marked data-autofocus and gets focus on open.
-export default function Modal({ open, onClose, labelledBy, children }) {
+// On close, focus goes back to whatever had it on open; if that element is gone by then,
+// fallbackFocus() can return another element to focus instead.
+export default function Modal({ open, onClose, labelledBy, fallbackFocus, children }) {
   const dialogRef = useRef(null)
   const onCloseRef = useRef(onClose)
+  const fallbackRef = useRef(fallbackFocus)
 
   useEffect(() => {
     onCloseRef.current = onClose
+    fallbackRef.current = fallbackFocus
   })
 
   useEffect(() => {
@@ -40,7 +44,8 @@ export default function Modal({ open, onClose, labelledBy, children }) {
     document.addEventListener('keydown', onKeyDown)
     return () => {
       document.removeEventListener('keydown', onKeyDown)
-      if (trigger && trigger.isConnected) trigger.focus()
+      const target = trigger && trigger.isConnected && trigger !== document.body ? trigger : fallbackRef.current?.()
+      target?.focus()
     }
   }, [open])
 
