@@ -11,6 +11,8 @@ import Taskbar from '../components/ui/Taskbar.jsx'
 import PetFace from '../components/pets/PetFace.jsx'
 import ApplicationDetail from '../components/apply/ApplicationDetail.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useUnread } from '../context/UnreadContext.jsx'
+import { messagesTaskLabel } from '../utils/messages.js'
 import { useMyApplications } from '../hooks/useMyApplications.js'
 import { applicationPet, canApplyAgain, isActive } from '../api/applications.js'
 import { APP_STATUSES, APP_STATUS_COLOR, APP_STATUS_LABEL, TYPE_LABEL, applicationsTaskLabel } from '../utils/applications.js'
@@ -60,6 +62,7 @@ function Missing({ onClose }) {
 
 function MyApplications() {
   const { user, logout } = useAuth()
+  const { count: unread } = useUnread()
   const navigate = useNavigate()
   const { status, applications, retry, refresh, patch } = useMyApplications()
   const [filter, setFilter] = useState('all')
@@ -122,6 +125,7 @@ function MyApplications() {
         items={[
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
           { id: 'apps', label: applicationsTaskLabel(status === 'ready' ? counts.pending : null) },
+          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
           { id: 'logout', label: 'Log out', onClick: logout },
         ]}

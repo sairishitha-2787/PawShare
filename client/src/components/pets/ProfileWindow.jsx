@@ -5,6 +5,8 @@ import Window from '../ui/Window.jsx'
 import Pill from '../ui/Pill.jsx'
 import Button from '../ui/Button.jsx'
 import PetFace from './PetFace.jsx'
+import MessageButton from '../messages/MessageButton.jsx'
+import { useAuth } from '../../context/AuthContext.jsx'
 import { useFavorites } from '../../context/FavoritesContext.jsx'
 import { SPECIES_LABEL } from '../../utils/pets.js'
 import { formatDay } from '../../utils/dates.js'
@@ -23,7 +25,10 @@ export default function ProfileWindow({ pet, onClose, fallbackFocus }) {
   const titleId = useId()
   const { isFav, toggleFav } = useFavorites()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const fav = isFav(pet.id)
+  // adopters (and visitors, who log in first) can write to the shelter; shelters and admins can't
+  const canMessage = !user || user.role === 'adopter'
 
   return (
     <Modal open onClose={onClose} labelledBy={titleId} fallbackFocus={fallbackFocus}>
@@ -78,6 +83,7 @@ export default function ProfileWindow({ pet, onClose, fallbackFocus }) {
             <Button aria-pressed={fav} onClick={() => toggleFav(pet.id)}>
               {fav ? '♥ Saved to favorites' : '♡ Add to favorites'}
             </Button>
+            {canMessage && <MessageButton to={{ animalId: pet.id }}>Message the shelter</MessageButton>}
           </div>
         </div>
       </Window>

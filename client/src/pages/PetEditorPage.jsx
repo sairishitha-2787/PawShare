@@ -6,6 +6,8 @@ import LoadingWindow from '../components/ui/LoadingWindow.jsx'
 import Taskbar from '../components/ui/Taskbar.jsx'
 import PetForm from '../components/shelter/PetForm.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useUnread } from '../context/UnreadContext.jsx'
+import { messagesTaskLabel } from '../utils/messages.js'
 import { createAnimal, getAnimalRecord, updateAnimal } from '../api/animals.js'
 import { editTitle, emptyForm, formFromAnimal } from '../utils/listing.js'
 import { firstName } from '../utils/auth.js'
@@ -28,6 +30,7 @@ function useAnimalRecord(id) {
 
 function Shell({ title, children }) {
   const { user, logout } = useAuth()
+  const { count: unread } = useUnread()
   const navigate = useNavigate()
   return (
     <div className="desk editor-desk">
@@ -41,6 +44,7 @@ function Shell({ title, children }) {
         items={[
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt'), hideOnSmall: true },
           { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
+          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
           { id: 'logout', label: 'Log out', onClick: logout },
         ]}

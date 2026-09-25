@@ -10,17 +10,19 @@ import ApplicationsPage from './pages/ApplicationsPage.jsx'
 import ShelterInboxPage from './pages/ShelterInboxPage.jsx'
 import MyPetsPage from './pages/MyPetsPage.jsx'
 import PetEditorPage from './pages/PetEditorPage.jsx'
-import PlaceholderPage from './pages/PlaceholderPage.jsx'
+import MessagesPage from './pages/MessagesPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import SignupPage from './pages/SignupPage.jsx'
 import RequireAuth from './components/auth/RequireAuth.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { FavoritesProvider } from './context/FavoritesContext.jsx'
+import { UnreadProvider } from './context/UnreadContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
     <FavoritesProvider>
+    <UnreadProvider>
       <BrowserRouter>
         <Routes>
           {/* one layout route so the page (filters, street, view) stays mounted while profiles open and close */}
@@ -45,20 +47,17 @@ createRoot(document.getElementById('root')).render(
           <Route path="/shelter/animals" element={<RequireAuth><MyPetsPage /></RequireAuth>} />
           <Route path="/shelter/animals/new" element={<RequireAuth><PetEditorPage /></RequireAuth>} />
           <Route path="/shelter/animals/:id/edit" element={<RequireAuth><PetEditorPage /></RequireAuth>} />
-          {/* placeholder: messages arrive in session 14 */}
-          <Route
-            path="/messages"
-            element={
-              <RequireAuth>
-                <PlaceholderPage title="MESSAGES.EXE" text="Your conversations with shelters will be here soon." />
-              </RequireAuth>
-            }
-          />
+          {/* the list stays mounted while conversations open and close */}
+          <Route path="/messages" element={<RequireAuth><MessagesPage /></RequireAuth>}>
+            <Route index element={null} />
+            <Route path=":threadId" element={null} />
+          </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dev/kit" element={<DevKit />} />
         </Routes>
       </BrowserRouter>
+    </UnreadProvider>
     </FavoritesProvider>
     </AuthProvider>
   </StrictMode>,

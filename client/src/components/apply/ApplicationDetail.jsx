@@ -6,6 +6,7 @@ import Pill from '../ui/Pill.jsx'
 import Button from '../ui/Button.jsx'
 import FormError from '../auth/FormError.jsx'
 import PetFace from '../pets/PetFace.jsx'
+import MessageButton from '../messages/MessageButton.jsx'
 import { Review, TypeAnswers, HomeAnswers } from './Answers.jsx'
 import { applicationPet, withdrawApplication } from '../../api/applications.js'
 import { APP_STATUS_COLOR, APP_STATUS_LABEL, TYPE_LABEL } from '../../utils/applications.js'
@@ -121,7 +122,7 @@ export default function ApplicationDetail({ application, canReapply, onClose, on
           {status === 'approved' && (
             <div className="approved">
               <p>{`Approved! ${shelter} will be in touch.`}</p>
-              <Link className="btn primary" to="/messages">Message the shelter</Link>
+              <MessageButton variant="primary" to={{ animalId: pet.id }}>Message the shelter</MessageButton>
             </div>
           )}
 

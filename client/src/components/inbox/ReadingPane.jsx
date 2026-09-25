@@ -1,10 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import Pill from '../ui/Pill.jsx'
 import Button from '../ui/Button.jsx'
 import Field from '../ui/Field.jsx'
 import FormError from '../auth/FormError.jsx'
 import PetFace from '../pets/PetFace.jsx'
+import MessageButton from '../messages/MessageButton.jsx'
 import { Review, TypeAnswers, HomeAnswers } from '../apply/Answers.jsx'
 import { applicationPet, decideApplication } from '../../api/applications.js'
 import { APP_STATUS_COLOR, APP_STATUS_LABEL, TYPE_LABEL, applicantName } from '../../utils/applications.js'
@@ -151,7 +151,7 @@ function DecisionBox({ application, name, petName, othersPending, onDecided, onF
 }
 
 // The decision once it's made, read-only: status, date and the note.
-function Decision({ application, name }) {
+function Decision({ application }) {
   const { status } = application
   const note = application.shelterNote
 
@@ -166,11 +166,6 @@ function Decision({ application, name }) {
           <span>Note to the applicant</span>
           {note || 'No note'}
         </p>
-      )}
-      {status === 'approved' && (
-        <div className="app-actions">
-          <Link className="btn primary" to="/messages">{`Message ${name}`}</Link>
-        </div>
       )}
     </div>
   )
@@ -206,6 +201,11 @@ export default function ReadingPane({ application, othersPending, onDecided, onF
         <CopyLine label="Email" value={applicant.email} />
         <CopyLine label="Phone" value={applicant.phone} />
       </dl>
+      {applicant._id && (
+        <div className="app-actions reading-msg">
+          <MessageButton to={{ recipientId: applicant._id, animalId: animal?._id }}>{`Message ${name}`}</MessageButton>
+        </div>
+      )}
 
       <div className="reading-pet">
         <PetFace pet={pet} size={48} />
@@ -238,7 +238,7 @@ export default function ReadingPane({ application, othersPending, onDecided, onF
         />
       ) : (
         <div className="decision-wrap" ref={endRef} tabIndex={-1}>
-          <Decision application={application} name={name} />
+          <Decision application={application} />
         </div>
       )}
     </article>
