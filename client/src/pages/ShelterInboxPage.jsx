@@ -10,6 +10,8 @@ import Taskbar from '../components/ui/Taskbar.jsx'
 import PetFace from '../components/pets/PetFace.jsx'
 import ReadingPane from '../components/inbox/ReadingPane.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useUnread } from '../context/UnreadContext.jsx'
+import { messagesTaskLabel } from '../utils/messages.js'
 import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
 import { applicationPet } from '../api/applications.js'
 import { getMyAnimals } from '../api/animals.js'
@@ -75,6 +77,7 @@ function emptyText(filter, petName) {
 
 function Inbox() {
   const { user, logout } = useAuth()
+  const { count: unread } = useUnread()
   const navigate = useNavigate()
   const { status, applications, retry, refresh, patch } = useReceivedApplications()
   const ownAnimals = useOwnAnimals()
@@ -215,6 +218,7 @@ function Inbox() {
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
           { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
           { id: 'inbox', label: inboxTaskLabel(pendingTotal) },
+          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
           { id: 'logout', label: 'Log out', onClick: logout },
         ]}

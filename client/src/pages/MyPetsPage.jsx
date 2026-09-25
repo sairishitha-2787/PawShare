@@ -9,6 +9,8 @@ import LoadingWindow from '../components/ui/LoadingWindow.jsx'
 import Taskbar from '../components/ui/Taskbar.jsx'
 import PetCard from '../components/pets/PetCard.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useUnread } from '../context/UnreadContext.jsx'
+import { messagesTaskLabel } from '../utils/messages.js'
 import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
 import { deleteAnimal, getMyAnimals, toListing } from '../api/animals.js'
 import { LISTING_STATUSES, LISTING_STATUS_COLOR, LISTING_STATUS_LABEL } from '../utils/listing.js'
@@ -123,6 +125,7 @@ function emptyText(filter) {
 
 function MyPets() {
   const { user, logout, refreshUser } = useAuth()
+  const { count: unread } = useUnread()
   const navigate = useNavigate()
   const location = useLocation()
   const listings = useMyListings()
@@ -219,6 +222,7 @@ function MyPets() {
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
           { id: 'mypets', label: 'My pets' },
           { id: 'inbox', label: inboxTaskLabel(pendingTotal), onClick: () => navigate('/shelter/applications') },
+          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
           { id: 'logout', label: 'Log out', onClick: logout },
         ]}

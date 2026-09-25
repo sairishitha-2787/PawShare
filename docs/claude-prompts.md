@@ -442,6 +442,52 @@ Commit: "feat(shelter): add and edit animal listings".
 
 ---
 
+## Session 14 — Messaging
+
+```text
+Run `git checkout main && git pull`, then create `feature/messaging` from main.
+
+Read CLAUDE.md, the "Messaging — /api/threads" section of README.md, and server/models + controllers for
+Thread and Message (read only, don't change server/). Check: request/response shapes, max message length,
+how a thread is keyed (one per pair per animal), pagination with ?before and hasMore, and what PATCH /:id/read
+does. Messages are NOT pushed in real time, so we poll. Tell me what you found first.
+
+Build /messages and /messages/:threadId (RequireAuth, adopters and shelters), replacing the placeholder:
+1. src/api/threads.js: listThreads, unreadCount, startThread({ animalId } | { recipientId }),
+   getMessages(id, { before, limit }), sendMessage(id, text), markRead(id).
+2. Window "MESSENGER.EXE" (lavender title bar), two panes (below 860px show one at a time: the list, then the
+   chat with a "← Back" button):
+   - Left "CONTACTS": one row per thread, most recent first: other person's name, the pet's name + small
+     face/photo, last message preview (one line, ellipsis), time, and an unread count badge (pink, Silkscreen).
+     Selected row in --lav-soft.
+   - Right chat window: header with the other person's name, "about <Pet>" linking to the pet's profile, and
+     for shelters their verified badge. Messages oldest→newest; mine right-aligned on --lav-soft, theirs
+     left-aligned on --paper, both with the 2px ink border and small radius, time under each, date dividers
+     ("Today", "Yesterday", "24 Sept"). "Load older messages" at the top when hasMore.
+   - Compose bar: textarea (Enter sends, Shift+Enter new line), character counter near the limit, "Send"
+     primary button, "SENDING..." while waiting. Keep the draft and show the error if sending fails.
+3. Polling: while a thread is open, fetch new messages every 5s and mark read; refresh the contact list and
+   unread count every 15s. Pause when the tab is hidden (visibilitychange). Stay scrolled to the bottom on new
+   messages only if the user was already at the bottom; otherwise show a "New messages ↓" pill.
+4. Entry points (all call startThread, then open /messages/:threadId):
+   - Pet profile window: "Message the shelter" secondary button (adopters; logged out → login first).
+   - My applications detail (approved): "Message the shelter".
+   - Shelter inbox reading pane: "Message <applicant>".
+5. Empty states: no threads → "No messages yet. Open a pet's profile to message its shelter."; new thread with
+   no messages → "Say hello to <Name>.". Loading/error: same LOADING window / ErrorDialog + Retry.
+6. Taskbar: "Messages (n)" task button with the unread count for everyone logged in (updates every 15s).
+7. No emoji picker (CLAUDE.md). Works at 400px. Append this prompt to docs/claude-prompts.md as
+   "Session 14 — Messaging".
+
+Done when: an adopter opens Mochi's profile → "Message the shelter" → sends "Is Mochi good with other cats?";
+logging in as Mochi's shelter (see README "Demo accounts", password PawShare@123) in an incognito window shows
+Messages (1), the thread with the unread badge and the message; the shelter's reply appears in the adopter's
+open chat within ~5 seconds without refreshing. Lint and build pass. Commit: "feat(messages): messenger".
+```
+
+---
+
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

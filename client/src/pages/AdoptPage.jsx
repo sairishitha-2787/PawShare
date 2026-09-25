@@ -13,6 +13,8 @@ import FavoritesPanel from '../components/pets/FavoritesPanel.jsx'
 import ProfileWindow from '../components/pets/ProfileWindow.jsx'
 import { useFavorites } from '../context/FavoritesContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useUnread } from '../context/UnreadContext.jsx'
+import { messagesTaskLabel } from '../utils/messages.js'
 import { firstName } from '../utils/auth.js'
 import { applicationsTaskLabel, inboxTaskLabel } from '../utils/applications.js'
 import { useMyApplications } from '../hooks/useMyApplications.js'
@@ -81,6 +83,7 @@ export default function AdoptPage() {
   const [filter, setFilter] = useState({ species: 'all', urgent: false })
   const { favs } = useFavorites()
   const { user, loading: authLoading, logout } = useAuth()
+  const { count: unread } = useUnread()
   // adopters get an Applications task with their pending count, shelters (and admins) an Inbox task
   const isAdopter = user?.role === 'adopter'
   const isShelter = user?.role === 'shelter' || user?.role === 'admin'
@@ -177,7 +180,11 @@ export default function AdoptPage() {
               ]
             : []),
           ...(user
-            ? [{ id: 'me', label: `${firstName(user.name)} · ${user.role}` }, { id: 'logout', label: 'Log out', onClick: logout }]
+            ? [
+                { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
+                { id: 'me', label: `${firstName(user.name)} · ${user.role}` },
+                { id: 'logout', label: 'Log out', onClick: logout },
+              ]
             : authLoading
               ? []
               : [{ id: 'login', label: 'Log in', onClick: () => navigate('/login', { state: { from: location } }) }]),

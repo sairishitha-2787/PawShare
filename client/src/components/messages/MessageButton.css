@@ -1,0 +1,3 @@
+.msg-btn { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.msg-btn .btn:disabled { cursor: progress; opacity: .7; box-shadow: none; }
+.msg-btn-err { font-size: 13px; color: #B8325B; }

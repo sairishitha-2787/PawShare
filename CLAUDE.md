@@ -52,7 +52,7 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 
 ```
 client/src/
-  api/          client.js, animals.js, auth.js, applications.js, uploads.js (Cloudinary photo upload)
+  api/          client.js, animals.js, auth.js, applications.js, uploads.js (Cloudinary photo upload), threads.js
   components/
     ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar, Field, ChoiceField, LoadingWindow
     auth/       RequireAuth, FormError
@@ -61,11 +61,12 @@ client/src/
     apply/      ApplyWizard, Answers (read-only answers, shared), ApplicationDetail
     inbox/      ReadingPane (the shelter's view of one application, with Approve / Reject)
     shelter/    PetForm (add/edit listing) + TagField, HealthLogField, PhotoField, PetPreview
-  context/      AuthContext.jsx, FavoritesContext.jsx
-  hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js
+    messages/   ContactList, ChatPane, MessageButton (starts a thread, then opens /messages/:threadId)
+  context/      AuthContext.jsx, FavoritesContext.jsx, UnreadContext.jsx (unread message count, polled every 15s)
+  hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js, usePolling.js
   data/         mockPets.js
   pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, ShelterInboxPage.jsx, MyPetsPage.jsx, PetEditorPage.jsx,
-                PlaceholderPage.jsx, LoginPage.jsx, SignupPage.jsx, DevKit.jsx
+                MessagesPage.jsx, LoginPage.jsx, SignupPage.jsx, DevKit.jsx
   styles/       tokens.css, global.css
 ```
 
@@ -84,6 +85,9 @@ Hamsters use the guinea cartoon face. The API has no hamster species: they are `
 Listing form state, validation and the API body live in `utils/listing.js`. Photos: `VITE_CLOUDINARY_CLOUD_NAME` +
 `VITE_CLOUDINARY_UPLOAD_PRESET` (unsigned); without them the form takes a pasted image URL.
 Demo photos live in `client/public/demo-pets/<id>.jpg`; raw source photos go in `PHOTOS/`, which is git-ignored.
+
+Messages aren't pushed: the open chat polls every 5s, the contact list and the unread count every 15s, all
+paused while the tab is hidden (`usePolling`).
 
 ## Working rules
 
