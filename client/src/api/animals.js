@@ -53,6 +53,8 @@ export function toPet(a) {
     name: a.name,
     species: SPECIES[a.species] || 'guinea',
     status,
+    // 'adoption' | 'foster' | 'both': which application types the shelter accepts
+    listingType: a.listingType || 'both',
     age: formatAge(a.ageMonths),
     breed: a.breed,
     sex: SEX[a.gender] || 'Unknown',

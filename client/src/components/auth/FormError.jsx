@@ -1,4 +1,5 @@
 import Window from '../ui/Window.jsx'
+import './FormError.css'
 
 // The server's error for a form (e.g. "Invalid credentials"), in a small pink ERROR window. Renders nothing without one.
 export default function FormError({ error }) {

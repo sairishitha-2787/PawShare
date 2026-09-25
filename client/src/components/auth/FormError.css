@@ -1,0 +1,5 @@
+/* the server's message for a form, in a small pink ERROR window */
+.form-err { box-shadow: 3px 3px 0 var(--ink); }
+.form-err .body { padding: 10px 12px; }
+.form-err p { margin: 0; font-family: var(--pixel); font-size: 12px; line-height: 1.6; text-transform: uppercase; }
+.form-err ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; }

@@ -236,6 +236,44 @@ shows the server's message; clicking "Start adoption application" while logged o
 on to /apply/<id> after logging in; Log out works. Lint and build pass. Commit: "feat(auth): login and signup".
 ```
 
+## Session 10 — Application form
+
+```text
+Run `git checkout main && git pull`, then create `feature/apply-form` from main.
+
+Read CLAUDE.md, the "Applications — /api/applications" section of README.md, and
+server/controllers + server/models for Application (read only, don't change server/).
+Check exactly which fields POST /api/applications accepts and which errors it returns (duplicate application,
+animal not available, wrong role), and use those rules. Tell me what you found before building.
+
+Build /apply/:petId (already behind RequireAuth) as a setup wizard in one Window titled "APPLY.EXE — <PET NAME>":
+1. Top of the window: small pet summary (PetFace or photo 64px, name, species · shelter, area, Pill) and a pixel
+   progress bar "STEP 1 OF 3" in Silkscreen.
+2. Step 1 "What kind of home?": two Chips, "Adopt" / "Foster". Default: Foster for urgent pets, Adopt otherwise.
+   If Foster: a "Foster until" date input (must be in the future).
+3. Step 2 "About your home" (the `answers` object): home type (House / Apartment / Other chips), has a yard
+   (yes/no), children at home (yes/no), other pets (short text), hours the pet would be alone per day (number
+   0–24), experience with pets (textarea). Use the exact field names and allowed values the server expects.
+4. Step 3 "Say hello": message to the shelter (textarea, optional, max length from the model if it has one), then
+   a read-only summary of every answer with "Edit" links back to steps 1–2.
+5. Buttons at the bottom right: "Back" and "Next" / "Send application" (primary). Validate each step before Next;
+   show errors under the fields. While sending: "SENDING..." and disabled.
+6. Success: replace the wizard with a mint window "APPLICATION SENT" — "<Shelter> will review your application.
+   You'll see its status under My applications." Buttons: "Back to the neighborhood" and "My applications"
+   (link to /applications; create a placeholder page there for session 11).
+7. Errors: show the server's message in the pink ERROR box. Special cases: a shelter account sees
+   "Shelter accounts can't apply. Log in with an adopter account." instead of the form; if the user already
+   applied for this pet, show that with a link to My applications.
+8. Reuse the form input styles from the login pages (move them into a shared FormField component if they aren't
+   already). Works at 400px.
+9. Append this prompt to docs/claude-prompts.md as "Session 10 — Application form".
+
+Done when: as an adopter, applying for Biscuit goes through all 3 steps and creates the application (check it
+appears via GET /api/applications/mine); applying again shows the "already applied" message; Mochi defaults
+to Foster; a shelter account sees the shelter message. Lint and build pass.
+Commit: "feat(apply): adoption and foster application wizard".
+```
+
 ---
 
 ## Tips

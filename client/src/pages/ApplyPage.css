@@ -1,4 +1,35 @@
-.apply { max-width: 480px; width: 100%; justify-self: center; }
-.apply .body { padding: 18px; display: grid; gap: 14px; justify-items: start; }
-.apply p { margin: 0; font-size: 16px; }
-.apply .btn { text-decoration: none; }
+/* APPLY.EXE: one window, centered on the grid */
+.apply-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr; }
+.apply { max-width: 560px; width: 100%; justify-self: center; align-self: start; }
+.apply-wait { position: relative; min-height: 50vh; }
+
+.apply-top { padding: 16px 18px 14px; display: grid; gap: 14px; border-bottom: 2px dashed var(--grid); }
+.apply-pet { display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center; }
+.apply-pet svg { width: 64px; height: 64px; border: 2px solid var(--ink); border-radius: 50%; }
+.apply-pet h2 { margin: 0; font-family: var(--pixel); font-size: 20px; letter-spacing: .03em; line-height: 1.1; }
+.apply-pet .sub { margin: 2px 0 6px; color: var(--ink-soft); font-size: 14px; }
+
+/* STEP n OF 3: 12 pixel cells in a framed bar, filled in pink */
+.stepbar { display: grid; gap: 6px; }
+.stepbar p { margin: 0; font-family: var(--pixel); font-size: 11px; letter-spacing: .06em; }
+.stepbar .cells {
+  display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; height: 20px; padding: 3px;
+  border: 2px solid var(--ink); border-radius: 6px; background: var(--paper);
+}
+.stepbar .cells i { display: block; }
+.stepbar .cells i.on { background: var(--pink); }
+
+.apply-body { padding: 18px; display: grid; gap: 14px; }
+.apply-body .lead { margin: 0; font-size: 16px; }
+.apply-body .lead:focus { outline: none; }
+.apply-body .note {
+  margin: 0; font-size: 15px; line-height: 1.45; padding: 8px 10px;
+  background: var(--sun); border: 2px solid var(--ink); border-radius: 8px;
+}
+.apply-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.apply-actions .btn { font-size: 13px; padding: 7px 16px; text-decoration: none; }
+
+@media (max-width: 520px) {
+  .apply-top { padding: 14px; }
+  .apply-body { padding: 14px; }
+}

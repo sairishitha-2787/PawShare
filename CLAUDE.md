@@ -52,15 +52,16 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 
 ```
 client/src/
-  api/          client.js, animals.js, auth.js
+  api/          client.js, animals.js, auth.js, applications.js
   components/
-    ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar, Field, LoadingWindow
+    ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar, Field, ChoiceField, LoadingWindow
     auth/       RequireAuth, FormError
     pets/       PetFace, House, Pin, PetCard, ProfileWindow
     map/        Neighborhood, SceneBackdrop, Legend
+    apply/      ApplyWizard
   context/      AuthContext.jsx, FavoritesContext.jsx
   data/         mockPets.js
-  pages/        AdoptPage.jsx, ApplyPage.jsx, LoginPage.jsx, SignupPage.jsx, DevKit.jsx
+  pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, LoginPage.jsx, SignupPage.jsx, DevKit.jsx
   styles/       tokens.css, global.css
 ```
 
@@ -68,6 +69,7 @@ client/src/
 
 ```js
 { id, name, species: 'dog'|'cat'|'bunny'|'guinea', status: 'available'|'urgent'|'pending',
+  listingType: 'adoption'|'foster'|'both',
   age, breed, sex, size, shelter, area, vax, tags: [], blurb,
   colors: { fur, dark, bg }, photoUrl?: string }
 ```

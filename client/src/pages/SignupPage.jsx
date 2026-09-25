@@ -1,9 +1,9 @@
-import { useId, useState } from 'react'
+import { useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import Button from '../components/ui/Button.jsx'
-import Chip from '../components/ui/Chip.jsx'
 import Field from '../components/ui/Field.jsx'
+import ChoiceField from '../components/ui/ChoiceField.jsx'
 import FormError from '../components/auth/FormError.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { EMAIL_RE } from '../utils/auth.js'
@@ -29,7 +29,6 @@ function validate({ name, email, password, phone }) {
 export default function SignupPage() {
   const { user, signup } = useAuth()
   const location = useLocation()
-  const rolesLabel = useId()
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'adopter', city: 'Bengaluru', phone: '' })
   const [errors, setErrors] = useState({})
   const [serverError, setServerError] = useState(null)
@@ -85,16 +84,7 @@ export default function SignupPage() {
             hint="At least 8 characters."
           />
 
-          <div className="roles">
-            <span className="field-label" id={rolesLabel}>I am...</span>
-            <div className="chips" role="group" aria-labelledby={rolesLabel}>
-              {ROLES.map((r) => (
-                <Chip key={r.value} pressed={form.role === r.value} onClick={() => setForm((f) => ({ ...f, role: r.value }))}>
-                  {r.label}
-                </Chip>
-              ))}
-            </div>
-          </div>
+          <ChoiceField label="I am..." options={ROLES} value={form.role} onChange={(role) => setForm((f) => ({ ...f, role }))} />
           {form.role === 'shelter' && (
             <p className="note">Shelters need admin verification before they can list animals.</p>
           )}
