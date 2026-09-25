@@ -314,6 +314,54 @@ Commit: "feat(apply): my applications folder".
 
 ---
 
+## Session 12 — Shelter inbox
+
+```text
+Run `git checkout main && git pull`, then create `feature/shelter-inbox` from main.
+
+Read CLAUDE.md, the "Applications" section of README.md, and server/controllers + models for Application
+(read only). Check what GET /api/applications/received returns (applicant contact details, populated animal),
+the rules for PATCH /:id/status (who may call it, allowed values, what happens to other pending applications
+and to the animal's status when one is approved). Tell me what you found first.
+
+Also: tell me the demo shelter logins from the seed script (email + password). If the seed script doesn't
+set known passwords, add them and list them in README.md under "Demo accounts". That is the only server/
+change allowed in this session.
+
+Build /shelter/applications (behind RequireAuth, shelters and admins only; adopters are sent to /applications),
+replacing the placeholder:
+1. Window "INBOX.EXE" (mint title bar). Toolbar: status Chips (Pending / Approved / Rejected / Withdrawn / All,
+   with counts; Pending selected by default) and a pet dropdown ("All pets" + each of the shelter's animals).
+2. Two panes (stack to one column below 860px, list first):
+   - Left: message-style rows: pet face/photo 40px, applicant name (bold if pending), "wants to adopt Mochi" /
+     "wants to foster Mochi", date, status Pill. Selected row highlighted in --lav-soft.
+   - Right (reading pane): applicant name, email and phone as selectable text with a Copy button each (catch
+     clipboard errors), pet summary, Adopt/Foster + foster-until, the shared read-only answers component,
+     their message, date sent.
+3. Pending applications get a decision box at the bottom of the reading pane: optional "Note to the applicant"
+   textarea, "Approve" (primary) and "Reject" buttons. Confirm inside the pane (no confirm()):
+   - Approve: "Approve <name> for Mochi? The other N pending applications for Mochi will be rejected
+     automatically." (N from the list; leave the sentence out if 0) → "Yes, approve" / "Cancel".
+   - Reject: "Reject <name>'s application?" → "Yes, reject" / "Cancel".
+   After success, refresh the list and keep the pane open on the decided application, showing the decision,
+   the date and the note.
+4. Decided applications show the decision read-only. Approved ones get a "Message <name>" button (link to
+   /messages, still a placeholder until session 14).
+5. Empty: "No pending applications. New ones will show up here." Loading/error: same LOADING window and
+   ErrorDialog + Retry as other pages. Deep link /shelter/applications/:id selects that application.
+6. Taskbar for shelters: "Inbox (n pending)" task button. If the logged-in shelter isn't verified, show a sun
+   note at the top: "Your shelter isn't verified yet. You can review applications, but new listings need
+   admin approval."
+7. Works at 400px. Append this prompt to docs/claude-prompts.md as "Session 12 — Shelter inbox".
+
+Done when: as the demo shelter that owns Mochi, two adopters' pending applications for Mochi appear; approving
+one shows the confirm text with "1 other", approves it, rejects the other automatically, and Mochi no longer
+shows on the neighborhood map; logging in as each adopter shows Approved / Rejected in My applications with the
+shelter's note. Lint and build pass. Commit: "feat(shelter): applications inbox".
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

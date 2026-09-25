@@ -7,6 +7,7 @@ import AdoptPage from './pages/AdoptPage.jsx'
 import DevKit from './pages/DevKit.jsx'
 import ApplyPage from './pages/ApplyPage.jsx'
 import ApplicationsPage from './pages/ApplicationsPage.jsx'
+import ShelterInboxPage from './pages/ShelterInboxPage.jsx'
 import PlaceholderPage from './pages/PlaceholderPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import SignupPage from './pages/SignupPage.jsx'
@@ -33,15 +34,12 @@ createRoot(document.getElementById('root')).render(
             <Route index element={null} />
             <Route path=":id" element={null} />
           </Route>
-          {/* placeholders: the shelter's inbox arrives in session 12, messages in session 14 */}
-          <Route
-            path="/shelter/applications"
-            element={
-              <RequireAuth>
-                <PlaceholderPage title="INCOMING_APPLICATIONS/" text="Applications for your pets will be listed here soon." />
-              </RequireAuth>
-            }
-          />
+          {/* the shelter's inbox: the list stays mounted while the reading pane switches applications */}
+          <Route path="/shelter/applications" element={<RequireAuth><ShelterInboxPage /></RequireAuth>}>
+            <Route index element={null} />
+            <Route path=":id" element={null} />
+          </Route>
+          {/* placeholder: messages arrive in session 14 */}
           <Route
             path="/messages"
             element={

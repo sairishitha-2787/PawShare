@@ -14,8 +14,9 @@ import ProfileWindow from '../components/pets/ProfileWindow.jsx'
 import { useFavorites } from '../context/FavoritesContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { firstName } from '../utils/auth.js'
-import { applicationsTaskLabel } from '../utils/applications.js'
+import { applicationsTaskLabel, inboxTaskLabel } from '../utils/applications.js'
 import { useMyApplications } from '../hooks/useMyApplications.js'
+import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
 import { matchesFilter } from '../utils/pets.js'
 import { mockPets } from '../data/mockPets.js'
 import { getAnimal, getAnimals } from '../api/animals.js'
@@ -79,10 +80,12 @@ export default function AdoptPage() {
   const [filter, setFilter] = useState({ species: 'all', urgent: false })
   const { favs } = useFavorites()
   const { user, loading: authLoading, logout } = useAuth()
-  // adopters get an Applications task with their pending count
+  // adopters get an Applications task with their pending count, shelters (and admins) an Inbox task
   const isAdopter = user?.role === 'adopter'
+  const isShelter = user?.role === 'shelter' || user?.role === 'admin'
   const myApps = useMyApplications(isAdopter)
-  const pendingCount = myApps.status === 'ready' ? myApps.applications.filter((a) => a.status === 'pending').length : null
+  const received = useReceivedApplications(isShelter)
+  const pendingIn = (list) => (list.status === 'ready' ? list.applications.filter((a) => a.status === 'pending').length : null)
   // the view lives in the URL hash (#list) so it survives a refresh
   const location = useLocation()
   const { hash } = location
@@ -165,7 +168,8 @@ export default function AdoptPage() {
           { label: 'Key.txt', hideOnSmall: true },
           { id: 'fav', label: `Favorites (${pets.filter((p) => favs.has(p.id)).length})`, hideOnSmall: true },
           // nothing while a saved login is being checked, so "Log in" doesn't flash up
-          ...(isAdopter ? [{ id: 'apps', label: applicationsTaskLabel(pendingCount), onClick: () => navigate('/applications') }] : []),
+          ...(isAdopter ? [{ id: 'apps', label: applicationsTaskLabel(pendingIn(myApps)), onClick: () => navigate('/applications') }] : []),
+          ...(isShelter ? [{ id: 'inbox', label: inboxTaskLabel(pendingIn(received)), onClick: () => navigate('/shelter/applications') }] : []),
           ...(user
             ? [{ id: 'me', label: `${firstName(user.name)} · ${user.role}` }, { id: 'logout', label: 'Log out', onClick: logout }]
             : authLoading

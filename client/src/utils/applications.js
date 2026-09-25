@@ -10,3 +10,11 @@ export const HOME_TYPE_LABEL = { house: 'House', apartment: 'Apartment', other: 
 
 // taskbar label; n is null until the count is known
 export const applicationsTaskLabel = (n) => (n == null ? 'Applications' : `Applications (${n} pending)`)
+// the shelter's version
+export const inboxTaskLabel = (n) => (n == null ? 'Inbox' : `Inbox (${n} pending)`)
+
+// "wants to adopt Mochi" / "wants to foster Mochi"
+export const wantsTo = (type, petName) => `wants to ${type === 'foster' ? 'foster' : 'adopt'} ${petName}`
+
+// a received application's applicant (populated), or a stand-in if the account is gone
+export const applicantName = (application) => application.applicant?.name || 'Unknown applicant'
