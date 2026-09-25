@@ -59,10 +59,11 @@ client/src/
     pets/       PetFace, House, Pin, PetCard, ProfileWindow
     map/        Neighborhood, SceneBackdrop, Legend
     apply/      ApplyWizard, Answers (read-only answers, shared), ApplicationDetail
+    inbox/      ReadingPane (the shelter's view of one application, with Approve / Reject)
   context/      AuthContext.jsx, FavoritesContext.jsx
-  hooks/        useMyApplications.js
+  hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js
   data/         mockPets.js
-  pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, PlaceholderPage.jsx, LoginPage.jsx, SignupPage.jsx, DevKit.jsx
+  pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, ShelterInboxPage.jsx, PlaceholderPage.jsx, LoginPage.jsx, SignupPage.jsx, DevKit.jsx
   styles/       tokens.css, global.css
 ```
 

@@ -1,0 +1,50 @@
+/* INBOX.EXE reading pane: one received application */
+.reading { display: grid; gap: 14px; }
+.reading .sub { margin: 2px 0 0; color: var(--ink-soft); font-size: 14px; }
+.reading .btn { font-size: 13px; padding: 7px 16px; text-decoration: none; }
+.reading .btn:disabled { cursor: progress; opacity: .75; }
+.reading .btn:disabled:active { transform: none; box-shadow: 2px 2px 0 var(--ink); }
+
+.reading-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.reading-head h2 { margin: 0; font-family: var(--pixel); font-size: 20px; letter-spacing: .03em; line-height: 1.15; overflow-wrap: anywhere; }
+.reading-head h2:focus, .decision-wrap:focus { outline: none; }
+.reading-head h2:focus-visible, .decision-wrap:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+.reading-head .pill { flex: none; font-size: 11px; padding: 2px 10px; }
+
+/* contact details: label, the text itself (selectable), Copy */
+.contact { margin: 0; display: grid; gap: 8px; }
+.copy-line { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 4px 10px; align-items: center; }
+.copy-line dt { font-family: var(--pixel); font-size: 10px; letter-spacing: .06em; color: var(--ink-soft); text-transform: uppercase; }
+.copy-line dd { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.copy-value { font-weight: 500; overflow-wrap: anywhere; user-select: text; }
+.copy-value.none { color: var(--ink-soft); font-weight: 400; }
+.reading .copy-btn { font-size: 11px; padding: 3px 10px; }
+.copy-note { flex-basis: 100%; font-size: 13px; color: #B8325B; }
+.copy-note:empty { display: none; }
+
+/* the pet it's for */
+.reading-pet {
+  display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  padding: 8px 10px; border: 2px solid var(--ink); border-radius: 10px; background: var(--lav-soft);
+}
+.reading-pet svg { width: 48px; height: 48px; border: 2px solid var(--ink); border-radius: 50%; }
+.reading-pet p { margin: 0; }
+.reading-pet .pet-name { font-family: var(--pixel); font-size: 15px; letter-spacing: .03em; text-transform: uppercase; }
+
+.sent { margin: -4px 0 0; font-size: 13px; color: var(--ink-soft); text-align: right; }
+
+/* pending: the decision box */
+.decide { display: grid; gap: 10px; padding-top: 14px; border-top: 2px dashed var(--grid); }
+.decide h3 { margin: 0; font-family: var(--pixel); font-size: 12px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+.decide textarea { min-height: 72px; }
+.decide .field textarea:disabled { opacity: .7; }
+
+/* decided: what was decided, when, and the note */
+.decision { display: grid; gap: 10px; border: 2px solid var(--ink); border-radius: 10px; padding: 10px 12px; background: var(--cream); }
+.decision[data-status="approved"] { background: var(--mint-soft); }
+.decision[data-status="rejected"] { background: var(--pink-soft); }
+.decision-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.decision-head .pill { font-size: 11px; padding: 2px 10px; }
+.decision-head p { margin: 0; font-weight: 600; }
+.decision-note { margin: 0; display: grid; gap: 2px; font-weight: 500; overflow-wrap: anywhere; white-space: pre-line; }
+.decision-note span { font-family: var(--pixel); font-size: 10px; letter-spacing: .06em; color: var(--ink-soft); text-transform: uppercase; }

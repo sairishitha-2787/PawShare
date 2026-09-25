@@ -1,0 +1,78 @@
+/* INBOX.EXE: toolbar, then the message list and the reading pane side by side; taskbar below */
+.inbox-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+/* the unverified note (if any) and the window */
+.inbox-stack { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.inbox { width: 100%; }
+
+/* unverified shelter */
+.inbox-note {
+  margin: 0; font-size: 15px; line-height: 1.45; padding: 8px 12px;
+  background: var(--sun); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 3px 3px 0 var(--ink);
+}
+
+/* toolbar: status chips, then the pet dropdown */
+.inbox-tools {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px;
+  padding: 12px 14px; border-bottom: 2px dashed var(--grid);
+}
+.inbox-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pet-pick { display: flex; align-items: center; gap: 8px; }
+.pet-pick span { font-family: var(--pixel); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+.pet-pick select {
+  font-family: var(--body); font-size: 15px; color: var(--ink); min-width: 150px; max-width: 100%;
+  border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); padding: 6px 8px; cursor: pointer;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.pet-pick select:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+
+/* room for the centered LOADING... / ERROR window */
+.inbox-wait { position: relative; min-height: 300px; }
+
+.inbox-panes { display: grid; grid-template-columns: minmax(280px, 2fr) minmax(0, 3fr); }
+.inbox-list { padding: 10px; border-right: 2px dashed var(--grid); max-height: 72vh; overflow-y: auto; }
+.inbox-pane { padding: 16px 18px; min-width: 0; }
+
+/* message rows */
+.msgs { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.msg {
+  width: 100%; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center;
+  padding: 8px 10px; background: none; border: 2px solid transparent; border-radius: 10px;
+  font: inherit; color: var(--ink); text-align: left; cursor: pointer;
+}
+.msg:hover { background: var(--cream); border-color: var(--ink); }
+.msg.selected { background: var(--lav-soft); border-color: var(--ink); }
+.msg > svg { width: 40px; height: 40px; border: 2px solid var(--ink); border-radius: 50%; }
+.msg-main { display: grid; gap: 1px; min-width: 0; }
+.msg-from { font-weight: 400; overflow-wrap: anywhere; }
+.msg.unread .msg-from { font-weight: 600; }
+.msg-subject { font-size: 13px; color: var(--ink-soft); overflow-wrap: anywhere; }
+.msg-side { display: grid; justify-items: end; gap: 4px; }
+.msg-date { font-size: 12px; color: var(--ink-soft); white-space: nowrap; }
+.msg .pill { white-space: nowrap; }
+
+.inbox-empty, .pane-hint, .pane-missing p {
+  margin: 0; font-family: var(--pixel); font-size: 13px; letter-spacing: .04em; line-height: 1.6; text-align: center;
+}
+.inbox-empty { padding: 28px 10px; }
+.pane-hint { padding: 40px 10px; color: var(--ink-soft); }
+.pane-missing { display: grid; justify-items: center; gap: 12px; padding: 32px 10px; }
+.pane-missing .btn { font-size: 13px; padding: 7px 16px; }
+
+/* one column: the list, then the pane under it */
+@media (max-width: 859px) {
+  .inbox-panes { grid-template-columns: minmax(0, 1fr); }
+  .inbox-list { border-right: 0; max-height: none; overflow: visible; }
+  .inbox-pane { border-top: 2px dashed var(--grid); }
+  /* nothing picked yet: no empty pane under the list */
+  .inbox-pane.idle { display: none; }
+}
+
+@media (max-width: 520px) {
+  .inbox-tools { padding: 10px; }
+  .inbox-chips { gap: 6px; }
+  .pet-pick { width: 100%; }
+  .pet-pick select { flex: 1; min-width: 0; }
+  .inbox-list { padding: 6px; }
+  .inbox-pane { padding: 14px 12px; }
+  .msg { padding: 8px; gap: 8px; }
+}

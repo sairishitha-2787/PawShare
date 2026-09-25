@@ -88,6 +88,12 @@ export async function getAnimals(filters = {}, options) {
   return animals.map(toPet).filter(Boolean)
 }
 
+// The logged-in shelter's own listings, whatever their status, newest first, as the API sends them.
+export async function getMyAnimals(options) {
+  const { animals } = await request('/animals/mine', options)
+  return animals
+}
+
 // One animal as a pet, or null if it's adopted/fostered. Throws (status 404) if it doesn't exist.
 export async function getAnimal(id, options) {
   const { animal } = await request(`/animals/${encodeURIComponent(id)}`, options)

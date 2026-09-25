@@ -14,6 +14,24 @@ export async function getMyApplications(query, options) {
   return applications
 }
 
+// Applications for the logged-in shelter's animals (all of them for an admin), newest first, with animal and
+// applicant (name, email, phone, city) populated. query: { status?, animal? }
+export async function getReceivedApplications(query, options) {
+  const { applications } = await request('/applications/received', { query, ...options })
+  return applications
+}
+
+// The shelter's decision: status 'approved' | 'rejected', note optional → the updated application (not populated).
+// Approving also rejects every other pending application for the pet and marks it adopted/fostered.
+// Anything no longer pending is a 409.
+export async function decideApplication(id, status, note) {
+  const { application } = await request(`/applications/${encodeURIComponent(id)}/status`, {
+    method: 'PATCH',
+    body: { status, ...(note && { note }) },
+  })
+  return application
+}
+
 // pending and approved applications block a new one for the same animal (same rule as the server)
 export const isActive = (application) => application.status === 'pending' || application.status === 'approved'
 
