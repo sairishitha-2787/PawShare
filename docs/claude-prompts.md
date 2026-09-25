@@ -362,6 +362,33 @@ shelter's note. Lint and build pass. Commit: "feat(shelter): applications inbox"
 
 ---
 
+## Session 12b — Demo pet photos
+
+```text
+Run `git checkout main && git pull`, then create `feature/pet-photos` from main.
+
+1. Add `PHOTOS/` to the root .gitignore (raw source photos must never be committed).
+2. Copy the 9 ready-made 400×400 JPEGs from PHOTOS/demo-pets/ into client/public/demo-pets/
+   (biscuit, mochi, clover, pepper, luna, rocky, tofu, sushi, peanut .jpg). Don't resize them again.
+3. Add 'hamster' as a small-pet species: house type hutch, included in the "Small pets" filter, label "Hamster",
+   cartoon face = the guinea face for now. Check server/models/Animal allows 'hamster'; if it doesn't, tell me
+   and use the closest allowed value instead of changing the model.
+4. Update the pet details in client/src/data/mockPets.js AND the server seed script so they match the photos:
+   Biscuit → Golden Retriever; Pepper → Labrador mix; Luna → grey British Shorthair mix, 4 months, tags
+   Playful / Curious / Indoor only (no grooming tag); Rocky → Golden Retriever (senior); Sushi → ginger Persian
+   mix, fix the blurb; Tofu → dwarf hamster, 6 months; Peanut → Syrian hamster, 1 year, blurb no longer mentions
+   guinea pigs. Keep names, ids, statuses and shelters the same.
+5. Set photoUrl "/demo-pets/<id>.jpg" in mockPets, and in the seed script set photos:
+   [{ url: `${CLIENT_URL || 'http://localhost:5173'}/demo-pets/<id>.jpg` }]. Re-run the seed on the dev database.
+6. Check the photo sits correctly in the pin (40px), the list card (64px) and the profile (120px).
+7. README.md: add "Photo credits: demo pet photos collected from the internet, used only for this
+   non-commercial student project."
+8. Append this prompt to docs/claude-prompts.md.
+Commit: "feat(pets): real demo photos".
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

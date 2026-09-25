@@ -1,7 +1,10 @@
 import { request } from './client.js'
 
-// API species → our species. Anything not listed (bird, other) shows as a guinea pig in a hutch.
-const SPECIES = { dog: 'dog', cat: 'cat', rabbit: 'bunny', 'guinea pig': 'guinea' }
+// API species → our species. The API has no hamster species, so an "other" whose breed says hamster
+// is a hamster; anything else not listed (bird, other) shows as a guinea pig in a hutch.
+const SPECIES = { dog: 'dog', cat: 'cat', rabbit: 'bunny', 'guinea pig': 'guinea', hamster: 'hamster' }
+const speciesFor = ({ species, breed }) =>
+  SPECIES[species] || (species === 'other' && /hamster/i.test(breed || '') ? 'hamster' : 'guinea')
 const SIZE = { small: 'Small', medium: 'Medium', large: 'Large', xlarge: 'Extra large' }
 const SEX = { male: 'Male', female: 'Female' }
 
@@ -50,7 +53,7 @@ export function petLook(a) {
   return {
     id: a._id,
     name: a.name,
-    species: SPECIES[a.species] || 'guinea',
+    species: speciesFor(a),
     colors: PALETTE[hash(a._id) % PALETTE.length],
     photoUrl: a.photos?.[0]?.url,
   }

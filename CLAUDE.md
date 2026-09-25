@@ -41,7 +41,7 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 - Buttons and chips: 2px ink border, `2px 2px 0` shadow that disappears on `:active` (pressed look).
 - Status colors (used as pin ring + pill): available `#A8D8B9`, urgent `#FF9EBB`, pending `#FFD873`.
 - House type = species: doghouse (coral roof `#F4877F`) for dogs, cat tower (blue ear-roof `#8FB8F0`) for cats,
-  hutch (yellow roof `#FFD873`) for rabbits and guinea pigs.
+  hutch (yellow roof `#FFD873`) for rabbits, guinea pigs and hamsters.
 - One joke only: the empty-results state is an `ERROR` window with an `OK` button. No other gags.
 - No emoji in UI. The only glyphs allowed are ♥ / ♡ on the favorite button.
 - Visible focus ring: `outline:3px solid var(--hot)`. Respect `prefers-reduced-motion` (turn off pin bob/hover lift).
@@ -70,13 +70,15 @@ client/src/
 ## Pet data shape (frontend)
 
 ```js
-{ id, name, species: 'dog'|'cat'|'bunny'|'guinea', status: 'available'|'urgent'|'pending',
+{ id, name, species: 'dog'|'cat'|'bunny'|'guinea'|'hamster', status: 'available'|'urgent'|'pending',
   listingType: 'adoption'|'foster'|'both',
   age, breed, sex, size, shelter, area, vax, tags: [], blurb,
   colors: { fur, dark, bg }, photoUrl?: string }
 ```
-`house` is derived from species (dog→dog, cat→cat, bunny/guinea→hutch). Map positions are **not** stored on the pet;
+`house` is derived from species (dog→dog, cat→cat, bunny/guinea/hamster→hutch). Map positions are **not** stored on the pet;
 they come from the lot layout in `Neighborhood` (see prompts).
+Hamsters use the guinea cartoon face. The API has no hamster species: they are `other` with "hamster" in the breed.
+Demo photos live in `client/public/demo-pets/<id>.jpg`; raw source photos go in `PHOTOS/`, which is git-ignored.
 
 ## Working rules
 

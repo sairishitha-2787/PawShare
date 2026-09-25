@@ -53,7 +53,7 @@ function Features({ species, fur: f, dark: d }) {
       </>
     )
   }
-  // guinea
+  // guinea (hamsters use the guinea face for now)
   return (
     <>
       <circle cx="15" cy="27" r="4.5" fill={d} />
