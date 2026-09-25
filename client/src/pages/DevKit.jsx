@@ -7,7 +7,28 @@ import Pill from '../components/ui/Pill.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import Modal from '../components/ui/Modal.jsx'
 import Taskbar from '../components/ui/Taskbar.jsx'
+import PetFace from '../components/pets/PetFace.jsx'
+import HouseMarker from '../components/pets/HouseMarker.jsx'
+import { mockPets } from '../data/mockPets.js'
 import './DevKit.css'
+
+const pet = (id) => mockPets.find((p) => p.id === id)
+// one pet per species; peanut is the only guinea pig
+const FACES = ['biscuit', 'mochi', 'clover', 'peanut'].map(pet)
+// a stand-in photo so the photoUrl branch (clipped to the same circle) is visible without a network call
+const PHOTO_PET = {
+  ...pet('luna'),
+  photoUrl: 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><rect width="60" height="60" fill="#8FB8F0"/><rect y="30" width="60" height="30" fill="#E9668E"/></svg>',
+  ),
+}
+// houses on one ground line; pepper is shown dimmed (filtered out)
+const HOUSES = [
+  { id: 'biscuit', x: 90 },
+  { id: 'mochi', x: 230 },
+  { id: 'clover', x: 370 },
+  { id: 'pepper', x: 510, dimmed: true },
+]
 
 const SPECIES = [
   { value: 'all', label: 'All' },
@@ -20,6 +41,7 @@ export default function DevKit() {
   const [species, setSpecies] = useState('all')
   const [view, setView] = useState('map')
   const [showError, setShowError] = useState(true)
+  const [opened, setOpened] = useState(null)
   // /dev/kit#modal opens the modal on load, handy for screenshots
   const [modalOpen, setModalOpen] = useState(() => window.location.hash === '#modal')
   const titleId = useId()
@@ -86,6 +108,22 @@ export default function DevKit() {
           </div>
         </Window>
       </Modal>
+
+      <h2 className="kit-h">PETFACE · HOUSE · PIN</h2>
+      <Window title="PETS.SVG" barColor="mint">
+        <div className="kit-row">
+          {FACES.map((p) => <PetFace key={p.id} pet={p} size={64} />)}
+          <PetFace pet={PHOTO_PET} size={64} />
+        </div>
+        <div className="kit-houses">
+          <svg viewBox="0 0 600 225" role="group" aria-label="House types">
+            {HOUSES.map((h) => (
+              <HouseMarker key={h.id} pet={pet(h.id)} x={h.x} y={185} dimmed={h.dimmed} onOpen={setOpened} />
+            ))}
+          </svg>
+        </div>
+        <p className="kit-body">Last opened: {opened ?? 'none'}. Hover or Tab to lift a pin; Mochi (urgent) bobs.</p>
+      </Window>
 
       <h2 className="kit-h">TASKBAR</h2>
       <Taskbar

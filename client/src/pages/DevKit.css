@@ -6,3 +6,6 @@
 .kit-modal { padding: 16px; display: grid; gap: 14px; }
 .kit-modal h2 { margin: 0; font-family: var(--pixel); font-size: 26px; letter-spacing: .03em; line-height: 1.1; }
 .kit-modal p { margin: 0; }
+.kit-houses { margin: 0 14px; border: 2px solid var(--ink); border-radius: 10px; background: #A8D8B9; overflow-x: auto; }
+/* direct child only: the pin faces are nested <svg>s and must keep their own 40×40 size */
+.kit-houses > svg { display: block; width: 100%; max-width: 600px; min-width: 480px; height: auto; margin: 0 auto; }
