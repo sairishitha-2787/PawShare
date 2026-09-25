@@ -1,6 +1,4 @@
 * { box-sizing: border-box; }
-/* Page background sizes against the root box; keep it at least one screen tall so the gradient doesn't tile */
-html { min-height: 100%; }
 [hidden] { display: none !important; }
 
 body {

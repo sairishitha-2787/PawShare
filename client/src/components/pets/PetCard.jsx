@@ -16,7 +16,7 @@ export default function PetCard({ pet, onOpen }) {
         <PetFace pet={pet} size={64} />
         <div>
           <h4>{pet.name}</h4>
-          <p>{pet.age} · {pet.breed}</p>
+          <p>{`${pet.age} · ${pet.breed}`}</p>
           <p>{pet.area}</p>
         </div>
       </div>
