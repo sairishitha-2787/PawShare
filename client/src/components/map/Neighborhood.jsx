@@ -15,7 +15,6 @@ export default function Neighborhood({ pets, isDimmed, onOpen, children }) {
   const placed = pets
     .slice(current * LOTS.length, (current + 1) * LOTS.length)
     .map((pet, i) => ({ pet, ...LOTS[i] }))
-    .sort((a, b) => a.y - b.y) // nearer houses draw on top
 
   return (
     <div>

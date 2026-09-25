@@ -52,7 +52,7 @@ export default function AdoptPage() {
         <p>Mockup · Neighborhood view · sample pets from Bengaluru shelters</p>
       </header>
 
-      <Window title={`NEIGHBORHOOD.EXE — ${shown.length} pets nearby`} aria-label="Neighborhood">
+      <Window title={<>NEIGHBORHOOD.EXE — <span>{shown.length}</span> pets nearby</>} aria-label="Neighborhood">
         <div className="toolbar">
           <div className="chips" role="group" aria-label="Species">
             {SPECIES.map((s) => (

@@ -41,7 +41,7 @@ export default function ProfileWindow({ pet, onClose, fallbackFocus }) {
             <PetFace pet={pet} size={120} />
             <div>
               <h2 id={titleId}>{pet.name}</h2>
-              <p className="sub">{SPECIES_LABEL[pet.species]} · {pet.shelter}, {pet.area}</p>
+              <p className="sub">{`${SPECIES_LABEL[pet.species]} · ${pet.shelter}, ${pet.area}`}</p>
               <Pill status={pet.status} />
             </div>
           </div>

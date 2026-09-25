@@ -14,9 +14,10 @@ createRoot(document.getElementById('root')).render(
         <Routes>
           {/* one layout route so the page (filters, street, view) stays mounted while profiles open and close */}
           <Route element={<AdoptPage />}>
-            <Route index />
-            <Route path="adopt" />
-            <Route path="adopt/:petId" />
+            {/* element={null}: AdoptPage renders everything, the children only match URLs */}
+            <Route index element={null} />
+            <Route path="adopt" element={null} />
+            <Route path="adopt/:petId" element={null} />
           </Route>
           <Route path="/dev/kit" element={<DevKit />} />
         </Routes>

@@ -10,4 +10,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .house .pin, .house.urgent-pin .pin { animation: none; transition: none; }
+  .house:hover .pin, .house:focus-visible .pin { transform: none; }
 }
