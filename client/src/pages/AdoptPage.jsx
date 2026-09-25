@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import Chip from '../components/ui/Chip.jsx'
 import SegToggle from '../components/ui/SegToggle.jsx'
@@ -9,6 +9,7 @@ import Neighborhood from '../components/map/Neighborhood.jsx'
 import Legend from '../components/map/Legend.jsx'
 import PetCard from '../components/pets/PetCard.jsx'
 import FavoritesPanel from '../components/pets/FavoritesPanel.jsx'
+import ProfileWindow from '../components/pets/ProfileWindow.jsx'
 import { useFavorites } from '../context/FavoritesContext.jsx'
 import { matchesFilter } from '../utils/pets.js'
 import { mockPets } from '../data/mockPets.js'
@@ -35,8 +36,14 @@ export default function AdoptPage() {
   const matches = (p) => matchesFilter(p, filter)
   const shown = pets.filter(matches)
   const noneWord = SPECIES.find((s) => s.value === filter.species).word
-  // session 6 opens the profile window here
-  const openPet = (id) => console.log('open pet', id)
+
+  // the open profile lives in the URL too: /adopt/:petId (keeps #list if it's there)
+  const petId = useMatch('/adopt/:petId')?.params.petId
+  const profilePet = pets.find((p) => p.id === petId)
+  const showPet = (id) => navigate({ pathname: `/adopt/${id}`, hash })
+  const closePet = () => navigate({ pathname: '/adopt', hash }, { replace: true })
+  // if the button that opened the profile is gone (unfavorited in the FAVORITES/ panel), focus the pet's house
+  const houseFor = (id) => () => document.querySelector(`.house[data-pet-id="${CSS.escape(id)}"]`)
 
   return (
     <div className="desk">
@@ -66,7 +73,7 @@ export default function AdoptPage() {
         </div>
 
         <div className="main" hidden={view !== 'map'}>
-          <Neighborhood pets={pets} isDimmed={(p) => !matches(p)} onOpen={openPet}>
+          <Neighborhood pets={pets} isDimmed={(p) => !matches(p)} onOpen={showPet}>
             {shown.length === 0 && (
               <ErrorDialog
                 message={`NO ${noneWord} NEED AN URGENT FOSTER RIGHT NOW.`}
@@ -76,13 +83,13 @@ export default function AdoptPage() {
           </Neighborhood>
           <aside className="side">
             <Legend pets={shown} />
-            <FavoritesPanel pets={pets} onOpen={openPet} />
+            <FavoritesPanel pets={pets} onOpen={showPet} />
           </aside>
         </div>
 
         <div className="list" hidden={view !== 'list'}>
           {shown.length ? (
-            shown.map((p) => <PetCard key={p.id} pet={p} onOpen={openPet} />)
+            shown.map((p) => <PetCard key={p.id} pet={p} onOpen={showPet} />)
           ) : (
             <Window as="div" title="ERROR" barColor="pink" dots={false} className="list-err">
               <div className="body">NO PETS MATCH THESE FILTERS.</div>
@@ -98,6 +105,8 @@ export default function AdoptPage() {
           { id: 'fav', label: `Favorites (${pets.filter((p) => favs.has(p.id)).length})`, hideOnSmall: true },
         ]}
       />
+
+      {profilePet && <ProfileWindow key={profilePet.id} pet={profilePet} onClose={closePet} fallbackFocus={houseFor(profilePet.id)} />}
     </div>
   )
 }

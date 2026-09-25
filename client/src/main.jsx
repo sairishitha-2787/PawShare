@@ -12,7 +12,12 @@ createRoot(document.getElementById('root')).render(
     <FavoritesProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<AdoptPage />} />
+          {/* one layout route so the page (filters, street, view) stays mounted while profiles open and close */}
+          <Route element={<AdoptPage />}>
+            <Route index />
+            <Route path="adopt" />
+            <Route path="adopt/:petId" />
+          </Route>
           <Route path="/dev/kit" element={<DevKit />} />
         </Routes>
       </BrowserRouter>

@@ -19,6 +19,7 @@ export default function HouseMarker({ pet, x, y, onOpen, dimmed = false }) {
   return (
     <g
       className={className}
+      data-pet-id={pet.id}
       role="button"
       tabIndex={dimmed ? -1 : 0}
       aria-disabled={dimmed || undefined}
