@@ -44,14 +44,24 @@ export function formatAge(months) {
 
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 
+// Just enough of an API animal to draw its PetFace, whatever its status (an approved application's pet is
+// adopted/fostered, which toPet leaves out). The same id always gets the same colours as on the map.
+export function petLook(a) {
+  return {
+    id: a._id,
+    name: a.name,
+    species: SPECIES[a.species] || 'guinea',
+    colors: PALETTE[hash(a._id) % PALETTE.length],
+    photoUrl: a.photos?.[0]?.url,
+  }
+}
+
 // API animal → our pet shape (see CLAUDE.md), or null if it shouldn't be shown.
 export function toPet(a) {
   const status = statusFor(a)
   if (!status) return null
   return {
-    id: a._id,
-    name: a.name,
-    species: SPECIES[a.species] || 'guinea',
+    ...petLook(a),
     status,
     // 'adoption' | 'foster' | 'both': which application types the shelter accepts
     listingType: a.listingType || 'both',
@@ -65,8 +75,6 @@ export function toPet(a) {
     // the API stores temperament lowercased; show it in sentence case like the reference
     tags: (a.temperament || []).map(capitalize),
     blurb: a.description || '',
-    colors: PALETTE[hash(a._id) % PALETTE.length],
-    photoUrl: a.photos?.[0]?.url,
   }
 }
 

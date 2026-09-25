@@ -58,10 +58,11 @@ client/src/
     auth/       RequireAuth, FormError
     pets/       PetFace, House, Pin, PetCard, ProfileWindow
     map/        Neighborhood, SceneBackdrop, Legend
-    apply/      ApplyWizard
+    apply/      ApplyWizard, Answers (read-only answers, shared), ApplicationDetail
   context/      AuthContext.jsx, FavoritesContext.jsx
+  hooks/        useMyApplications.js
   data/         mockPets.js
-  pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, LoginPage.jsx, SignupPage.jsx, DevKit.jsx
+  pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, PlaceholderPage.jsx, LoginPage.jsx, SignupPage.jsx, DevKit.jsx
   styles/       tokens.css, global.css
 ```
 

@@ -14,6 +14,8 @@ import ProfileWindow from '../components/pets/ProfileWindow.jsx'
 import { useFavorites } from '../context/FavoritesContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { firstName } from '../utils/auth.js'
+import { applicationsTaskLabel } from '../utils/applications.js'
+import { useMyApplications } from '../hooks/useMyApplications.js'
 import { matchesFilter } from '../utils/pets.js'
 import { mockPets } from '../data/mockPets.js'
 import { getAnimal, getAnimals } from '../api/animals.js'
@@ -77,6 +79,10 @@ export default function AdoptPage() {
   const [filter, setFilter] = useState({ species: 'all', urgent: false })
   const { favs } = useFavorites()
   const { user, loading: authLoading, logout } = useAuth()
+  // adopters get an Applications task with their pending count
+  const isAdopter = user?.role === 'adopter'
+  const myApps = useMyApplications(isAdopter)
+  const pendingCount = myApps.status === 'ready' ? myApps.applications.filter((a) => a.status === 'pending').length : null
   // the view lives in the URL hash (#list) so it survives a refresh
   const location = useLocation()
   const { hash } = location
@@ -159,6 +165,7 @@ export default function AdoptPage() {
           { label: 'Key.txt', hideOnSmall: true },
           { id: 'fav', label: `Favorites (${pets.filter((p) => favs.has(p.id)).length})`, hideOnSmall: true },
           // nothing while a saved login is being checked, so "Log in" doesn't flash up
+          ...(isAdopter ? [{ id: 'apps', label: applicationsTaskLabel(pendingCount), onClick: () => navigate('/applications') }] : []),
           ...(user
             ? [{ id: 'me', label: `${firstName(user.name)} · ${user.role}` }, { id: 'logout', label: 'Log out', onClick: logout }]
             : authLoading

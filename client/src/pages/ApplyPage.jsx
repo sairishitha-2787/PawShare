@@ -15,7 +15,7 @@ import './ApplyPage.css'
 
 const CELLS_PER_STEP = 4
 
-// The pet, and (for adopters) whether they already have an active application for it.
+// The pet, and (for adopters) their active application for it, if they have one.
 // status: 'loading' | 'ready' | 'closed' (adopted/fostered) | 'error'
 function useApplyData(petId, isAdopter) {
   const [load, setLoad] = useState({ status: 'loading' })
@@ -27,8 +27,8 @@ function useApplyData(petId, isAdopter) {
     Promise.all([getAnimal(petId, opts), isAdopter ? getMyApplications(undefined, opts) : []])
       .then(([pet, mine]) => {
         if (!pet) return setLoad({ status: 'closed' })
-        const applied = mine.some((a) => a.animal?._id === pet.id && isActive(a))
-        setLoad({ status: 'ready', pet, applied })
+        const existing = mine.find((a) => a.animal?._id === pet.id && isActive(a))
+        setLoad({ status: 'ready', pet, existing })
       })
       .catch((err) => {
         if (err.name !== 'AbortError') setLoad({ status: 'error', error: err })
@@ -77,6 +77,9 @@ function StepBar({ step }) {
   )
 }
 
+// /applications/:id opens that application's detail window
+const applicationLink = (application) => `/applications/${encodeURIComponent(application._id)}`
+
 function Shell({ children }) {
   return (
     <div className="desk apply-desk">
@@ -89,7 +92,7 @@ function Shell({ children }) {
 }
 
 // The mint window that replaces the wizard once the application is in.
-function Sent({ pet }) {
+function Sent({ pet, application }) {
   const ref = useRef(null)
   useEffect(() => ref.current?.focus(), [])
   return (
@@ -100,7 +103,7 @@ function Sent({ pet }) {
         </p>
         <div className="apply-actions">
           <Link className="btn" to="/adopt">Back to the neighborhood</Link>
-          <Link className="btn primary" to="/applications">My applications</Link>
+          <Link className="btn primary" to={applicationLink(application)}>View application</Link>
         </div>
       </div>
     </Window>
@@ -112,12 +115,13 @@ export default function ApplyPage() {
   const { petId } = useParams()
   const { user, logout } = useAuth()
   const isAdopter = user?.role === 'adopter'
-  const { status, pet, applied, error, retry } = useApplyData(petId, isAdopter)
+  const { status, pet, existing, error, retry } = useApplyData(petId, isAdopter)
   const [step, setStep] = useState(1)
-  // 'form' | 'sent' | 'applied' (the server said there's an application already)
-  const [outcome, setOutcome] = useState('form')
-  const onSent = useCallback(() => setOutcome('sent'), [])
-  const onAlreadyApplied = useCallback(() => setOutcome('applied'), [])
+  // null while the form is open; 'sent' with the new application, or 'applied' with the one the server
+  // said was already there
+  const [outcome, setOutcome] = useState(null)
+  const onSent = useCallback((application) => setOutcome({ kind: 'sent', application }), [])
+  const onAlreadyApplied = useCallback((application) => setOutcome({ kind: 'applied', application }), [])
 
   if (status === 'loading') {
     return (
@@ -153,11 +157,12 @@ export default function ApplyPage() {
     )
   }
 
-  if (outcome === 'sent') {
-    return <Shell><Sent pet={pet} /></Shell>
+  if (outcome?.kind === 'sent') {
+    return <Shell><Sent pet={pet} application={outcome.application} /></Shell>
   }
 
-  const alreadyApplied = applied || outcome === 'applied'
+  const activeApplication = outcome?.kind === 'applied' ? outcome.application : existing
+  const alreadyApplied = Boolean(activeApplication)
   return (
     <Shell>
       <Window title={`APPLY.EXE — ${pet.name}`} className="apply">
@@ -189,7 +194,7 @@ export default function ApplyPage() {
               </p>
               <div className="apply-actions">
                 <Link className="btn" to="/adopt">Back to the neighborhood</Link>
-                <Link className="btn primary" to="/applications">My applications</Link>
+                <Link className="btn primary" to={applicationLink(activeApplication)}>View application</Link>
               </div>
             </>
           ) : (
