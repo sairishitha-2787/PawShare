@@ -16,7 +16,9 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 - Plain CSS with CSS variables (`src/styles/tokens.css`, `src/styles/global.css`) + one `.css` file per component.
   **No Tailwind, no UI libraries (MUI, Chakra, shadcn), no icon packs.** All shapes are hand-written SVG.
 - Data fetching: `fetch` wrapped in `src/api/client.js`. Base URL from `import.meta.env.VITE_API_URL`.
-- State: React state + context (`FavoritesContext`). No Redux.
+- State: React state + context (`AuthContext`, `FavoritesContext`). No Redux.
+- Auth: the token is in localStorage `pawshare-token`; `api/client.js` sends it as a Bearer header and clears it on a 401.
+  Wrap pages that need a login in `<RequireAuth>`.
 
 ## Design tokens (copy exactly)
 
@@ -50,14 +52,15 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 
 ```
 client/src/
-  api/          client.js, animals.js
+  api/          client.js, animals.js, auth.js
   components/
-    ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar
+    ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar, Field, LoadingWindow
+    auth/       RequireAuth, FormError
     pets/       PetFace, House, Pin, PetCard, ProfileWindow
     map/        Neighborhood, SceneBackdrop, Legend
-  context/      FavoritesContext.jsx
+  context/      AuthContext.jsx, FavoritesContext.jsx
   data/         mockPets.js
-  pages/        AdoptPage.jsx, DevKit.jsx
+  pages/        AdoptPage.jsx, ApplyPage.jsx, LoginPage.jsx, SignupPage.jsx, DevKit.jsx
   styles/       tokens.css, global.css
 ```
 

@@ -12,6 +12,8 @@ import PetCard from '../components/pets/PetCard.jsx'
 import FavoritesPanel from '../components/pets/FavoritesPanel.jsx'
 import ProfileWindow from '../components/pets/ProfileWindow.jsx'
 import { useFavorites } from '../context/FavoritesContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { firstName } from '../utils/auth.js'
 import { matchesFilter } from '../utils/pets.js'
 import { mockPets } from '../data/mockPets.js'
 import { getAnimal, getAnimals } from '../api/animals.js'
@@ -74,8 +76,10 @@ export default function AdoptPage() {
   const { status, pets, retry } = usePets()
   const [filter, setFilter] = useState({ species: 'all', urgent: false })
   const { favs } = useFavorites()
+  const { user, loading: authLoading, logout } = useAuth()
   // the view lives in the URL hash (#list) so it survives a refresh
-  const { hash } = useLocation()
+  const location = useLocation()
+  const { hash } = location
   const navigate = useNavigate()
   const view = hash === '#list' ? 'list' : 'map'
   const setView = (v) => navigate({ hash: v === 'list' ? '#list' : '' }, { replace: true })
@@ -154,6 +158,12 @@ export default function AdoptPage() {
           { label: 'Neighborhood.exe' },
           { label: 'Key.txt', hideOnSmall: true },
           { id: 'fav', label: `Favorites (${pets.filter((p) => favs.has(p.id)).length})`, hideOnSmall: true },
+          // nothing while a saved login is being checked, so "Log in" doesn't flash up
+          ...(user
+            ? [{ id: 'me', label: `${firstName(user.name)} · ${user.role}` }, { id: 'logout', label: 'Log out', onClick: logout }]
+            : authLoading
+              ? []
+              : [{ id: 'login', label: 'Log in', onClick: () => navigate('/login', { state: { from: location } }) }]),
         ]}
       />
 

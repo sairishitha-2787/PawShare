@@ -4,3 +4,8 @@
 .clock { margin-left: auto; font-family: var(--pixel); font-size: 12px; font-variant-numeric: tabular-nums; background: var(--lav-soft); border: 2px solid var(--ink); border-radius: 8px; padding: 3px 10px; }
 
 @media (max-width: 520px) { .task.hide-s { display: none; } }
+
+/* a task that does something (Log in / Log out): raised like the other buttons, pressed on click */
+.task-btn { color: var(--ink); line-height: inherit; cursor: pointer; box-shadow: 2px 2px 0 var(--ink); transition: transform .08s; }
+.task-btn:hover { background: var(--pink-soft); }
+.task-btn:active { transform: translate(2px, 2px); box-shadow: none; }

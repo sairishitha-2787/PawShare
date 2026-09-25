@@ -203,6 +203,39 @@ Done when: with the server running, real animals appear in the houses and profil
 error window shows and Retry works. Commit: "feat(api): load animals from backend".
 ```
 
+## Session 9 — Login and signup
+
+```text
+Run `git checkout main && git pull`, then create `feature/auth` from main.
+
+Read CLAUDE.md and the "Auth — /api/auth" section of README.md (POST /signup, POST /login, GET /me;
+protected routes need `Authorization: Bearer <token>`; tokens last 7 days; errors are { message, errors[] }).
+Don't change server/.
+
+1. src/api/auth.js: signup(data), login(email, password), getMe(). Update api/client.js so it adds the Bearer
+   token when one is saved, and on a 401 clears the token.
+2. src/context/AuthContext.jsx: { user, token, loading, login, signup, logout }. Token in localStorage key
+   "pawshare-token" (try/catch). On app start, if a token exists call getMe(); if it fails, log out quietly.
+3. Pages, built only from our ui kit (Window, Button, Chip...), centred on the grid background, max-width 420px:
+   - /login: Window "LOGIN.EXE". Email, password, "Log in" (primary). Link: "New here? Create an account".
+   - /signup: Window "NEW_USER.EXE". Name, email, password (min 8), "I am..." as two Chips: "Looking to adopt
+     or foster" (adopter) / "A shelter or caregiver" (shelter), city (Bengaluru default), phone optional.
+   - Labels in Silkscreen 11px uppercase, inputs in Fredoka 15px with 2px ink border, 8px radius, paper
+     background, the pink focus ring. Show field errors under each field, and the server's message in a
+     pink ERROR-style box above the button. Disable the button and show "LOGGING IN..." while waiting.
+   - A shelter signing up sees a note: "Shelters need admin verification before they can list animals."
+4. RequireAuth wrapper: sends logged-out users to /login and back to where they were after logging in
+   (keep the target in router state, not the URL).
+   Protect /apply/:petId with it.
+5. Taskbar: when logged out show a "Log in" task button; when logged in show "<first name> · adopter|shelter"
+   and a "Log out" button. Favorites stay local for now.
+6. Append this prompt to docs/claude-prompts.md as "Session 9 — Login and signup".
+
+Done when: signup → lands back on the Adopt page logged in; refresh keeps you logged in; wrong password
+shows the server's message; clicking "Start adoption application" while logged out goes to /login and then
+on to /apply/<id> after logging in; Log out works. Lint and build pass. Commit: "feat(auth): login and signup".
+```
+
 ---
 
 ## Tips

@@ -1,0 +1,11 @@
+.field { display: grid; gap: 6px; }
+.field label, .field-label { font-family: var(--pixel); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+.field input {
+  width: 100%; font-family: var(--body); font-size: 15px; color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); padding: 8px 10px;
+}
+.field input:focus { outline: 3px solid var(--hot); outline-offset: 2px; }
+.field input[aria-invalid="true"] { border-color: var(--hot); }
+.field-err, .field-hint { margin: 0; font-size: 13px; line-height: 1.4; }
+.field-err { color: #B8325B; }
+.field-hint { color: var(--ink-soft); }
