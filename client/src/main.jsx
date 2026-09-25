@@ -6,6 +6,7 @@ import './styles/global.css'
 import AdoptPage from './pages/AdoptPage.jsx'
 import DevKit from './pages/DevKit.jsx'
 import ApplyPage from './pages/ApplyPage.jsx'
+import ApplicationsPage from './pages/ApplicationsPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import SignupPage from './pages/SignupPage.jsx'
 import RequireAuth from './components/auth/RequireAuth.jsx'
@@ -26,6 +27,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="adopt/:petId" element={null} />
           </Route>
           <Route path="/apply/:petId" element={<RequireAuth><ApplyPage /></RequireAuth>} />
+          <Route path="/applications" element={<RequireAuth><ApplicationsPage /></RequireAuth>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dev/kit" element={<DevKit />} />

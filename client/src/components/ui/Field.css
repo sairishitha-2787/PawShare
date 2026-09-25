@@ -1,11 +1,17 @@
 .field { display: grid; gap: 6px; }
 .field label, .field-label { font-family: var(--pixel); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
-.field input {
+.field input, .field textarea {
   width: 100%; font-family: var(--body); font-size: 15px; color: var(--ink);
   border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); padding: 8px 10px;
 }
-.field input:focus { outline: 3px solid var(--hot); outline-offset: 2px; }
-.field input[aria-invalid="true"] { border-color: var(--hot); }
+.field textarea { min-height: 96px; resize: vertical; line-height: 1.45; }
+.field input:focus, .field textarea:focus { outline: 3px solid var(--hot); outline-offset: 2px; }
+.field input[aria-invalid="true"], .field textarea[aria-invalid="true"] { border-color: var(--hot); }
 .field-err, .field-hint { margin: 0; font-size: 13px; line-height: 1.4; }
 .field-err { color: #B8325B; }
 .field-hint { color: var(--ink-soft); }
+
+/* ChoiceField: a row of chips */
+.field .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.field .chip:disabled { cursor: not-allowed; opacity: .45; box-shadow: none; }
+.field .chip:disabled:active { transform: none; }
