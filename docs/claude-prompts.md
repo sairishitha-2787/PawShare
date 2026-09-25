@@ -276,6 +276,44 @@ Commit: "feat(apply): adoption and foster application wizard".
 
 ---
 
+## Session 11 — My applications
+
+```text
+Run `git checkout main && git pull`, then create `feature/my-applications` from main.
+
+Read CLAUDE.md, the "Applications" section of README.md, and server/models + controllers for Application
+(read only). Check the exact status values, what GET /api/applications/mine and GET /api/applications/:id
+return (populated animal/shelter?), and the rules for PATCH /:id/withdraw. Tell me what you found first.
+
+Build /applications (behind RequireAuth, adopters only; a shelter account is sent to /shelter/applications,
+which is a placeholder page until session 12):
+1. Window "MY_APPLICATIONS/" (pink title bar). Status Chips across the top: All / Pending / Approved /
+   Rejected / Withdrawn, with counts. Filtering happens on the client.
+2. Rows styled like files in a folder: pet face or photo 40px, "<PETNAME>.APP" in Silkscreen, Adopt/Foster
+   tag, shelter name, "Sent 25 Sept" (en-IN date), and a status Pill (pending sun, approved mint,
+   rejected pink, withdrawn lavender with text, never colour only). Newest first. Whole row is a button.
+3. Clicking a row opens a detail Window in the Modal: pet summary, status with the decided date, the
+   shelter's note if there is one, the answers the adopter gave (read-only, same labels as the wizard),
+   the message, and foster-until date for fosters.
+   - Pending: a "Withdraw application" button. Confirm inside the window (no confirm()): "Withdraw your
+     application for Mochi?" with "Yes, withdraw" / "Keep it". Then refresh the list.
+   - Approved: mint note "Approved! <Shelter> will be in touch." plus a "Message the shelter" button
+     (link to /messages, placeholder page until session 14).
+4. Empty folder: "No applications yet." and a "Browse the neighborhood" button. Loading: the LOADING window
+   from session 8. Error: ErrorDialog with Retry.
+5. Support /applications/:id deep link (opens the detail), and make the wizard's success screen and the
+   "already applied" message link to the right application.
+6. Taskbar: when logged in as an adopter, add an "Applications (n pending)" task button.
+7. Append this prompt to docs/claude-prompts.md as "Session 11 — My applications".
+
+Done when: after applying for Biscuit and Mochi, both show up as Pending with the right type; filters and
+counts work; withdrawing Biscuit moves it to Withdrawn and the pet can be applied for again (if the server
+allows); the detail deep link works; works at 400px. Lint and build pass.
+Commit: "feat(apply): my applications folder".
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

@@ -4,19 +4,16 @@ import Button from '../ui/Button.jsx'
 import Field from '../ui/Field.jsx'
 import ChoiceField from '../ui/ChoiceField.jsx'
 import FormError from '../auth/FormError.jsx'
+import { Review, TypeAnswers, HomeAnswers } from './Answers.jsx'
 import { applyFor, getMyApplications, isActive } from '../../api/applications.js'
+import { HOME_TYPE_LABEL, TYPE_LABEL } from '../../utils/applications.js'
 import './ApplyWizard.css'
 
 export const STEP_COUNT = 3
 const STEP_TITLE = { 1: 'What kind of home?', 2: 'About your home', 3: 'Say hello' }
 
 // values are the ones POST /api/applications accepts (see server/models/Application.js)
-const TYPES = { adoption: 'Adopt', foster: 'Foster' }
-const HOME_TYPES = [
-  { value: 'house', label: 'House' },
-  { value: 'apartment', label: 'Apartment' },
-  { value: 'other', label: 'Other' },
-]
+const HOME_TYPES = Object.entries(HOME_TYPE_LABEL).map(([value, label]) => ({ value, label }))
 const YES_NO = [{ value: true, label: 'Yes' }, { value: false, label: 'No' }]
 // the Application model's maxlength for each text field
 const MAX = { otherPets: 300, experience: 1000, message: 2000 }
@@ -27,12 +24,6 @@ function isoDate(offsetDays = 0) {
   d.setDate(d.getDate() + offsetDays)
   const pad = (n) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-}
-
-// "2026-10-12" → "12 Oct 2026", read as a local date (new Date("2026-10-12") would be UTC midnight)
-function formatDate(iso) {
-  const [y, m, d] = iso.split('-').map(Number)
-  return new Date(y, m - 1, d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 // the types this listing accepts; the server answers 400 for any other
@@ -92,11 +83,8 @@ function toBody(pet, form) {
   }
 }
 
-const yesNo = (v) => (v ? 'Yes' : 'No')
-const label = (options, value) => options.find((o) => o.value === value)?.label
-
 // The three steps of APPLY.EXE. onStep(n) reports the current step for the progress bar;
-// onSent() after the application is created; onAlreadyApplied() if the server says there's one already.
+// onSent(application) after it's created; onAlreadyApplied(application) if the server says there's one already.
 export default function ApplyWizard({ pet, onStep, onSent, onAlreadyApplied }) {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
@@ -155,14 +143,14 @@ export default function ApplyWizard({ pet, onStep, onSent, onAlreadyApplied }) {
 
     setBusy(true)
     try {
-      await applyFor(toBody(pet, form))
-      onSent()
+      onSent(await applyFor(toBody(pet, form)))
     } catch (err) {
       // 409 is either "already applied" or "no longer accepting"; the adopter's own list tells them apart
       if (err.status === 409) {
         const mine = await getMyApplications().catch(() => [])
-        if (mine.some((a) => a.animal?._id === pet.id && isActive(a))) {
-          onAlreadyApplied()
+        const existing = mine.find((a) => a.animal?._id === pet.id && isActive(a))
+        if (existing) {
+          onAlreadyApplied(existing)
           return
         }
       }
@@ -172,7 +160,7 @@ export default function ApplyWizard({ pet, onStep, onSent, onAlreadyApplied }) {
   }
 
   const allowed = allowedTypes(pet)
-  const typeOptions = Object.entries(TYPES).map(([value, text]) => ({ value, label: text, disabled: !allowed.includes(value) }))
+  const typeOptions = Object.entries(TYPE_LABEL).map(([value, text]) => ({ value, label: text, disabled: !allowed.includes(value) }))
   const onlyOne = allowed.length === 1 ? `${pet.name} is listed for ${allowed[0]} only.` : undefined
 
   return (
@@ -268,31 +256,12 @@ export default function ApplyWizard({ pet, onStep, onSent, onAlreadyApplied }) {
             hint={`${form.message.length} / ${MAX.message}`}
           />
 
-          <div className="review">
-            <div className="review-head">
-              <h4>What kind of home</h4>
-              <button type="button" className="edit" onClick={() => goTo(1)} aria-label="Edit what kind of home">Edit</button>
-            </div>
-            <dl>
-              <div><dt>Type</dt><dd>{TYPES[form.type]}</dd></div>
-              {form.type === 'foster' && <div><dt>Foster until</dt><dd>{formatDate(form.fosterUntil)}</dd></div>}
-            </dl>
-          </div>
-
-          <div className="review">
-            <div className="review-head">
-              <h4>About your home</h4>
-              <button type="button" className="edit" onClick={() => goTo(2)} aria-label="Edit about your home">Edit</button>
-            </div>
-            <dl>
-              <div><dt>Home type</dt><dd>{label(HOME_TYPES, form.homeType)}</dd></div>
-              <div><dt>Yard</dt><dd>{yesNo(form.hasYard)}</dd></div>
-              <div><dt>Children</dt><dd>{yesNo(form.hasChildren)}</dd></div>
-              <div><dt>Other pets</dt><dd>{form.otherPets.trim() || 'None given'}</dd></div>
-              <div><dt>Alone per day</dt><dd>{`${Number(form.hoursAlonePerDay)} h`}</dd></div>
-              <div className="wide"><dt>Experience</dt><dd>{form.experience.trim() || 'None given'}</dd></div>
-            </dl>
-          </div>
+          <Review title="What kind of home" onEdit={() => goTo(1)} editLabel="Edit what kind of home">
+            <TypeAnswers type={form.type} fosterUntil={form.fosterUntil} />
+          </Review>
+          <Review title="About your home" onEdit={() => goTo(2)} editLabel="Edit about your home">
+            <HomeAnswers answers={toBody(pet, form).answers} />
+          </Review>
         </>
       )}
 
