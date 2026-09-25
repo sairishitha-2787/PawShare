@@ -21,3 +21,6 @@
   .main { grid-template-columns: minmax(0, 1fr); }
   .side { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 }
+
+/* holds the LOADING / ERROR window in the list view (they center on their positioned parent) */
+.list-status { grid-column: 1 / -1; position: relative; min-height: 240px; }

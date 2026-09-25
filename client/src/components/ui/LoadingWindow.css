@@ -1,0 +1,17 @@
+.loading { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(330px, calc(100% - 32px)); z-index: 3; }
+.loading .body { padding: 16px; display: grid; gap: 12px; }
+.loading p { margin: 0; font-family: var(--pixel); font-size: 13px; line-height: 1.6; text-align: center; }
+
+/* 10 square cells that fill one at a time, then start over */
+.pbar { height: 22px; padding: 3px; border: 2px solid var(--ink); border-radius: 6px; background: var(--paper); }
+.pbar i {
+  display: block; height: 100%; width: 100%;
+  background: repeating-linear-gradient(90deg, var(--pink) 0 calc(10% - 3px), transparent calc(10% - 3px) 10%);
+  clip-path: inset(0 100% 0 0);
+  animation: pbar-fill 2s steps(10, jump-none) infinite;
+}
+@keyframes pbar-fill { from { clip-path: inset(0 90% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pbar i { animation: none; clip-path: inset(0 40% 0 0); }
+}

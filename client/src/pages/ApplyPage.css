@@ -1,0 +1,4 @@
+.apply { max-width: 480px; width: 100%; justify-self: center; }
+.apply .body { padding: 18px; display: grid; gap: 14px; justify-items: start; }
+.apply p { margin: 0; font-size: 16px; }
+.apply .btn { text-decoration: none; }
