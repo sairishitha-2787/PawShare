@@ -7,6 +7,7 @@ import Button from '../ui/Button.jsx'
 import PetFace from './PetFace.jsx'
 import { useFavorites } from '../../context/FavoritesContext.jsx'
 import { SPECIES_LABEL } from '../../utils/pets.js'
+import { formatDay } from '../../utils/dates.js'
 import './ProfileWindow.css'
 
 // primary button label per status; every one goes to the application page
@@ -28,8 +29,12 @@ export default function ProfileWindow({ pet, onClose, fallbackFocus }) {
     <Modal open onClose={onClose} labelledBy={titleId} fallbackFocus={fallbackFocus}>
       <Window as="div" title={`${pet.name.toUpperCase()}.PROFILE`} onClose={onClose} closeLabel="Close profile">
         <div className="pbody">
-          <div className="phead">
-            <PetFace pet={pet} size={120} />
+          <div className={pet.photoUrl ? 'phead has-photo' : 'phead'}>
+            {pet.photoUrl ? (
+              <img className="pphoto" src={pet.photoUrl} alt={`${pet.name}, main photo`} />
+            ) : (
+              <PetFace pet={pet} size={120} />
+            )}
             <div>
               <h2 id={titleId}>{pet.name}</h2>
               <p className="sub">{`${SPECIES_LABEL[pet.species]} · ${pet.shelter}, ${pet.area}`}</p>
@@ -49,6 +54,24 @@ export default function ProfileWindow({ pet, onClose, fallbackFocus }) {
             {pet.tags.map((t) => <span key={t}>{t}</span>)}
           </div>
           <p className="blurb">{pet.blurb}</p>
+
+          {pet.health?.length > 0 && (
+            <section className="hlog" aria-labelledby={`${titleId}-health`}>
+              <h3 id={`${titleId}-health`}>HEALTH.LOG</h3>
+              <ol>
+                {pet.health.map((r, i) => (
+                  <li key={r._id || i}>
+                    {r.date && <time dateTime={String(r.date).slice(0, 10)}>{formatDay(r.date)}</time>}
+                    <div>
+                      <b>{r.title}</b>
+                      {r.vetName && <span className="vet">{` · ${r.vetName}`}</span>}
+                      {r.notes && <p>{r.notes}</p>}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
 
           <div className="actions">
             <Button variant="primary" onClick={() => navigate(`/apply/${pet.id}`)}>{ACTION_LABEL[pet.status]}</Button>

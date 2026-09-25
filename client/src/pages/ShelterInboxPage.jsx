@@ -213,6 +213,7 @@ function Inbox() {
       <Taskbar
         items={[
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
+          { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
           { id: 'inbox', label: inboxTaskLabel(pendingTotal) },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
           { id: 'logout', label: 'Log out', onClick: logout },

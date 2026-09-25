@@ -1,9 +1,9 @@
 import { request } from './client.js'
 
 // API species → our species. The API has no hamster species, so an "other" whose breed says hamster
-// is a hamster; anything else not listed (bird, other) shows as a guinea pig in a hutch.
-const SPECIES = { dog: 'dog', cat: 'cat', rabbit: 'bunny', 'guinea pig': 'guinea', hamster: 'hamster' }
-const speciesFor = ({ species, breed }) =>
+// is a hamster; any other "other" shows as a guinea pig in a hutch.
+const SPECIES = { dog: 'dog', cat: 'cat', bird: 'bird', rabbit: 'bunny', 'guinea pig': 'guinea', hamster: 'hamster' }
+export const mapSpecies = ({ species, breed }) =>
   SPECIES[species] || (species === 'other' && /hamster/i.test(breed || '') ? 'hamster' : 'guinea')
 const SIZE = { small: 'Small', medium: 'Medium', large: 'Large', xlarge: 'Extra large' }
 const SEX = { male: 'Male', female: 'Female' }
@@ -53,7 +53,7 @@ export function petLook(a) {
   return {
     id: a._id,
     name: a.name,
-    species: speciesFor(a),
+    species: mapSpecies(a),
     colors: PALETTE[hash(a._id) % PALETTE.length],
     photoUrl: a.photos?.[0]?.url,
   }
@@ -78,6 +78,21 @@ export function toPet(a) {
     // the API stores temperament lowercased; show it in sentence case like the reference
     tags: (a.temperament || []).map(capitalize),
     blurb: a.description || '',
+    // { title, date?, vetName?, notes? }, oldest first as the shelter entered them
+    health: a.healthRecords || [],
+  }
+}
+
+// One of the shelter's own listings (GET /animals/mine), whatever its status, for MY_PETS/: the PetFace look
+// plus the API's own status ('available' | 'pending' | 'adopted' | 'fostered') and listingType.
+export function toListing(a) {
+  return {
+    ...petLook(a),
+    status: a.status,
+    listingType: a.listingType,
+    age: formatAge(a.ageMonths),
+    breed: a.breed,
+    area: a.location?.city || '',
   }
 }
 
@@ -95,6 +110,29 @@ export async function getAnimals(filters = {}, options) {
 export async function getMyAnimals(options) {
   const { animals } = await request('/animals/mine', options)
   return animals
+}
+
+// One animal exactly as the API sends it (any status), for the edit form. Throws (status 404) if it doesn't exist.
+export async function getAnimalRecord(id, options) {
+  const { animal } = await request(`/animals/${encodeURIComponent(id)}`, options)
+  return animal
+}
+
+// POST: verified shelters and admins only (an unverified shelter gets a 403). data: see server/models/Animal.js
+export async function createAnimal(data) {
+  const { animal } = await request('/animals', { method: 'POST', body: data })
+  return animal
+}
+
+// PUT: the owner or an admin. Only the fields sent are changed.
+export async function updateAnimal(id, data) {
+  const { animal } = await request(`/animals/${encodeURIComponent(id)}`, { method: 'PUT', body: data })
+  return animal
+}
+
+// DELETE: the owner or an admin. The server doesn't check for applications, so callers check first.
+export function deleteAnimal(id) {
+  return request(`/animals/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 // One animal as a pet, or null if it's adopted/fostered. Throws (status 404) if it doesn't exist.

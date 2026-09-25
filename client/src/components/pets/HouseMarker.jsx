@@ -4,10 +4,23 @@ import { INK, SPECIES_LABEL, STATUS_LABEL, houseTypeFor, peakY } from '../../uti
 import './HouseMarker.css'
 
 // House + name plate + pin for one pet, standing on ground line y. Port of houseSVG() in the reference.
-export default function HouseMarker({ pet, x, y, onOpen, dimmed = false }) {
+// interactive={false} draws it as a picture only (the listing form's preview): no button, no focus.
+export default function HouseMarker({ pet, x, y, onOpen, dimmed = false, interactive = true }) {
   const type = houseTypeFor(pet.species)
   const cy = peakY(type, y) - 34
   const className = ['house', pet.status === 'urgent' && 'urgent-pin', dimmed && 'off'].filter(Boolean).join(' ')
+
+  const drawing = (
+    <>
+      <House type={type} x={x} y={y} />
+      <rect className="plate" x={x - 34} y={y + 7} width="68" height="18" rx="9" fill="#FFFDF8" stroke={INK} strokeWidth="2" />
+      <text x={x} y={y + 20} textAnchor="middle" fontFamily="Silkscreen, monospace" fontSize="11" fill={INK}>
+        {pet.name.toUpperCase()}
+      </text>
+      <Pin pet={pet} x={x} cy={cy} />
+    </>
+  )
+  if (!interactive) return <g className={className}>{drawing}</g>
 
   function handleKeyDown(e) {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -27,12 +40,7 @@ export default function HouseMarker({ pet, x, y, onOpen, dimmed = false }) {
       onClick={() => onOpen?.(pet.id)}
       onKeyDown={handleKeyDown}
     >
-      <House type={type} x={x} y={y} />
-      <rect className="plate" x={x - 34} y={y + 7} width="68" height="18" rx="9" fill="#FFFDF8" stroke={INK} strokeWidth="2" />
-      <text x={x} y={y + 20} textAnchor="middle" fontFamily="Silkscreen, monospace" fontSize="11" fill={INK}>
-        {pet.name.toUpperCase()}
-      </text>
-      <Pin pet={pet} x={x} cy={cy} />
+      {drawing}
     </g>
   )
 }

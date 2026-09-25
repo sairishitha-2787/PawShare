@@ -6,6 +6,7 @@ import './Legend.css'
 const HOUSES = [
   { type: 'dog', label: 'Doghouse', sub: 'Dogs' },
   { type: 'cat', label: 'Cat tower', sub: 'Cats' },
+  { type: 'bird', label: 'Birdhouse', sub: 'Birds' },
   { type: 'hutch', label: 'Hutch', sub: 'Small pets' },
 ]
 

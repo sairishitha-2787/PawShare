@@ -45,7 +45,21 @@ function Hutch({ x, y }) {
   )
 }
 
-const SHAPES = { dog: DogHouse, cat: CatTower, hutch: Hutch }
+// a birdhouse on a pole: round entrance hole with a perch under it, lilac roof peaking 100 above the ground
+function Birdhouse({ x, y }) {
+  return (
+    <>
+      <rect x={x - 14} y={y - 5} width="28" height="5" rx="2" fill="#C9A06A" {...SW} />
+      <rect x={x - 4} y={y - 46} width="8" height="42" fill="#C9A06A" {...SW} />
+      <rect x={x - 25} y={y - 82} width="50" height="40" rx="3" fill="#FFF3D6" {...SW} />
+      <circle cx={x} cy={y - 66} r="8" fill={INK} />
+      <rect x={x - 9} y={y - 54} width="18" height="4" rx="2" fill="#C9A06A" stroke={INK} strokeWidth="1.5" />
+      <path d={`M${x - 34} ${y - 78} L${x} ${y - 100} L${x + 34} ${y - 78} Z`} fill="#B8A6E0" {...SW} />
+    </>
+  )
+}
+
+const SHAPES = { dog: DogHouse, cat: CatTower, bird: Birdhouse, hutch: Hutch }
 
 // Ground shadow + house, standing on ground line y and centred on x. The legend draws them without the shadow.
 export default function House({ type, x, y, shadow = true }) {
