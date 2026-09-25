@@ -1,9 +1,5 @@
 import { INK } from '../../utils/pets.js'
 
-// peakY lives in utils/pets.js; re-exported so callers can import it next to House
-// oxlint-disable-next-line react/only-export-components
-export { peakY } from '../../utils/pets.js'
-
 const SW = { stroke: INK, strokeWidth: 2, strokeLinejoin: 'round' }
 
 function DogHouse({ x, y }) {
