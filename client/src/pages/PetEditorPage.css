@@ -1,0 +1,4 @@
+/* ADD_PET.EXE / EDIT_<NAME>.EXE: one window on the grid, taskbar below */
+.editor-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.editor { width: 100%; align-self: start; }
+.editor-wait { position: relative; min-height: 50vh; }

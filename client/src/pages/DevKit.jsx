@@ -14,8 +14,8 @@ import { mockPets } from '../data/mockPets.js'
 import './DevKit.css'
 
 const pet = (id) => mockPets.find((p) => p.id === id)
-// one pet per species; peanut is the only guinea pig
-const FACES = ['biscuit', 'mochi', 'clover', 'peanut'].map(pet)
+// one cartoon face per face shape, photos left off; peanut is a hamster, which uses the guinea face
+const FACES = ['biscuit', 'mochi', 'clover', 'peanut'].map((id) => ({ ...pet(id), photoUrl: undefined }))
 // a stand-in photo so the photoUrl branch (clipped to the same circle) is visible without a network call
 const PHOTO_PET = {
   ...pet('luna'),

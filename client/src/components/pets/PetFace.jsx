@@ -53,7 +53,18 @@ function Features({ species, fur: f, dark: d }) {
       </>
     )
   }
-  // guinea
+  if (species === 'bird') {
+    return (
+      <>
+        <ellipse cx="27" cy="14" rx="3" ry="9" fill={d} transform="rotate(-20 27 14)" />
+        <ellipse cx="33" cy="13" rx="3" ry="10" fill={d} transform="rotate(12 33 13)" />
+        <circle cx="30" cy="35" r="15" fill={f} />
+        <Eyes />
+        <path d="M26.5 37.5h7l-3.5 6z" fill="#F4A340" stroke={INK} strokeWidth="1" strokeLinejoin="round" />
+      </>
+    )
+  }
+  // guinea (hamsters use the guinea face for now)
   return (
     <>
       <circle cx="15" cy="27" r="4.5" fill={d} />

@@ -8,6 +8,8 @@ import DevKit from './pages/DevKit.jsx'
 import ApplyPage from './pages/ApplyPage.jsx'
 import ApplicationsPage from './pages/ApplicationsPage.jsx'
 import ShelterInboxPage from './pages/ShelterInboxPage.jsx'
+import MyPetsPage from './pages/MyPetsPage.jsx'
+import PetEditorPage from './pages/PetEditorPage.jsx'
 import PlaceholderPage from './pages/PlaceholderPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import SignupPage from './pages/SignupPage.jsx'
@@ -39,6 +41,10 @@ createRoot(document.getElementById('root')).render(
             <Route index element={null} />
             <Route path=":id" element={null} />
           </Route>
+          {/* the shelter's listings, and the add / edit form */}
+          <Route path="/shelter/animals" element={<RequireAuth><MyPetsPage /></RequireAuth>} />
+          <Route path="/shelter/animals/new" element={<RequireAuth><PetEditorPage /></RequireAuth>} />
+          <Route path="/shelter/animals/:id/edit" element={<RequireAuth><PetEditorPage /></RequireAuth>} />
           {/* placeholder: messages arrive in session 14 */}
           <Route
             path="/messages"

@@ -213,3 +213,7 @@ npm test
 ```
 
 69 tests across auth, animals, applications, messaging, check-ins, reviews, verification and robustness. They start a throwaway in-memory MongoDB (downloaded automatically on the first run), so they never touch your real database.
+
+## Photo credits
+
+Photo credits: demo pet photos collected from the internet, used only for this non-commercial student project.

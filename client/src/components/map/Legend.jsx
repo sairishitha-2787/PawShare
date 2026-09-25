@@ -6,7 +6,8 @@ import './Legend.css'
 const HOUSES = [
   { type: 'dog', label: 'Doghouse', sub: 'Dogs' },
   { type: 'cat', label: 'Cat tower', sub: 'Cats' },
-  { type: 'hutch', label: 'Hutch', sub: 'Rabbits, guinea pigs' },
+  { type: 'bird', label: 'Birdhouse', sub: 'Birds' },
+  { type: 'hutch', label: 'Hutch', sub: 'Small pets' },
 ]
 
 // Mini house cropped to its roof, like keyRow() in the reference (house at 22,36).

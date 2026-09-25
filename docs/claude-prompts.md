@@ -362,6 +362,86 @@ shelter's note. Lint and build pass. Commit: "feat(shelter): applications inbox"
 
 ---
 
+## Session 12b — Demo pet photos
+
+```text
+Run `git checkout main && git pull`, then create `feature/pet-photos` from main.
+
+1. Add `PHOTOS/` to the root .gitignore (raw source photos must never be committed).
+2. Copy the 9 ready-made 400×400 JPEGs from PHOTOS/demo-pets/ into client/public/demo-pets/
+   (biscuit, mochi, clover, pepper, luna, rocky, tofu, sushi, peanut .jpg). Don't resize them again.
+3. Add 'hamster' as a small-pet species: house type hutch, included in the "Small pets" filter, label "Hamster",
+   cartoon face = the guinea face for now. Check server/models/Animal allows 'hamster'; if it doesn't, tell me
+   and use the closest allowed value instead of changing the model.
+4. Update the pet details in client/src/data/mockPets.js AND the server seed script so they match the photos:
+   Biscuit → Golden Retriever; Pepper → Labrador mix; Luna → grey British Shorthair mix, 4 months, tags
+   Playful / Curious / Indoor only (no grooming tag); Rocky → Golden Retriever (senior); Sushi → ginger Persian
+   mix, fix the blurb; Tofu → dwarf hamster, 6 months; Peanut → Syrian hamster, 1 year, blurb no longer mentions
+   guinea pigs. Keep names, ids, statuses and shelters the same.
+5. Set photoUrl "/demo-pets/<id>.jpg" in mockPets, and in the seed script set photos:
+   [{ url: `${CLIENT_URL || 'http://localhost:5173'}/demo-pets/<id>.jpg` }]. Re-run the seed on the dev database.
+6. Check the photo sits correctly in the pin (40px), the list card (64px) and the profile (120px).
+7. README.md: add "Photo credits: demo pet photos collected from the internet, used only for this
+   non-commercial student project."
+8. Append this prompt to docs/claude-prompts.md.
+Commit: "feat(pets): real demo photos".
+```
+
+---
+
+## Session 13 — Shelter listings
+
+```text
+Run `git checkout main && git pull`, then create `feature/shelter-listings` from main.
+
+Read CLAUDE.md, the "Animals" section and "Integration notes → Photos" in README.md, and server/models/Animal
++ the animals controller (read only, don't change server/). Check: every field and allowed value (species is
+dog/cat/bird/rabbit/other; hamsters are 'other' with "hamster" in the breed), size, gender, listingType, status,
+temperament, the healthRecords shape, location, photo limit, which fields PUT accepts, who can POST (verified
+shelters only?), and what DELETE does when the animal has pending applications. Tell me what you found first.
+
+1. /shelter/animals (shelters + admins, RequireAuth): Window "MY_PETS/" (sun title bar) listing GET /animals/mine
+   as the same PetCard grid as the list view, with a status Pill and "Edit" / "Remove" buttons on each card.
+   Top: "Add a pet" primary button. Status chips: All / Available / Pending / Adopted / Fostered.
+   If the shelter isn't verified: disable "Add a pet" and show the sun note "Your shelter needs admin
+   verification before you can list animals."
+2. /shelter/animals/new and /shelter/animals/:id/edit: one form in a Window "ADD_PET.EXE" / "EDIT_<NAME>.EXE",
+   built from the shared FormField + Chip components, in four titled sections:
+   - BASICS: name, species chips (Dog / Cat / Bird / Rabbit / Hamster / Other small pet → Hamster saves as
+     'other' + breed containing "hamster"), breed, age (number + months/years toggle → stored as ageMonths),
+     gender, size chips, listing type (Adopt / Foster chips), city.
+   - PERSONALITY: temperament tags as toggle chips from the server's allowed list (or free-text chips if it's
+     open), description if the model has one.
+   - HEALTH: vaccinated and neutered (yes/no), and a HEALTH.LOG list of health records using the model's fields
+     (e.g. date + title + notes) with "Add record" and a remove button per row.
+   - PHOTOS: up to the model's limit. Upload via src/api/uploads.js → Cloudinary unsigned upload using
+     VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET (store { url, publicId }). Before uploading,
+     centre-crop to a square and resize to 800×800 in the browser (canvas) so pins look right. Thumbnails in
+     64px circles; first photo = "Main photo", "Make main" to reorder. If the env vars are missing, show a
+     "Paste image URL" field instead. Images only, max 5 MB, show upload progress.
+   - Live preview in a side column: the HouseMarker + Pin exactly as it will look on the map.
+   Validate before saving; show server errors in the pink ERROR box; "SAVING..." while waiting. After saving,
+   go back to MY_PETS/ with a mint "Saved <Name>." note.
+3. Remove: confirm inside the card ("Remove Mochi from PawShare?" → "Yes, remove" / "Cancel"). If the server
+   refuses because of applications, show its message.
+4. Birds: add a birdhouse house type (a small house on a pole with a round entrance hole and a perch, roof
+   #B8A6E0, same SVG style and 2px ink stroke as the others, export its peakY), a cartoon bird face, a legend
+   row "Birdhouse — Birds", and a "Birds" filter chip. mapSpecies: 'bird' → bird.
+5. Profile window (adopter view): add a HEALTH.LOG section showing the health records, and show the main photo
+   large in the header when there is one.
+6. Taskbar for shelters: "My pets" task button. Add VITE_CLOUDINARY_* to client/.env.example.
+7. Works at 400px (the preview column moves under the form). Append this prompt to docs/claude-prompts.md as
+   "Session 13 — Shelter listings".
+
+Done when: logged in as shelter.koramangala@demo.pawshare.test / PawShare@123, adding "Kiwi" (bird, cockatiel,
+2 years, adopt, 1 health record, 1 photo) makes her appear on the neighborhood map in a birdhouse with her photo
+on the pin; editing her breed shows in her profile; removing her takes her off the map; adding "Coco" (cat,
+foster) gives a pink pin; an unverified shelter can't add pets. Lint and build pass.
+Commit: "feat(shelter): add and edit animal listings".
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

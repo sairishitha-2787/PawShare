@@ -3,6 +3,9 @@
 .phead svg { width: 120px; height: 120px; border: 2px solid var(--ink); border-radius: 50%; }
 .phead h2 { margin: 0; font-family: var(--pixel); font-size: 26px; letter-spacing: .03em; line-height: 1.1; }
 .phead .sub { margin: 4px 0 8px; color: var(--ink-soft); }
+/* a main photo shows large, as a rounded square, instead of the round face */
+.phead.has-photo { grid-template-columns: 180px 1fr; }
+.pphoto { width: 180px; height: 180px; object-fit: cover; display: block; border: 2px solid var(--ink); border-radius: 14px; background: var(--cream); box-shadow: 3px 3px 0 var(--ink); }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
 .stats div { background: var(--cream); border: 2px solid var(--ink); border-radius: 10px; padding: 6px 10px; }
 .stats .wide { grid-column: span 2; }
@@ -11,11 +14,24 @@
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tags span { font-size: 13px; background: var(--mint-soft); border: 2px solid var(--ink); border-radius: 999px; padding: 0 10px; }
 .blurb { margin: 0; max-width: 62ch; }
+/* HEALTH.LOG: dated records, oldest first */
+.hlog { border: 2px solid var(--ink); border-radius: 10px; background: var(--mint-soft); padding: 8px 12px 10px; }
+.hlog h3 { margin: 0 0 6px; font-family: var(--pixel); font-size: 11px; letter-spacing: .08em; font-weight: 400; }
+.hlog ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.hlog li { display: grid; grid-template-columns: 104px 1fr; gap: 10px; padding-top: 6px; border-top: 2px dashed var(--mint); }
+.hlog li:first-child { border-top: 0; padding-top: 0; }
+.hlog time { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.hlog b { font-weight: 500; }
+.hlog .vet { font-size: 13px; color: var(--ink-soft); }
+.hlog p { margin: 2px 0 0; font-size: 14px; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
 @media (max-width: 520px) {
   .phead { grid-template-columns: 84px 1fr; }
   .phead svg { width: 84px; height: 84px; }
   .phead h2 { font-size: 21px; }
+  .phead.has-photo { grid-template-columns: 120px 1fr; }
+  .pphoto { width: 120px; height: 120px; }
+  .hlog li { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

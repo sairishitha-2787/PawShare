@@ -26,6 +26,7 @@ const SPECIES = [
   { value: 'all', label: 'All', word: 'PETS' },
   { value: 'dog', label: 'Dogs', word: 'DOGS' },
   { value: 'cat', label: 'Cats', word: 'CATS' },
+  { value: 'bird', label: 'Birds', word: 'BIRDS' },
   { value: 'small', label: 'Small pets', word: 'SMALL PETS' },
 ]
 const VIEWS = [{ value: 'map', label: 'Map' }, { value: 'list', label: 'Full list' }]
@@ -169,7 +170,12 @@ export default function AdoptPage() {
           { id: 'fav', label: `Favorites (${pets.filter((p) => favs.has(p.id)).length})`, hideOnSmall: true },
           // nothing while a saved login is being checked, so "Log in" doesn't flash up
           ...(isAdopter ? [{ id: 'apps', label: applicationsTaskLabel(pendingIn(myApps)), onClick: () => navigate('/applications') }] : []),
-          ...(isShelter ? [{ id: 'inbox', label: inboxTaskLabel(pendingIn(received)), onClick: () => navigate('/shelter/applications') }] : []),
+          ...(isShelter
+            ? [
+                { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
+                { id: 'inbox', label: inboxTaskLabel(pendingIn(received)), onClick: () => navigate('/shelter/applications') },
+              ]
+            : []),
           ...(user
             ? [{ id: 'me', label: `${firstName(user.name)} · ${user.role}` }, { id: 'logout', label: 'Log out', onClick: logout }]
             : authLoading

@@ -46,9 +46,19 @@ export function AuthProvider({ children }) {
   const login = useCallback((email, password) => authApi.login(email, password).then(startSession), [startSession])
   const signup = useCallback((data) => authApi.signup(data).then(startSession), [startSession])
 
+  // fetch the user again (e.g. to see if an admin has verified the shelter since login); a failure keeps the old copy
+  const refreshUser = useCallback(
+    (options) =>
+      authApi
+        .getMe(options)
+        .then(setUser)
+        .catch(() => {}),
+    [],
+  )
+
   const value = useMemo(
-    () => ({ user, token, loading, login, signup, logout }),
-    [user, token, loading, login, signup, logout],
+    () => ({ user, token, loading, login, signup, logout, refreshUser }),
+    [user, token, loading, login, signup, logout, refreshUser],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

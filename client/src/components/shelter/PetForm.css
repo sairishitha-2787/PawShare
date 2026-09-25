@@ -1,0 +1,88 @@
+/* ADD_PET.EXE / EDIT_<NAME>.EXE: the sections on the left, the map preview on the right (under them when narrow) */
+.pet-form { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; padding: 18px; align-items: start; }
+.pf-main { display: grid; gap: 18px; min-width: 0; }
+
+.pf-section { margin: 0; padding: 14px 16px 16px; display: grid; gap: 14px; border: 2px dashed var(--lav); border-radius: 12px; min-width: 0; }
+.pf-section legend {
+  font-family: var(--pixel); font-size: 12px; letter-spacing: .08em; padding: 1px 10px;
+  background: var(--lav-soft); border: 2px solid var(--ink); border-radius: 999px;
+}
+.pf-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+/* age: number + Years/Months */
+.age-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.age-row input { width: 110px; }
+.age-row .seg { margin-left: 0; }
+
+/* inputs outside a Field (age, tag and URL boxes) look like Field inputs */
+.pet-form .age-row input, .tag-add input {
+  font-family: var(--body); font-size: 15px; color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); padding: 8px 10px;
+}
+.pet-form .age-row input:focus, .tag-add input:focus { outline: 3px solid var(--hot); outline-offset: 2px; }
+.pet-form .age-row input[aria-invalid="true"] { border-color: var(--hot); }
+
+/* temperament: a box + Add tag button under the chips */
+.tag-add { display: flex; gap: 8px; align-items: center; }
+.tag-add input { flex: 1; min-width: 0; }
+
+/* HEALTH.LOG */
+.health-log { box-shadow: 3px 3px 0 var(--ink); }
+.log-empty { margin: 0; padding: 14px; font-size: 14px; color: var(--ink-soft); }
+.log-rows { list-style: none; margin: 0; padding: 0; }
+.log-row { display: grid; gap: 10px; padding: 12px 14px; border-bottom: 2px dashed var(--grid); }
+.log-row-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.log-row-head span { font-family: var(--pixel); font-size: 11px; letter-spacing: .06em; color: var(--ink-soft); }
+.log-grid { display: grid; grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.log-notes textarea { min-height: 56px; }
+.log-foot { padding: 12px 14px; }
+
+/* PHOTOS: 64px circles in a row, the first labelled Main photo */
+.thumbs { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 14px; }
+.thumb { display: grid; justify-items: center; gap: 6px; width: 96px; }
+.thumb img { width: 64px; height: 64px; object-fit: cover; border: 2px solid var(--ink); border-radius: 50%; background: var(--cream); }
+.thumb:first-child img { box-shadow: 0 0 0 3px var(--sun), 0 0 0 5px var(--ink); }
+.thumb .btn { font-size: 10px; padding: 3px 8px; }
+.main-tag { font-family: var(--pixel); font-size: 10px; letter-spacing: .04em; background: var(--sun); border: 2px solid var(--ink); border-radius: 999px; padding: 1px 8px; }
+.photo-add { display: grid; gap: 8px; justify-items: start; }
+.photo-add .tag-add { width: 100%; }
+
+/* upload progress: a framed bar that fills in pink */
+.upbar { position: relative; width: min(260px, 100%); height: 22px; border: 2px solid var(--ink); border-radius: 6px; background: var(--paper); overflow: hidden; }
+.upbar i { position: absolute; inset: 0 auto 0 0; background: var(--pink); transition: width .15s; }
+.upbar span { position: relative; display: block; text-align: center; font-family: var(--pixel); font-size: 11px; line-height: 18px; }
+
+/* the "fix the fields" note and the buttons */
+.pf-check { margin: 0; font-size: 15px; padding: 8px 12px; background: var(--pink-soft); border: 2px solid var(--ink); border-radius: 10px; }
+.pf-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.pf-actions .btn { font-size: 13px; padding: 7px 16px; }
+.pet-form .btn:disabled { cursor: not-allowed; opacity: .55; box-shadow: none; }
+.pet-form .btn:disabled:active { transform: none; }
+
+/* ON THE MAP */
+.pf-side {
+  position: sticky; top: 16px; display: grid; gap: 10px; padding: 12px;
+  background: var(--cream); border: 2px solid var(--ink); border-radius: 12px; box-shadow: 3px 3px 0 var(--ink);
+}
+.pf-side h3 { margin: 0; font-family: var(--pixel); font-size: 11px; letter-spacing: .08em; color: var(--ink-soft); font-weight: 400; }
+.preview { margin: 0; display: grid; gap: 8px; }
+.preview svg { width: 100%; max-width: 236px; justify-self: center; border: 2px solid var(--ink); border-radius: 10px; display: block; }
+.preview figcaption, .pf-side-note, .pf-side-empty { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.4; }
+.pf-side-empty { padding: 30px 8px; text-align: center; font-family: var(--pixel); font-size: 12px; }
+
+@media (max-width: 860px) {
+  .pet-form { grid-template-columns: minmax(0, 1fr); }
+  .pf-side { position: static; }
+  .log-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .log-grid .field:first-child { grid-column: 1 / -1; max-width: 200px; }
+}
+
+@media (max-width: 520px) {
+  .pet-form { padding: 12px; gap: 16px; }
+  .pf-section { padding: 12px 10px 14px; }
+  .pf-pair, .log-grid { grid-template-columns: minmax(0, 1fr); }
+  .log-grid .field:first-child { max-width: none; }
+  .log-row { padding: 12px 10px; }
+  .pf-actions { justify-content: stretch; }
+  .pf-actions .btn { flex: 1; }
+}

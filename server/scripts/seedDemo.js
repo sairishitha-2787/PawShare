@@ -19,6 +19,9 @@ const DEMO_PASSWORD = "PawShare@123";
 // createdAt times in mockPets order. That keeps each pet in its reference house on every re-run.
 const LISTED_FROM = new Date("2026-01-01T00:00:00Z");
 
+// Photos are served by the client from client/public/demo-pets/<id>.jpg (id = lowercase name).
+const PHOTO_BASE = `${process.env.CLIENT_URL || "http://localhost:5173"}/demo-pets`;
+
 const SHELTERS = [
   { key: "koramangala", name: "Happy Tails Shelter", city: "Koramangala", coords: [77.6245, 12.9352] },
   { key: "indiranagar", name: "Whisker Walk Rescue", city: "Indiranagar", coords: [77.6408, 12.9784] },
@@ -26,10 +29,11 @@ const SHELTERS = [
   { key: "bengaluru", name: "Bengaluru Paws Collective", city: "Bengaluru", coords: [77.5946, 12.9716] },
 ];
 
-// Same order as mockPets. The API has no guinea pig species, so Peanut is "other".
+// Same order as mockPets. The API has no hamster species, so Tofu and Peanut are "other"; the client
+// reads "hamster" in the breed and shows them as hamsters.
 const ANIMALS = [
   {
-    shelter: "koramangala", name: "Biscuit", species: "dog", breed: "Beagle mix", ageMonths: 24,
+    shelter: "koramangala", name: "Biscuit", species: "dog", breed: "Golden Retriever", ageMonths: 24,
     gender: "male", size: "medium", vaccinated: true, listingType: "adoption", status: "available",
     temperament: ["Loves fetch", "Good with kids", "House-trained"],
     description: "Biscuit follows his nose everywhere and will sit for a single treat. He does best with a family that walks him twice a day.",
@@ -47,40 +51,40 @@ const ANIMALS = [
     description: "Clover spends her mornings doing laps and her afternoons asleep in a cardboard box. Apartment-friendly.",
   },
   {
-    shelter: "hsr", name: "Pepper", species: "dog", breed: "Indie", ageMonths: 48,
+    shelter: "hsr", name: "Pepper", species: "dog", breed: "Labrador mix", ageMonths: 48,
     gender: "female", size: "medium", vaccinated: true, listingType: "adoption", status: "pending",
     temperament: ["Calm", "Leash-trained", "Spayed"],
     description: "Pepper already has an application in review. You can still favorite her in case it falls through.",
   },
   {
-    shelter: "indiranagar", name: "Luna", species: "cat", breed: "Persian mix", ageMonths: 36,
-    gender: "female", size: "medium", vaccinated: true, listingType: "adoption", status: "available",
-    temperament: ["Needs grooming", "Gentle", "Sleeps a lot"],
-    description: "Luna needs brushing three times a week and likes to supervise from the top of the fridge.",
+    shelter: "indiranagar", name: "Luna", species: "cat", breed: "Grey British Shorthair mix", ageMonths: 4,
+    gender: "female", size: "small", vaccinated: true, listingType: "adoption", status: "available",
+    temperament: ["Playful", "Curious", "Indoor only"],
+    description: "Luna is a grey kitten who investigates every bag and box that comes into the house, then naps on top of it.",
   },
   {
-    shelter: "hsr", name: "Rocky", species: "dog", breed: "Labrador", ageMonths: 108,
+    shelter: "hsr", name: "Rocky", species: "dog", breed: "Golden Retriever", ageMonths: 108,
     gender: "male", size: "large", vaccinated: true, listingType: "foster", status: "available",
     temperament: ["Senior", "Arthritis meds", "Very gentle"],
     description: "Rocky was surrendered when his family moved abroad. He needs a ground-floor foster while the shelter is full.",
   },
   {
-    shelter: "koramangala", name: "Tofu", species: "rabbit", breed: "Lionhead", ageMonths: 6,
+    shelter: "koramangala", name: "Tofu", species: "other", breed: "Dwarf hamster", ageMonths: 6,
     gender: "male", size: "small", vaccinated: false, listingType: "adoption", status: "pending",
     temperament: ["Playful", "Chews cables", "Neutered"],
-    description: "Tofu is fluffy and busy. Bunny-proof your wires before he visits.",
+    description: "Tofu is tiny and busy. Keep cables away from his cage, because he will find them.",
   },
   {
-    shelter: "indiranagar", name: "Sushi", species: "cat", breed: "Calico Indie", ageMonths: 24,
+    shelter: "indiranagar", name: "Sushi", species: "cat", breed: "Ginger Persian mix", ageMonths: 24,
     gender: "female", size: "small", vaccinated: true, listingType: "adoption", status: "available",
     temperament: ["Chatty", "Good with cats", "Spayed"],
-    description: "Sushi will tell you about her day, loudly. She shares her space well with other cats.",
+    description: "Sushi has a long ginger coat that needs brushing a few times a week. She shares her space well with other cats.",
   },
   {
-    shelter: "hsr", name: "Peanut", species: "other", breed: "Guinea pig (American)", ageMonths: 18,
+    shelter: "hsr", name: "Peanut", species: "other", breed: "Syrian hamster", ageMonths: 12,
     gender: "male", size: "small", vaccinated: false, listingType: "adoption", status: "available",
-    temperament: ["Squeaks at dinner", "Needs a buddy", "Hay lover"],
-    description: "Peanut should go home with another guinea pig, or to a home that already has one.",
+    temperament: ["Night owl", "Lives solo", "Cheek stuffer"],
+    description: "Peanut is a Syrian hamster, so he lives on his own. He wakes up in the evening and runs laps on his wheel.",
   },
 ];
 
@@ -127,7 +131,13 @@ const seedDemo = async ({ log = () => {} } = {}) => {
     const animal =
       (await Animal.findOne({ owner: owner._id, name: fields.name })) || new Animal({ owner: owner._id });
     const listedAt = new Date(LISTED_FROM.getTime() + i * 60 * 1000);
-    animal.set({ ...fields, location: locationFor(shelter), createdAt: listedAt, updatedAt: new Date() });
+    animal.set({
+      ...fields,
+      photos: [{ url: `${PHOTO_BASE}/${fields.name.toLowerCase()}.jpg` }],
+      location: locationFor(shelter),
+      createdAt: listedAt,
+      updatedAt: new Date(),
+    });
     await animal.save({ timestamps: false });
     animals.push(animal);
   }
