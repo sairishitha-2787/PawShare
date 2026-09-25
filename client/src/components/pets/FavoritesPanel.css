@@ -1,0 +1,4 @@
+.favs { padding: 10px 12px 12px; font-size: 14px; }
+.favs ul { margin: 6px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.favs li button { font-family: var(--body); font-size: 13px; border: 2px solid var(--ink); border-radius: 999px; background: var(--pink-soft); padding: 1px 10px; cursor: pointer; color: var(--ink); }
+.favs p { margin: 0; color: var(--ink-soft); }

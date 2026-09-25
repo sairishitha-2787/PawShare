@@ -2,4 +2,22 @@
 .brand h1 { margin: 0; font-family: var(--pixel); font-weight: 700; font-size: clamp(20px, 3.4vw, 28px); letter-spacing: .04em; }
 .brand h1 span { color: var(--hot); }
 .brand p { margin: 0; color: var(--ink-soft); font-size: 14px; }
-.main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 14px; }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 16px; padding: 14px; }
+
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 14px; border-bottom: 2px dashed var(--lav); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.urgent { display: flex; align-items: center; gap: 7px; font-size: 14px; cursor: pointer; }
+.urgent input { width: 18px; height: 18px; accent-color: #E9668E; }
+
+.side { display: grid; gap: 14px; align-content: start; }
+.side .win { box-shadow: 4px 4px 0 var(--ink); }
+
+.list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; padding: 14px; }
+.list-err { grid-column: 1 / -1; max-width: 360px; justify-self: center; }
+.list-err .body { padding: 16px; font-family: var(--pixel); font-size: 13px; }
+
+@media (max-width: 860px) {
+  /* minmax(0,1fr), not 1fr: the 720px map must scroll inside .mapwrap instead of widening the column */
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .side { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+}

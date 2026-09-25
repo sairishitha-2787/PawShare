@@ -9,6 +9,7 @@ import Modal from '../components/ui/Modal.jsx'
 import Taskbar from '../components/ui/Taskbar.jsx'
 import PetFace from '../components/pets/PetFace.jsx'
 import HouseMarker from '../components/pets/HouseMarker.jsx'
+import Neighborhood from '../components/map/Neighborhood.jsx'
 import { mockPets } from '../data/mockPets.js'
 import './DevKit.css'
 
@@ -28,6 +29,12 @@ const HOUSES = [
   { id: 'mochi', x: 230 },
   { id: 'clover', x: 370 },
   { id: 'pepper', x: 510, dimmed: true },
+]
+
+// 12 pets = one full street of 9 plus 3 on the next, so Next / Previous street show up
+const STREET_PETS = [
+  ...mockPets,
+  ...['biscuit', 'mochi', 'clover'].map((id) => ({ ...pet(id), id: `${id}-2` })),
 ]
 
 const SPECIES = [
@@ -123,6 +130,14 @@ export default function DevKit() {
           </svg>
         </div>
         <p className="kit-body">Last opened: {opened ?? 'none'}. Hover or Tab to lift a pin; Mochi (urgent) bobs.</p>
+      </Window>
+
+      <h2 className="kit-h">NEIGHBORHOOD · 12 PETS (STREET PAGING)</h2>
+      <Window title={`STREETS.EXE — ${STREET_PETS.length} pets`}>
+        <div className="kit-map">
+          <Neighborhood pets={STREET_PETS} onOpen={setOpened} />
+        </div>
+        <p className="kit-body">Street 2 holds Biscuit, Mochi and Clover again (ids biscuit-2, mochi-2, clover-2). Last opened: {opened ?? 'none'}.</p>
       </Window>
 
       <h2 className="kit-h">TASKBAR</h2>

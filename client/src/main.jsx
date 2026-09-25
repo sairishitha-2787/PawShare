@@ -5,14 +5,17 @@ import './styles/tokens.css'
 import './styles/global.css'
 import AdoptPage from './pages/AdoptPage.jsx'
 import DevKit from './pages/DevKit.jsx'
+import { FavoritesProvider } from './context/FavoritesContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<AdoptPage />} />
-        <Route path="/dev/kit" element={<DevKit />} />
-      </Routes>
-    </BrowserRouter>
+    <FavoritesProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<AdoptPage />} />
+          <Route path="/dev/kit" element={<DevKit />} />
+        </Routes>
+      </BrowserRouter>
+    </FavoritesProvider>
   </StrictMode>,
 )
