@@ -1,6 +1,7 @@
 const { describe, it, before, after, beforeEach } = require("node:test");
 const assert = require("node:assert/strict");
 const { app, request, startDB, stopDB, clearDB, signupAs } = require("./setup");
+const User = require("../models/User");
 
 const pet = (name) => ({ name, species: "dog", ageMonths: 24, size: "medium" });
 
@@ -121,6 +122,34 @@ describe("reviews, profiles and adoption history", () => {
     assert.deepEqual(p.stats, { availableCount: 1, placedCount: 1 });
 
     assert.equal((await request(app).get("/api/users/64b000000000000000000000")).status, 404);
+  });
+
+  it("shows a shelter's about text and website but not its verification details", async () => {
+    // The test shelter is already approved, so set what its earlier request would have stored.
+    await User.updateOne(
+      { _id: shelter.user.id },
+      {
+        "verification.registrationNumber": "KA-123",
+        "verification.about": "We rescue street dogs.",
+        "verification.website": "https://example.org",
+        "verification.documentUrl": "https://example.org/cert.pdf",
+        "verification.note": "Checked by phone",
+      }
+    );
+
+    const p = await profile();
+    assert.equal(p.about, "We rescue street dogs.");
+    assert.equal(p.website, "https://example.org");
+    const text = JSON.stringify(p);
+    for (const hidden of ["KA-123", "cert.pdf", "Checked by phone", "registrationNumber", "documentUrl"]) {
+      assert.ok(!text.includes(hidden), `profile leaks ${hidden}`);
+    }
+    assert.equal(p.verification, undefined);
+
+    // Adopters get neither field.
+    const a = (await request(app).get(`/api/users/${adopter.user.id}`)).body.profile;
+    assert.equal(a.about, undefined);
+    assert.equal(a.website, undefined);
   });
 
   it("lets users update their own profile but not their role", async () => {

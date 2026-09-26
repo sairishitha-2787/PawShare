@@ -189,7 +189,7 @@ Messages are not pushed in real time — poll `/unread-count` and the open threa
 ### Users — `/api/users`
 | Method | Path | Access | Notes |
 |---|---|---|---|
-| GET | `/:id` | public | profile without email/phone; shelters include `stats` |
+| GET | `/:id` | public | profile without email/phone; shelters include `stats`, `about` and `website` (from the verification request; never the registration number, document or admin note) |
 | GET | `/:id/reviews` | public | paged, newest first |
 | GET | `/:id/adoption-history` | shelters: public · adopters: self/admin | adopter entries include `reviewed` |
 | PUT | `/me` | logged in | `{ name?, phone?, location? }` |

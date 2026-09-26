@@ -14,7 +14,9 @@ const loadUser = async (id) => {
   return user;
 };
 
-// GET /api/users/:id  — public profile (no email/phone), with shelter stats
+// GET /api/users/:id  — public profile (no email/phone), with shelter stats.
+// Shelters also show the about text and website from their verification request (never the
+// registration number, document or admin note).
 const getProfile = async (req, res) => {
   const user = await loadUser(req.params.id);
 
@@ -35,6 +37,8 @@ const getProfile = async (req, res) => {
       Application.countDocuments({ shelter: user._id, status: "approved" }),
     ]);
     profile.stats = { availableCount, placedCount };
+    profile.about = user.verification?.about || "";
+    profile.website = user.verification?.website || "";
   }
 
   res.json({ profile });
