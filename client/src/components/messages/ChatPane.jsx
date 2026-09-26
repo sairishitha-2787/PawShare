@@ -8,6 +8,7 @@ import { ThreadFace } from './ContactList.jsx'
 import { MAX_MESSAGE, getMessages, markRead, otherPerson, sendMessage } from '../../api/threads.js'
 import { usePolling } from '../../hooks/usePolling.js'
 import { dayKey, dayLabel, mergeMessages, timeOf } from '../../utils/messages.js'
+import ShelterLink from '../shelters/ShelterLink.jsx'
 
 const PAGE = 30
 const POLL_MS = 5000
@@ -166,7 +167,7 @@ export default function ChatPane({ thread, myId, onActivity, onBack, headingRef 
         <ThreadFace thread={thread} name={name} size={44} />
         <div className="chat-who">
           <h2 id={`${composeId}-who`} ref={headingRef} tabIndex={-1}>
-            {name}
+            {other?.role === 'shelter' ? <ShelterLink id={other._id} name={name} /> : name}
             {other?.role === 'shelter' && other.isVerified && <span className="verified">VERIFIED</span>}
           </h2>
           {pet?._id && (

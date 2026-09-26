@@ -19,6 +19,7 @@ import { CONDITION_COLOR, CONDITION_LABEL, groupByApplication, stopState, summar
 import { messagesTaskLabel } from '../utils/messages.js'
 import { formatShort } from '../utils/dates.js'
 import { firstName } from '../utils/auth.js'
+import { profileTask } from '../utils/shelters.js'
 import './ShelterCheckInsPage.css'
 
 const FILTERS = [
@@ -174,6 +175,7 @@ function ShelterCheckIns() {
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt'), hideOnSmall: true },
           { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals'), hideOnSmall: true },
           { id: 'inbox', label: 'Inbox', onClick: () => navigate('/shelter/applications'), hideOnSmall: true },
+          profileTask(user, navigate),
           checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },

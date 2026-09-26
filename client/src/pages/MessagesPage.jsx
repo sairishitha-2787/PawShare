@@ -14,6 +14,7 @@ import { listThreads } from '../api/threads.js'
 import { usePolling } from '../hooks/usePolling.js'
 import { messagesTaskLabel } from '../utils/messages.js'
 import { firstName } from '../utils/auth.js'
+import { profileTask } from '../utils/shelters.js'
 import './MessagesPage.css'
 
 const LIST_POLL_MS = 15000
@@ -157,6 +158,7 @@ export default function MessagesPage() {
           ...(user.role === 'adopter'
             ? [{ id: 'apps', label: 'Applications', onClick: () => navigate('/applications'), hideOnSmall: true }]
             : [{ id: 'inbox', label: 'Inbox', onClick: () => navigate('/shelter/applications'), hideOnSmall: true }]),
+          profileTask(user, navigate),
           checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread.count) },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },

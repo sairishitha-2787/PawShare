@@ -9,6 +9,7 @@
 }
 .mypets-note.sun { background: var(--sun); }
 .mypets-note.mint { background: var(--mint); }
+.mypets-note a { color: var(--ink); font-weight: 600; text-decoration-thickness: 2px; text-underline-offset: 2px; }
 
 .mypets-tools {
   display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;

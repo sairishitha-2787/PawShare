@@ -9,6 +9,8 @@ import PetFace from '../components/pets/PetFace.jsx'
 import Timeline from '../components/checkins/Timeline.jsx'
 import HealthLog from '../components/checkins/HealthLog.jsx'
 import CheckInForm from '../components/checkins/CheckInForm.jsx'
+import ShelterLink from '../components/shelters/ShelterLink.jsx'
+import RateShelter from '../components/shelters/RateShelter.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
 import { useCheckIns, useCheckInsTask } from '../context/CheckInsContext.jsx'
@@ -54,11 +56,17 @@ function useDiary() {
   return { ...load, retry, refresh }
 }
 
-// "Adopted from Stray Hearts Trust on 22 Aug" / "Fostered from ..."
-function fromLine(application) {
+// "Adopted from Stray Hearts Trust on 22 Aug" / "Fostered from ...", the shelter linking to its profile
+function FromLine({ application }) {
   const verb = application.type === 'foster' ? 'Fostered' : 'Adopted'
-  const shelter = application.shelter?.name || 'the shelter'
-  return application.decidedAt ? `${verb} from ${shelter} on ${formatShort(application.decidedAt)}` : `${verb} from ${shelter}`
+  const { shelter } = application
+  return (
+    <p>
+      {`${verb} from `}
+      {shelter?.name ? <ShelterLink id={shelter._id} name={shelter.name} /> : 'the shelter'}
+      {application.decidedAt && ` on ${formatShort(application.decidedAt)}`}
+    </p>
+  )
 }
 
 // One pet: face, name, where from; the timeline; the buttons; HEALTH.LOG.
@@ -80,7 +88,7 @@ function PetSection({ entry, saved, onFill }) {
         <PetFace pet={pet} size={64} />
         <div>
           <h2 id={headingId}>{pet.name}</h2>
-          <p>{fromLine(application)}</p>
+          <FromLine application={application} />
         </div>
       </div>
 
@@ -94,6 +102,8 @@ function PetSection({ entry, saved, onFill }) {
         )}
         <Button onClick={() => onFill(entry, null)}>Log an update</Button>
       </div>
+
+      <RateShelter application={application} petName={pet.name} />
 
       <HealthLog entries={log} petName={pet.name} />
     </section>

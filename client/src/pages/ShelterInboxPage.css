@@ -9,6 +9,7 @@
   margin: 0; font-size: 15px; line-height: 1.45; padding: 8px 12px;
   background: var(--sun); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 3px 3px 0 var(--ink);
 }
+.inbox-note a { color: var(--ink); font-weight: 600; text-decoration-thickness: 2px; text-underline-offset: 2px; }
 
 /* toolbar: status chips, then the pet dropdown */
 .inbox-tools {

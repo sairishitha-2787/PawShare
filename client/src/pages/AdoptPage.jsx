@@ -23,6 +23,7 @@ import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
 import { matchesFilter } from '../utils/pets.js'
 import { mockPets } from '../data/mockPets.js'
 import { getAnimal, getAnimals } from '../api/animals.js'
+import { profileTask } from '../utils/shelters.js'
 import './AdoptPage.css'
 
 const SPECIES = [
@@ -179,6 +180,7 @@ export default function AdoptPage() {
             ? [
                 { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
                 { id: 'inbox', label: inboxTaskLabel(pendingIn(received)), onClick: () => navigate('/shelter/applications') },
+                profileTask(user, navigate),
               ]
             : []),
           ...(user
