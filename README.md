@@ -41,7 +41,7 @@ npm run dev                 # http://localhost:5000/api/health → {"status":"ok
 
 ### Demo accounts
 
-Created by `npm run seed:demo`. Every account uses the password `PawShare@123`. Each shelter is verified and has a short public about text.
+Created by `npm run seed:demo`. Every account uses the password `PawShare@123`. The first four shelters are verified and have a short public about text; the last two are waiting on an admin.
 
 | Email | Role | What's there |
 |---|---|---|
@@ -49,7 +49,12 @@ Created by `npm run seed:demo`. Every account uses the password `PawShare@123`. 
 | `shelter.indiranagar@demo.pawshare.test` | shelter | Whisker Walk Rescue: Mochi, Luna, Sushi |
 | `shelter.hsr@demo.pawshare.test` | shelter | Stray Hearts Trust: Pepper, Rocky, Peanut, and Bruno (adopted) |
 | `shelter.bengaluru@demo.pawshare.test` | shelter | Bengaluru Paws Collective (no pets yet) |
+| `shelter.jpnagar@demo.pawshare.test` | shelter | Paws & Whiskers Foundation, JP Nagar. Verification **pending** (registration KA-BLR-TR-2024-0417), so it can't list pets until an admin approves it. |
+| `shelter.whitefield@demo.pawshare.test` | shelter | Little Paws Home, Whitefield. Verification **not submitted** yet. |
 | `adopter@demo.pawshare.test` | adopter | Ananya Rao. Adopted Bruno from Stray Hearts Trust 35 days before the first seed: 1-week check-in done, 1-month overdue, 3-month still to come. Left Stray Hearts a 5-star review for Bruno. |
+| admin | admin | Not seeded: create your own with `npm run create-admin`. |
+
+The seed only sets the two unverified shelters' verification when it first creates them, so approving, rejecting or resubmitting survives a re-run.
 
 ---
 
@@ -201,6 +206,8 @@ Messages are not pushed in real time — poll `/unread-count` and the open threa
 | POST | `/api/verification/request` | shelter | `{ registrationNumber, about, website?, documentUrl? }` |
 | GET | `/api/admin/shelters` | admin | `?status=pending\|approved\|rejected\|unsubmitted` |
 | PATCH | `/api/admin/shelters/:id/verification` | admin | `{ decision: approve\|reject, note? }` |
+
+Rejecting an approved shelter revokes it; existing listings stay live, new listings are blocked until re-approved.
 
 ---
 
