@@ -52,7 +52,7 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 
 ```
 client/src/
-  api/          client.js, animals.js, auth.js, applications.js, uploads.js (Cloudinary photo upload), threads.js
+  api/          client.js, animals.js, auth.js, applications.js, uploads.js (Cloudinary photo upload), threads.js, checkins.js
   components/
     ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar, Field, ChoiceField, LoadingWindow
     auth/       RequireAuth, FormError
@@ -62,11 +62,13 @@ client/src/
     inbox/      ReadingPane (the shelter's view of one application, with Approve / Reject)
     shelter/    PetForm (add/edit listing) + TagField, HealthLogField, PhotoField, PetPreview
     messages/   ContactList, ChatPane, MessageButton (starts a thread, then opens /messages/:threadId)
-  context/      AuthContext.jsx, FavoritesContext.jsx, UnreadContext.jsx (unread message count, polled every 15s)
+    checkins/   Timeline (1 WEEK · 1 MONTH · 3 MONTHS stops), HealthLog + WeightChart, CheckInForm (CHECKUP.EXE modal)
+  context/      AuthContext.jsx, FavoritesContext.jsx, UnreadContext.jsx (unread message count, polled every 15s),
+                CheckInsContext.jsx (the taskbar's check-ins count, polled every minute; useCheckInsTask)
   hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js, usePolling.js
   data/         mockPets.js
   pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, ShelterInboxPage.jsx, MyPetsPage.jsx, PetEditorPage.jsx,
-                MessagesPage.jsx, LoginPage.jsx, SignupPage.jsx, DevKit.jsx
+                MessagesPage.jsx, CheckInsPage.jsx (PET_DIARY.EXE), ShelterCheckInsPage.jsx (CHECKINS.EXE), LoginPage.jsx, SignupPage.jsx, DevKit.jsx
   styles/       tokens.css, global.css
 ```
 

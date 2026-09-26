@@ -12,6 +12,7 @@ import PetFace from '../components/pets/PetFace.jsx'
 import ApplicationDetail from '../components/apply/ApplicationDetail.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
+import { useCheckInsTask } from '../context/CheckInsContext.jsx'
 import { messagesTaskLabel } from '../utils/messages.js'
 import { useMyApplications } from '../hooks/useMyApplications.js'
 import { applicationPet, canApplyAgain, isActive } from '../api/applications.js'
@@ -65,6 +66,7 @@ function MyApplications() {
   const { count: unread } = useUnread()
   const navigate = useNavigate()
   const { status, applications, retry, refresh, patch } = useMyApplications()
+  const checkInsTask = useCheckInsTask(navigate)
   const [filter, setFilter] = useState('all')
 
   const counts = { all: applications.length }
@@ -125,6 +127,7 @@ function MyApplications() {
         items={[
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
           { id: 'apps', label: applicationsTaskLabel(status === 'ready' ? counts.pending : null) },
+          checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
           { id: 'logout', label: 'Log out', onClick: logout },

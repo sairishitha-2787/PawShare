@@ -1,0 +1,36 @@
+/* PET_DIARY.EXE: one window, a section per pet, taskbar below */
+.diary-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.diary { max-width: 760px; width: 100%; justify-self: center; align-self: start; }
+
+.diary-main { padding: 16px; display: grid; gap: 0; }
+/* room for the centered LOADING... / ERROR window */
+.diary-main.waiting { position: relative; min-height: 280px; }
+
+.diary-pet { display: grid; gap: 16px; padding: 18px 0; border-top: 2px dashed var(--grid); scroll-margin-top: 12px; }
+.diary-pet:first-child { border-top: 0; padding-top: 2px; }
+.diary-pet:last-child { padding-bottom: 2px; }
+
+.diary-head { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; align-items: center; }
+.diary-head > svg, .diary-head > img { width: 64px; height: 64px; border: 2px solid var(--ink); border-radius: 50%; }
+.diary-head h2 { margin: 0; font-family: var(--pixel); font-size: 20px; letter-spacing: .03em; line-height: 1.1; overflow-wrap: anywhere; }
+.diary-head p { margin: 4px 0 0; color: var(--ink-soft); font-size: 14px; }
+
+.diary-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.diary .btn { font-size: 13px; padding: 7px 16px; text-decoration: none; }
+
+.diary-saved {
+  margin: 0; font-weight: 600; background: var(--mint); border: 2px solid var(--ink); border-radius: 10px;
+  padding: 8px 12px; box-shadow: 3px 3px 0 var(--ink);
+}
+.diary-saved:focus { outline: none; }
+.diary-saved:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+
+.diary-empty { display: grid; justify-items: center; gap: 14px; padding: 36px 16px; text-align: center; }
+.diary-empty p { margin: 0; font-family: var(--pixel); font-size: 13px; letter-spacing: .04em; }
+
+@media (max-width: 520px) {
+  .diary-main { padding: 12px; }
+  .diary-head { grid-template-columns: 52px minmax(0, 1fr); gap: 10px; }
+  .diary-head > svg, .diary-head > img { width: 52px; height: 52px; }
+  .diary-head h2 { font-size: 17px; }
+}

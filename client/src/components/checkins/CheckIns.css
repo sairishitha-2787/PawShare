@@ -1,0 +1,99 @@
+/* ---- Timeline: the scheduled check-ins as stops on a dashed line ---- */
+.timeline {
+  --dot: 34px;
+  position: relative; list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(var(--stops, 3), minmax(0, 1fr)); gap: 12px;
+}
+/* the dashed line runs from the first dot's centre to the last one's */
+.timeline::before {
+  content: ""; position: absolute; top: calc(var(--dot) / 2 - 1px);
+  left: calc(100% / var(--stops, 3) / 2); right: calc(100% / var(--stops, 3) / 2);
+  border-top: 2px dashed var(--ink);
+}
+.stop { position: relative; display: grid; justify-items: center; gap: 8px; text-align: center; }
+.stop-dot {
+  width: var(--dot); height: var(--dot); display: grid; place-items: center;
+  border: 2px solid var(--ink); border-radius: 50%; background: var(--paper); box-shadow: 2px 2px 0 var(--ink);
+}
+.stop-words { display: grid; justify-items: center; gap: 4px; }
+.stop-name { font-family: var(--pixel); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+.stop-text {
+  font-size: 13px; font-weight: 500; line-height: 1.3;
+  border: 2px solid var(--ink); border-radius: 999px; padding: 1px 10px; background: var(--paper);
+}
+.stop.done .stop-dot, .stop.done .stop-text { background: var(--mint); }
+.stop.soon .stop-dot, .stop.soon .stop-text { background: var(--sun); }
+.stop.overdue .stop-dot, .stop.overdue .stop-text { background: var(--pink); }
+
+/* ---- HEALTH.LOG ---- */
+.health-log { box-shadow: 3px 3px 0 var(--ink); }
+.health-log .bar { font-size: 12px; padding: 5px 10px; }
+.log-body { padding: 12px 14px; display: grid; gap: 14px; }
+.log-empty { margin: 0; font-family: var(--pixel); font-size: 12px; letter-spacing: .04em; color: var(--ink-soft); text-align: center; padding: 8px 0; }
+.log-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.log-entry { display: grid; gap: 6px; padding: 12px 0; border-top: 2px dashed var(--grid); }
+.log-entry:first-child { border-top: 0; padding-top: 0; }
+.log-entry:last-child { padding-bottom: 0; }
+.log-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.log-head time { font-weight: 600; }
+.log-title { font-size: 13px; color: var(--ink-soft); }
+.log-head .pill { white-space: nowrap; }
+.log-facts { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; }
+.log-facts div { display: flex; gap: 6px; }
+.log-facts dt { font-family: var(--pixel); font-size: 10px; letter-spacing: .04em; text-transform: uppercase; align-self: center; }
+.log-facts dd { margin: 0; }
+.log-notes { margin: 0; font-size: 14px; line-height: 1.45; background: var(--cream); border-radius: 8px; padding: 6px 10px; overflow-wrap: anywhere; white-space: pre-line; }
+.log-photos { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.log-photos a { display: block; border-radius: 50%; }
+.log-photos img { display: block; width: 64px; height: 64px; object-fit: cover; border: 2px solid var(--ink); border-radius: 50%; background: var(--cream); }
+
+/* weight chart */
+.weight-chart { margin: 0; display: grid; gap: 4px; }
+.weight-chart figcaption { font-family: var(--pixel); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+.weight-chart svg { width: 100%; max-width: 420px; height: auto; display: block; background: var(--paper); }
+.wc-axis { font-family: var(--pixel); font-size: 10px; fill: var(--ink); }
+.wc-grid { stroke: var(--grid); stroke-width: 1.5; }
+.wc-axis-line { stroke: var(--ink); stroke-width: 2; }
+.wc-line { fill: none; stroke: var(--hot); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.wc-point { fill: var(--pink); stroke: var(--ink); stroke-width: 2; }
+
+/* ---- CHECKUP.EXE form ---- */
+.checkup { padding: 16px; display: grid; gap: 14px; }
+.checkup h2 { margin: 0; font-family: var(--pixel); font-size: 16px; letter-spacing: .03em; line-height: 1.3; }
+.checkup .field input[type="number"] { max-width: 160px; }
+.checkup-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.checkup .btn { font-size: 13px; padding: 7px 16px; }
+.checkup .btn:disabled { cursor: progress; opacity: .75; }
+.checkup .btn:disabled:active { transform: none; box-shadow: 2px 2px 0 var(--ink); }
+
+.ci-thumbs { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 14px; }
+.ci-thumbs li { display: grid; justify-items: center; gap: 6px; }
+.ci-thumbs img { width: 64px; height: 64px; object-fit: cover; border: 2px solid var(--ink); border-radius: 50%; background: var(--cream); }
+.checkup .ci-thumbs .btn { font-size: 10px; padding: 3px 8px; }
+.ci-photo-add { display: grid; gap: 8px; justify-items: start; }
+.ci-url { display: flex; gap: 8px; align-items: center; width: 100%; }
+.ci-url input {
+  flex: 1; min-width: 0; font-family: var(--body); font-size: 15px; color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); padding: 8px 10px;
+}
+.ci-url input:focus { outline: 3px solid var(--hot); outline-offset: 2px; }
+.ci-upbar { position: relative; width: min(260px, 100%); height: 22px; border: 2px solid var(--ink); border-radius: 6px; background: var(--paper); overflow: hidden; }
+.ci-upbar i { position: absolute; inset: 0 auto 0 0; background: var(--pink); transition: width .15s; }
+.ci-upbar span { position: relative; display: block; text-align: center; font-family: var(--pixel); font-size: 11px; line-height: 18px; }
+
+/* ---- narrow: the timeline stacks, the line runs down the left ---- */
+@media (max-width: 520px) {
+  .timeline { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .timeline::before {
+    top: calc(var(--dot) / 2); bottom: calc(var(--dot) / 2); left: calc(var(--dot) / 2 - 1px); right: auto;
+    border-top: 0; border-left: 2px dashed var(--ink);
+  }
+  .stop { grid-template-columns: var(--dot) minmax(0, 1fr); justify-items: start; align-items: center; gap: 12px; text-align: left; }
+  .stop-words { justify-items: start; }
+  .checkup { padding: 14px; }
+  .log-body { padding: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ci-upbar i { transition: none; }
+}

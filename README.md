@@ -37,6 +37,19 @@ npm run dev                 # http://localhost:5000/api/health → {"status":"ok
 | `npm start` | Start for production |
 | `npm test` | Run the test suite on an in-memory MongoDB — no Atlas needed |
 | `npm run create-admin -- <email> <password> ["Name"]` | Create an admin, or promote an existing user. Admins can't sign up through the API. |
+| `npm run seed:demo` | Add the demo shelters, pets and adopter below. Safe to re-run: updates them in place. |
+
+### Demo accounts
+
+Created by `npm run seed:demo`. Every account uses the password `PawShare@123`.
+
+| Email | Role | What's there |
+|---|---|---|
+| `shelter.koramangala@demo.pawshare.test` | shelter | Happy Tails Shelter: Biscuit, Clover, Tofu |
+| `shelter.indiranagar@demo.pawshare.test` | shelter | Whisker Walk Rescue: Mochi, Luna, Sushi |
+| `shelter.hsr@demo.pawshare.test` | shelter | Stray Hearts Trust: Pepper, Rocky, Peanut, and Bruno (adopted) |
+| `shelter.bengaluru@demo.pawshare.test` | shelter | Bengaluru Paws Collective (no pets yet) |
+| `adopter@demo.pawshare.test` | adopter | Ananya Rao. Adopted Bruno from Stray Hearts Trust 35 days before the first seed: 1-week check-in done, 1-month overdue, 3-month still to come. |
 
 ---
 
