@@ -13,6 +13,7 @@ import MessageButton from '../components/messages/MessageButton.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
 import { useCheckInsTask } from '../context/CheckInsContext.jsx'
+import { useAdminTask } from '../context/AdminContext.jsx'
 import { getReceivedCheckIns } from '../api/checkins.js'
 import { petLook } from '../api/animals.js'
 import { CONDITION_COLOR, CONDITION_LABEL, groupByApplication, stopState, summarize } from '../utils/checkins.js'
@@ -129,6 +130,7 @@ function ShelterCheckIns() {
   const navigate = useNavigate()
   const { status, rows, retry } = useAdoptions()
   const checkInsTask = useCheckInsTask(navigate, { current: true })
+  const adminTask = useAdminTask(navigate)
   const [filter, setFilter] = useState('all')
   const [openId, setOpenId] = useState(null)
 
@@ -176,6 +178,7 @@ function ShelterCheckIns() {
           { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals'), hideOnSmall: true },
           { id: 'inbox', label: 'Inbox', onClick: () => navigate('/shelter/applications'), hideOnSmall: true },
           profileTask(user, navigate),
+          adminTask,
           checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },

@@ -10,6 +10,7 @@ import ChatPane from '../components/messages/ChatPane.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
 import { useCheckInsTask } from '../context/CheckInsContext.jsx'
+import { useAdminTask } from '../context/AdminContext.jsx'
 import { listThreads } from '../api/threads.js'
 import { usePolling } from '../hooks/usePolling.js'
 import { messagesTaskLabel } from '../utils/messages.js'
@@ -53,6 +54,7 @@ export default function MessagesPage() {
   const unread = useUnread()
   const navigate = useNavigate()
   const checkInsTask = useCheckInsTask(navigate)
+  const adminTask = useAdminTask(navigate)
   const location = useLocation()
   const threads = useThreads()
 
@@ -159,6 +161,7 @@ export default function MessagesPage() {
             ? [{ id: 'apps', label: 'Applications', onClick: () => navigate('/applications'), hideOnSmall: true }]
             : [{ id: 'inbox', label: 'Inbox', onClick: () => navigate('/shelter/applications'), hideOnSmall: true }]),
           profileTask(user, navigate),
+          adminTask,
           checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread.count) },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },

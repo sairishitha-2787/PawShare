@@ -1,0 +1,82 @@
+/* CONTROL_PANEL.EXE › Shelter verification: status chips, then the shelter list and the request side by side */
+.vtools { padding: 12px 14px; border-bottom: 2px dashed var(--grid); }
+.vchips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.vpanes { display: grid; grid-template-columns: minmax(260px, 2fr) minmax(0, 3fr); }
+.vlist { padding: 10px; border-right: 2px dashed var(--grid); max-height: 72vh; overflow-y: auto; }
+.vpane-wrap { padding: 16px 18px; min-width: 0; }
+
+/* shelter rows, like the inbox's message rows */
+.vrows { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.vrow {
+  width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center;
+  padding: 8px 10px; background: none; border: 2px solid transparent; border-radius: 10px;
+  font: inherit; color: var(--ink); text-align: left; cursor: pointer;
+}
+.vrow:hover { background: var(--cream); border-color: var(--ink); }
+.vrow.selected { background: var(--lav-soft); border-color: var(--ink); }
+.vrow-main { display: grid; gap: 1px; min-width: 0; }
+.vrow-name { overflow-wrap: anywhere; }
+.vrow.unread .vrow-name { font-weight: 600; }
+.vrow-area { font-size: 13px; color: var(--ink-soft); overflow-wrap: anywhere; }
+.vrow-side { display: grid; justify-items: end; gap: 4px; }
+.vrow-date { font-size: 12px; color: var(--ink-soft); white-space: nowrap; }
+.vrow .pill { white-space: nowrap; }
+
+.vempty, .vhint {
+  margin: 0; font-family: var(--pixel); font-size: 13px; letter-spacing: .04em; line-height: 1.6; text-align: center;
+}
+.vempty { padding: 28px 10px; }
+.vhint { padding: 40px 10px; color: var(--ink-soft); }
+
+/* the request */
+.vpane { display: grid; gap: 14px; }
+.vpane .sub { margin: 2px 0 0; color: var(--ink-soft); font-size: 14px; overflow-wrap: anywhere; }
+.vpane-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.vpane-head h2 { margin: 0; font-family: var(--pixel); font-size: 20px; letter-spacing: .03em; line-height: 1.15; overflow-wrap: anywhere; }
+.vpane-head h2:focus { outline: none; }
+.vpane-head h2:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+.vpane-head .pill { flex: none; font-size: 11px; padding: 2px 10px; white-space: nowrap; }
+
+.vdone {
+  margin: 0; padding: 8px 12px; font-weight: 500;
+  background: var(--mint); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 3px 3px 0 var(--ink);
+}
+
+.vdetails { margin: 0; display: grid; gap: 10px; }
+.vdetail { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 4px 12px; align-items: baseline; }
+.vdetail dt { font-family: var(--pixel); font-size: 10px; letter-spacing: .06em; color: var(--ink-soft); text-transform: uppercase; }
+.vdetail dd { margin: 0; overflow-wrap: anywhere; }
+.vdetail .none { color: var(--ink-soft); }
+.vabout { white-space: pre-line; }
+.vpane a { color: var(--ink); font-weight: 600; text-decoration-thickness: 2px; text-underline-offset: 2px; }
+.vpane a:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+
+.vnone, .vwaiting, .vprofile { margin: 0; }
+.vnone { color: var(--ink-soft); }
+.vprofile { font-size: 14px; }
+.vwaiting {
+  padding: 10px 12px; border: 2px dashed var(--ink-soft); border-radius: 10px;
+  font-family: var(--pixel); font-size: 12px; letter-spacing: .04em; line-height: 1.6; text-align: center;
+}
+
+.vexplain { margin: 0; font-size: 14px; line-height: 1.45; }
+.vdecide .btn { font-size: 13px; padding: 7px 16px; }
+.vdecide .btn:disabled { cursor: progress; opacity: .75; }
+.vdecide .btn:disabled:active { transform: none; box-shadow: 2px 2px 0 var(--ink); }
+
+/* one column: the list, then the request under it */
+@media (max-width: 859px) {
+  .vpanes { grid-template-columns: minmax(0, 1fr); }
+  .vlist { border-right: 0; max-height: none; overflow: visible; }
+  .vpane-wrap { border-top: 2px dashed var(--grid); }
+  .vpane-wrap.idle { display: none; }
+}
+
+@media (max-width: 520px) {
+  .vtools { padding: 10px; }
+  .vchips { gap: 6px; }
+  .vlist { padding: 6px; }
+  .vpane-wrap { padding: 14px 12px; }
+  .vdetail { grid-template-columns: minmax(0, 1fr); }
+}

@@ -12,6 +12,7 @@ import ReadingPane from '../components/inbox/ReadingPane.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
 import { useCheckInsTask } from '../context/CheckInsContext.jsx'
+import { useAdminTask } from '../context/AdminContext.jsx'
 import { messagesTaskLabel } from '../utils/messages.js'
 import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
 import { applicationPet } from '../api/applications.js'
@@ -84,6 +85,7 @@ function Inbox() {
   const { status, applications, retry, refresh, patch } = useReceivedApplications()
   const ownAnimals = useOwnAnimals()
   const checkInsTask = useCheckInsTask(navigate)
+  const adminTask = useAdminTask(navigate)
   const [petId, setPetId] = useState('')
 
   // the selected application lives in the URL: /shelter/applications/:id
@@ -223,6 +225,7 @@ function Inbox() {
           { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
           { id: 'inbox', label: inboxTaskLabel(pendingTotal) },
           profileTask(user, navigate),
+          adminTask,
           checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },

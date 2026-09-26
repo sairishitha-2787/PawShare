@@ -17,11 +17,13 @@ import LoginPage from './pages/LoginPage.jsx'
 import SignupPage from './pages/SignupPage.jsx'
 import ShelterProfilePage from './pages/ShelterProfilePage.jsx'
 import VerificationPage from './pages/VerificationPage.jsx'
+import AdminPage from './pages/AdminPage.jsx'
 import RequireAuth from './components/auth/RequireAuth.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { FavoritesProvider } from './context/FavoritesContext.jsx'
 import { UnreadProvider } from './context/UnreadContext.jsx'
 import { CheckInsProvider } from './context/CheckInsContext.jsx'
+import { AdminProvider } from './context/AdminContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -29,6 +31,7 @@ createRoot(document.getElementById('root')).render(
     <FavoritesProvider>
     <UnreadProvider>
     <CheckInsProvider>
+    <AdminProvider>
       <BrowserRouter>
         <Routes>
           {/* one layout route so the page (filters, street, view) stays mounted while profiles open and close */}
@@ -64,11 +67,16 @@ createRoot(document.getElementById('root')).render(
           {/* a shelter's public profile (#general, #pets, #reviews, #history pick the tab), and its verification request */}
           <Route path="/shelters/:id" element={<ShelterProfilePage />} />
           <Route path="/shelter/verification" element={<RequireAuth><VerificationPage /></RequireAuth>} />
+          <Route path="/admin" element={<RequireAuth><AdminPage /></RequireAuth>}>
+            <Route index element={null} />
+            <Route path=":section" element={null} />
+          </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dev/kit" element={<DevKit />} />
         </Routes>
       </BrowserRouter>
+    </AdminProvider>
     </CheckInsProvider>
     </UnreadProvider>
     </FavoritesProvider>

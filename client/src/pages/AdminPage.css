@@ -1,0 +1,74 @@
+/* CONTROL_PANEL.EXE: summary row, then the icon grid or one section; taskbar below */
+.admin-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.admin-stack { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.cpanel { width: 100%; }
+
+/* "Saved Kiwi." / "Removed Mochi." */
+.admin-note {
+  margin: 0; font-size: 15px; line-height: 1.45; padding: 8px 12px; background: var(--mint);
+  border: 2px solid var(--ink); border-radius: 10px; box-shadow: 3px 3px 0 var(--ink);
+}
+
+/* Waiting for verification · Verified shelters · Listings · Placed pets */
+.cp-summary {
+  margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px;
+  padding: 12px 14px; border-bottom: 2px dashed var(--grid); background: var(--cream);
+}
+.cp-stat {
+  display: grid; gap: 2px; align-content: start; padding: 8px 10px;
+  background: var(--paper); border: 2px solid var(--ink); border-radius: 10px;
+}
+.cp-stat dt { font-family: var(--pixel); font-size: 10px; letter-spacing: .06em; line-height: 1.4; text-transform: uppercase; color: var(--ink-soft); }
+.cp-stat dd { margin: 0; font-family: var(--pixel); font-size: 22px; line-height: 1.2; }
+
+/* the classic Control Panel icon grid */
+.cp-icons {
+  list-style: none; margin: 0; padding: 24px 18px 28px;
+  display: flex; flex-wrap: wrap; gap: 18px 12px; justify-content: flex-start;
+}
+.cp-icon {
+  width: 150px; display: grid; justify-items: center; gap: 8px; padding: 12px 8px 10px;
+  background: none; border: 2px dashed transparent; border-radius: 12px;
+  font: inherit; color: var(--ink); cursor: pointer; text-align: center;
+}
+.cp-icon:hover { background: var(--lav-soft); border-color: var(--ink); }
+.cp-icon:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; background: var(--lav-soft); }
+.cp-icon:active .cp-art { transform: translate(1px, 1px); }
+.cp-art { position: relative; display: block; width: 56px; height: 56px; }
+.cp-art svg { display: block; }
+.cp-badge {
+  position: absolute; top: -6px; right: -12px; min-width: 24px; height: 24px; padding: 0 5px;
+  display: grid; place-items: center; font-family: var(--pixel); font-size: 11px; line-height: 1;
+  background: var(--sun); border: 2px solid var(--ink); border-radius: 999px; box-shadow: 2px 2px 0 var(--ink);
+}
+.cp-label { font-family: var(--pixel); font-size: 12px; letter-spacing: .03em; line-height: 1.45; text-transform: uppercase; }
+
+/* one section: "← Control Panel" and its heading, then the section */
+.cp-nav {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+  padding: 12px 14px; border-bottom: 2px dashed var(--grid);
+}
+.cp-nav .btn { font-size: 12px; padding: 6px 12px; }
+.cp-nav h2 { margin: 0; font-family: var(--pixel); font-size: 16px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+.cp-nav h2:focus { outline: none; }
+.cp-nav h2:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+
+/* room for the centered LOADING... / ERROR window */
+.cp-wait { position: relative; min-height: 300px; }
+.cp-denied { min-height: 60vh; }
+
+@media (max-width: 720px) {
+  .cp-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .cp-summary { padding: 10px; gap: 8px; }
+  .cp-stat dd { font-size: 18px; }
+  .cp-icons { padding: 16px 8px 20px; gap: 12px 4px; justify-content: center; }
+  .cp-icon { width: 128px; }
+  .cp-nav { padding: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-icon:active .cp-art { transform: none; }
+}

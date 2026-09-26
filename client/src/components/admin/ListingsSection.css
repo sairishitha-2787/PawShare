@@ -1,0 +1,25 @@
+/* CONTROL_PANEL.EXE › Listings: status chips + search, then the MY_PETS/ card grid */
+.ls-tools {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px;
+  padding: 12px 14px; border-bottom: 2px dashed var(--grid);
+}
+.ls-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ls-search { display: flex; align-items: center; gap: 8px; }
+.ls-search span { font-family: var(--pixel); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+.ls-search input {
+  font-family: var(--body); font-size: 15px; color: var(--ink); width: 200px; max-width: 100%;
+  border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); padding: 6px 8px;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.ls-search input:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+
+.ls-empty { margin: 0; padding: 36px 16px; font-family: var(--pixel); font-size: 13px; letter-spacing: .04em; line-height: 1.6; text-align: center; overflow-wrap: anywhere; }
+.ls-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; padding: 14px; }
+
+@media (max-width: 520px) {
+  .ls-tools { padding: 10px; }
+  .ls-chips { gap: 6px; }
+  .ls-search { width: 100%; }
+  .ls-search input { flex: 1; min-width: 0; width: auto; }
+  .ls-list { padding: 10px; }
+}

@@ -2,19 +2,20 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import Chip from '../components/ui/Chip.jsx'
-import Pill from '../components/ui/Pill.jsx'
 import Button from '../components/ui/Button.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
 import Taskbar from '../components/ui/Taskbar.jsx'
 import PetCard from '../components/pets/PetCard.jsx'
+import ListingFoot from '../components/shelter/ListingFoot.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
 import { useCheckInsTask } from '../context/CheckInsContext.jsx'
+import { useAdminTask } from '../context/AdminContext.jsx'
 import { messagesTaskLabel } from '../utils/messages.js'
 import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
-import { deleteAnimal, getMyAnimals, toListing } from '../api/animals.js'
-import { LISTING_STATUSES, LISTING_STATUS_COLOR, LISTING_STATUS_LABEL } from '../utils/listing.js'
+import { getMyAnimals, toListing } from '../api/animals.js'
+import { LISTING_STATUSES, LISTING_STATUS_LABEL } from '../utils/listing.js'
 import { inboxTaskLabel } from '../utils/applications.js'
 import { firstName } from '../utils/auth.js'
 import { profileTask, verifyLinkLabel } from '../utils/shelters.js'
@@ -47,79 +48,6 @@ function useMyListings() {
   return { ...load, retry, drop }
 }
 
-// Why this pet can't be removed, or null. The server deletes whatever it's asked to, so the check is here:
-// pending applications need a decision first, and an approved one keeps the pet for the adopter's check-ins.
-function removeBlock(name, apps) {
-  if (apps.status !== 'ready') return null
-  const pending = apps.list.filter((a) => a.status === 'pending').length
-  if (pending) {
-    return `${name} has ${pending} pending ${pending === 1 ? 'application' : 'applications'}. Approve or reject ${pending === 1 ? 'it' : 'them'} in the inbox first.`
-  }
-  if (apps.list.some((a) => a.status === 'approved')) {
-    return `${name} has an approved application, so the listing stays for the adopter's check-ins and reviews.`
-  }
-  return null
-}
-
-// The card's footer: status pill + Edit / Remove, or the "Remove Mochi from PawShare?" confirm in its place.
-function ListingFoot({ animal, apps, onEdit, onRemoved }) {
-  const navigate = useNavigate()
-  const [step, setStep] = useState('idle') // 'idle' | 'confirm' | 'removing'
-  const [error, setError] = useState('')
-  const { name } = animal
-  const blocked = removeBlock(name, apps)
-
-  async function remove() {
-    setStep('removing')
-    setError('')
-    try {
-      await deleteAnimal(animal._id)
-      onRemoved(animal)
-    } catch (err) {
-      setError(err.message)
-      setStep('confirm')
-    }
-  }
-
-  if (step === 'idle') {
-    return (
-      <div className="foot">
-        <Pill label={LISTING_STATUS_LABEL[animal.status]} color={LISTING_STATUS_COLOR[animal.status]} />
-        <span className="foot-btns">
-          <Button onClick={() => onEdit(animal._id)} aria-label={`Edit ${name}`}>Edit</Button>
-          <Button onClick={() => setStep('confirm')} aria-label={`Remove ${name}`}>Remove</Button>
-        </span>
-      </div>
-    )
-  }
-
-  return (
-    <div className="confirm" role="group" aria-label={`Remove ${name}`}>
-      {blocked ? (
-        <>
-          <p>{blocked}</p>
-          <span className="foot-btns">
-            <Button onClick={() => setStep('idle')} autoFocus>Cancel</Button>
-            <Button onClick={() => navigate('/shelter/applications')}>Open inbox</Button>
-          </span>
-        </>
-      ) : (
-        <>
-          <p>{`Remove ${name} from PawShare?`}</p>
-          {apps.status === 'loading' && <p className="confirm-small">Checking for applications...</p>}
-          {error && <p className="confirm-err" role="alert">{error}</p>}
-          <span className="foot-btns">
-            <Button onClick={() => setStep('idle')} disabled={step === 'removing'} autoFocus>Cancel</Button>
-            <Button variant="primary" onClick={remove} disabled={step === 'removing' || apps.status === 'loading'}>
-              {step === 'removing' ? 'REMOVING...' : 'Yes, remove'}
-            </Button>
-          </span>
-        </>
-      )}
-    </div>
-  )
-}
-
 function emptyText(filter) {
   if (filter === 'all') return 'No pets listed yet. Add one to put it on the neighborhood map.'
   return `No ${FILTER_LABEL[filter].toLowerCase()} pets.`
@@ -130,6 +58,7 @@ function MyPets() {
   const { count: unread } = useUnread()
   const navigate = useNavigate()
   const checkInsTask = useCheckInsTask(navigate)
+  const adminTask = useAdminTask(navigate)
   const location = useLocation()
   const listings = useMyListings()
   const received = useReceivedApplications()
@@ -229,6 +158,7 @@ function MyPets() {
           { id: 'mypets', label: 'My pets' },
           { id: 'inbox', label: inboxTaskLabel(pendingTotal), onClick: () => navigate('/shelter/applications') },
           profileTask(user, navigate),
+          adminTask,
           checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },

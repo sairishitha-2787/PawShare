@@ -15,6 +15,7 @@ import { useFavorites } from '../context/FavoritesContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
 import { useCheckInsTask } from '../context/CheckInsContext.jsx'
+import { useAdminTask } from '../context/AdminContext.jsx'
 import { messagesTaskLabel } from '../utils/messages.js'
 import { firstName } from '../utils/auth.js'
 import { applicationsTaskLabel, inboxTaskLabel } from '../utils/applications.js'
@@ -97,6 +98,7 @@ export default function AdoptPage() {
   const { hash } = location
   const navigate = useNavigate()
   const checkInsTask = useCheckInsTask(navigate)
+  const adminTask = useAdminTask(navigate)
   const view = hash === '#list' ? 'list' : 'map'
   const setView = (v) => navigate({ hash: v === 'list' ? '#list' : '' }, { replace: true })
 
@@ -185,6 +187,7 @@ export default function AdoptPage() {
             : []),
           ...(user
             ? [
+                adminTask,
                 checkInsTask,
                 { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
                 { id: 'me', label: `${firstName(user.name)} · ${user.role}` },

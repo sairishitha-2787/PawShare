@@ -622,6 +622,76 @@ toPet. Go ahead.
 
 ---
 
+## Session 18 — Admin control panel
+
+```text
+Run `git checkout main && git pull`, then create `feature/admin` from main.
+
+Read CLAUDE.md, README.md "Verification & admin", "Reviews" and "Animals", and server/routes + controllers for
+admin, verification, reviews and animals (read only). Check: GET /api/admin/shelters (status filter values,
+what fields come back, paging), PATCH /api/admin/shelters/:id/verification (decision approve|reject, note rules,
+can an approved shelter be revoked, what happens to its listings), which review and animal endpoints an admin
+may use (delete any review, edit any listing, list animals of any status), and whether there's any way to list
+all reviews. Tell me what you found first.
+
+Seed (the only server/ change allowed): add two shelters, keep idempotent, never overwrite their verification
+status once it has changed:
+- "Paws & Whiskers Foundation", JP Nagar [77.5857, 12.9063], shelter.jpnagar@demo.pawshare.test / PawShare@123,
+  verification PENDING (registration "KA-BLR-TR-2024-0417", about 2 sentences, website https://example.org/pww).
+- "Little Paws Home", Whitefield, shelter.whitefield@demo.pawshare.test / PawShare@123, verification UNSUBMITTED.
+Add both to README "Demo accounts" together with the admin line "create your own with npm run create-admin".
+
+Build /admin (RequireAuth, role admin only; others see an ERROR window "ADMINS ONLY."):
+1. Window "CONTROL_PANEL.EXE" (lavender title bar) opening on an icon grid in the classic Control Panel style,
+   each icon a small hand-drawn SVG in our style with a Silkscreen label and a count badge:
+   "Shelter verification (2 waiting)", "Reviews", "Listings". Clicking opens that section in the same window
+   with a "← Control Panel" back button; sections deep-link as /admin/verification, /admin/reviews, /admin/listings.
+   A summary row at the top: Waiting for verification · Verified shelters · Listings · Placed pets.
+2. Verification: status Chips (Pending / Approved / Rejected / Not submitted). Two panes like the shelter inbox:
+   list of shelters (name, area, submitted date, status Pill) + detail pane with registration number, about,
+   website link, document link (opens in a new tab), submitted date, previous admin note.
+   - Pending: "Approve" (primary) and "Reject"; the note is optional for approve and REQUIRED for reject
+     ("Tell the shelter what to fix."). Confirm inside the pane.
+   - Approved: "Revoke verification" with a required note, if the server supports it; explain the effect
+     shown by the server (e.g. can't publish new listings).
+   After a decision, refresh the list and counts.
+3. Reviews: pick a shelter (dropdown of approved shelters), list its reviews (reviewer, stars, date, comment,
+   pet) with "Remove review" (confirm inside the row, shows the server's message on failure). The shelter's
+   rating refreshes after removal.
+4. Listings: all animals, any status, with status Chips and a search box (name/breed), shelter name, and
+   "Edit" (reuses the session 13 editor, admin allowed) / "Remove" (same client-side guard from session 13:
+   blocked while applications are pending).
+5. Taskbar for admins: "Control Panel (n)" with the pending-verification count. The admin still sees the map.
+6. Empty/loading/error states like the rest of the app. Works at 400px (icon grid wraps, panes stack).
+   Append this prompt to docs/claude-prompts.md as "Session 18 — Admin control panel".
+
+Done when: after `npm run seed:demo`, logging in as the admin shows "Shelter verification (2 waiting)" (Paws &
+Whiskers pending + the shelter created in session 16 testing, if it exists); approving Paws & Whiskers with a
+note makes it VERIFIED on its /shelters page, and logging in as shelter.jpnagar@demo.pawshare.test lets it add a
+pet; rejecting another with a note shows that note on the shelter's VERIFY.EXE page and lets it resubmit;
+removing a review updates the shelter's rating; a non-admin gets "ADMINS ONLY.". Lint and build pass.
+Commits: "feat(server): demo pending shelters" and "feat(admin): control panel".
+```
+
+Follow-up after Claude reported what the server does:
+
+```text
+Go ahead as described, with these UI rules:
+- Pending → Approve / Reject. Approved → Revoke verification. Rejected and Not submitted → read-only
+  ("Waiting for the shelter to submit or resubmit."), no buttons, even though the server would allow it.
+- Reject and revoke need a note in the UI; approve note optional. Tell the admin that approving without a note
+  clears the old note.
+- Revoke confirmation text: "Revoke <Shelter>'s verification? They won't be able to add new listings. Their
+  current listings stay visible." (matches what the server does).
+- Reviews: use your /applications/received trick for pet names. Listings: client-side search is fine.
+- Editor back-navigation to /admin/listings when opened from there: yes.
+- Whitefield [77.7500, 12.9698] is fine. Update the seed header comment.
+Also add to README under Verification & admin: "Rejecting an approved shelter revokes it; existing listings
+stay live, new listings are blocked until re-approved."
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

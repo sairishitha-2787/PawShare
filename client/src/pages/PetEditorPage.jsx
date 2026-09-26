@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
@@ -8,6 +8,7 @@ import PetForm from '../components/shelter/PetForm.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
 import { useCheckInsTask } from '../context/CheckInsContext.jsx'
+import { useAdminTask } from '../context/AdminContext.jsx'
 import { messagesTaskLabel } from '../utils/messages.js'
 import { createAnimal, getAnimalRecord, updateAnimal } from '../api/animals.js'
 import { editTitle, emptyForm, formFromAnimal } from '../utils/listing.js'
@@ -35,6 +36,7 @@ function Shell({ title, children }) {
   const { count: unread } = useUnread()
   const navigate = useNavigate()
   const checkInsTask = useCheckInsTask(navigate)
+  const adminTask = useAdminTask(navigate)
   return (
     <div className="desk editor-desk">
       <header className="brand">
@@ -48,6 +50,7 @@ function Shell({ title, children }) {
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt'), hideOnSmall: true },
           { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
           profileTask(user, navigate),
+          adminTask,
           checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
@@ -58,7 +61,9 @@ function Shell({ title, children }) {
   )
 }
 
-const backToList = (navigate, name) => navigate('/shelter/animals', { state: { saved: name } })
+// An admin who opened the editor from CONTROL_PANEL.EXE › Listings goes back there; everyone else to MY_PETS/.
+const listPath = (fromAdmin) => (fromAdmin ? '/admin/listings' : '/shelter/animals')
+const backToList = (navigate, name, fromAdmin = false) => navigate(listPath(fromAdmin), { state: { saved: name } })
 
 function AddPet() {
   const { user } = useAuth()
@@ -87,8 +92,10 @@ function AddPet() {
 function EditPet({ id }) {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const load = useAnimalRecord(id)
-  const back = () => navigate('/shelter/animals')
+  const fromAdmin = user.role === 'admin' && location.state?.from === 'admin'
+  const back = () => navigate(listPath(fromAdmin))
 
   if (load.status !== 'ready') {
     const message = load.error?.status === 404 ? "WE COULDN'T FIND THAT PET." : "COULDN'T LOAD THAT PET."
@@ -123,7 +130,7 @@ function EditPet({ id }) {
         status={animal.status}
         onSave={async (body) => {
           await updateAnimal(animal._id, body)
-          backToList(navigate, body.name)
+          backToList(navigate, body.name, fromAdmin)
         }}
         onCancel={back}
       />
