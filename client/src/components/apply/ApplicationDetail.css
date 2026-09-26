@@ -23,6 +23,7 @@
   background: var(--mint-soft); border: 2px solid var(--ink); border-radius: 10px; padding: 10px 12px;
 }
 .approved p { margin: 0; font-weight: 600; }
+.approved-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 
 .app-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
 .app-detail .btn { font-size: 13px; padding: 7px 16px; text-decoration: none; }

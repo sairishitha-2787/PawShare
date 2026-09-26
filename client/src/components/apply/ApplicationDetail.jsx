@@ -122,7 +122,10 @@ export default function ApplicationDetail({ application, canReapply, onClose, on
           {status === 'approved' && (
             <div className="approved">
               <p>{`Approved! ${shelter} will be in touch.`}</p>
-              <MessageButton variant="primary" to={{ animalId: pet.id }}>Message the shelter</MessageButton>
+              <div className="approved-links">
+                <Link className="btn" to={`/checkins#diary-${encodeURIComponent(application._id)}`}>Open pet diary</Link>
+                <MessageButton variant="primary" to={{ animalId: pet.id }}>Message the shelter</MessageButton>
+              </div>
             </div>
           )}
 

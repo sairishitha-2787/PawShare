@@ -488,6 +488,69 @@ open chat within ~5 seconds without refreshing. Lint and build pass. Commit: "fe
 ---
 
 
+## Session 15 — Post-adoption check-ins
+
+```text
+Run `git checkout main && git pull`, then create `feature/checkins` from main.
+
+Read CLAUDE.md, the "Check-ins — /api/checkins" section of README.md, and server/models + controllers for
+CheckIn (read only). Check: status values, how isOverdue is worked out, the exact health-update fields and
+allowed values (condition great/good/fair/poor, weightKg, eatingWell, vetVisit, notes, photos), the ad-hoc
+POST /, and what GET /received and GET /animal/:animalId return. Tell me what you found first.
+
+Seed (the only server/ change allowed): extend server/scripts/seedDemo.js with a demo adopter
+adopter@demo.pawshare.test / PawShare@123 (name "Ananya Rao") who adopted Rocky from Stray Hearts Trust
+5 weeks ago (approved application), with check-ins: 1 week = completed (condition good, 31.5 kg, eating well,
+note), 1 month = overdue, 3 months = pending. Keep the seed idempotent. List the account in README "Demo accounts".
+
+Build:
+1. Adopter: /checkins (RequireAuth, adopters). Window "PET_DIARY.EXE" (mint title bar).
+   - One section per adopted/fostered pet: face/photo, name, "Adopted from <Shelter> on 20 Aug".
+   - A timeline row of the scheduled check-ins as three stops (1 WEEK · 1 MONTH · 3 MONTHS) joined by a
+     dashed line: completed = mint with a tick, due soon (≤7 days) = sun "Due in 3 days", overdue = pink
+     "Overdue by 4 days", later = paper "Due 20 Nov". Text on every state, not colour only.
+   - "Fill in check-in" button on the next due/overdue one; "Log an update" button for an ad-hoc update anytime.
+   - Below: HEALTH.LOG history, newest first: date, condition Pill, weight, eating well, vet visit, notes,
+     photos (64px circles). If there are 2+ weights, a small SVG line chart of weight over time
+     (axis labels in Silkscreen 10px, points marked, colours from tokens).
+2. Check-in form (Modal window "CHECKUP.EXE — ROCKY"): condition as 4 Chips (Great / Good / Fair / Poor),
+   weight (kg, optional), eating well (yes/no), vet visit since last time (yes/no), notes (textarea),
+   up to 3 photos using the upload helper from session 13 (URL fallback). Validate against the server's rules,
+   "SAVING..." while sending, then mint "Check-in saved. Thank you!" and refresh the diary.
+3. Shelter: /shelter/checkins (RequireAuth, shelters). Window "CHECKINS.EXE" (sun title bar): one row per
+   adopted/fostered animal with adopter name, last update date and condition, next due, and an Overdue pink
+   Pill if any. Status chips: All / Overdue / Due this week / Up to date. Clicking a row opens the same
+   HEALTH.LOG history (read-only) plus a "Message <adopter>" button (startThread from session 14).
+4. Taskbar: adopters get "Check-ins (n due)" when something is due within 7 days or overdue; shelters get
+   "Check-ins (n overdue)". My applications (approved) detail gets a "Open pet diary" link.
+5. Empty states: adopter with no adoptions → "No pets to check in on yet."; shelter → "No adopted pets yet.".
+   Loading/error as elsewhere. Works at 400px (timeline stacks vertically). Append this prompt to
+   docs/claude-prompts.md as "Session 15 — Post-adoption check-ins".
+
+Done when: after `npm run seed:demo`, logging in as adopter@demo.pawshare.test shows Bruno with 1 week done,
+1 month overdue, 3 months pending; filling in the overdue check-in (condition great, 32 kg) marks it done and
+adds it to the log with a 2-point weight chart; logging in as the Stray Hearts Trust shelter shows Bruno with
+the new update and no overdue pill. Lint and build pass.
+Commits: "feat(server): demo adopter with past adoption" and "feat(checkins): pet diary and shelter view".
+```
+
+Follow-up after the findings (Rocky is foster-only and on the map, so he can't be "adopted" without changing
+the map):
+
+```text
+Option D: don't touch Rocky or the other 9 pets. In the seed, add a 10th animal "Bruno" — dog, Labrador mix,
+3 years, male, large, vaccinated + neutered, temperament Gentle / Good with kids, listingType adoption,
+owned by Stray Hearts Trust (HSR Layout), with 2 health records (vaccination, neuter). No photo (cartoon face).
+Seed an adoption application from adopter@demo.pawshare.test (Ananya Rao) approved 35 days ago, so Bruno is
+`adopted` (not on the map, correctly) and the server's 3 check-ins exist: 1 week completed (condition good,
+31.5 kg, eating well, note "Settling in, loves the balcony"), 1 month overdue, 3 months pending.
+Create the check-ins the same way the server does on approval (reuse its helper if there is one) so the dates
+and labels match real ones. Keep the seed idempotent, and make sure re-running it never resets Bruno to available.
+Update the "Done when" checks to use Bruno instead of Rocky. Everything else as planned; go ahead.
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

@@ -9,6 +9,7 @@ import ContactList from '../components/messages/ContactList.jsx'
 import ChatPane from '../components/messages/ChatPane.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
+import { useCheckInsTask } from '../context/CheckInsContext.jsx'
 import { listThreads } from '../api/threads.js'
 import { usePolling } from '../hooks/usePolling.js'
 import { messagesTaskLabel } from '../utils/messages.js'
@@ -50,6 +51,7 @@ export default function MessagesPage() {
   const { user, logout } = useAuth()
   const unread = useUnread()
   const navigate = useNavigate()
+  const checkInsTask = useCheckInsTask(navigate)
   const location = useLocation()
   const threads = useThreads()
 
@@ -155,6 +157,7 @@ export default function MessagesPage() {
           ...(user.role === 'adopter'
             ? [{ id: 'apps', label: 'Applications', onClick: () => navigate('/applications'), hideOnSmall: true }]
             : [{ id: 'inbox', label: 'Inbox', onClick: () => navigate('/shelter/applications'), hideOnSmall: true }]),
+          checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread.count) },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
           { id: 'logout', label: 'Log out', onClick: logout },
