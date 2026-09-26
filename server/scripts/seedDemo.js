@@ -7,8 +7,9 @@
 //
 // Safe to re-run: shelters are matched by email and animals by (shelter, name), then updated in place,
 // so ids stay the same (favorites and /adopt/:id links keep working) and nothing else is deleted.
-// Bruno's approved application and its check-ins are only created once; later runs leave them (and any
-// updates logged since) alone, and Bruno always stays "adopted".
+// Bruno's approved application, its check-ins and Ananya's review of Stray Hearts are only created once;
+// later runs leave them (and any updates or edits since) alone, and Bruno always stays "adopted".
+// Shelter about texts are public on /shelters/:id; a re-run only replaces the old placeholder wording.
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
@@ -18,6 +19,7 @@ const User = require("../models/User");
 const Animal = require("../models/Animal");
 const Application = require("../models/Application");
 const CheckIn = require("../models/CheckIn");
+const Review = require("../models/Review");
 
 const DEMO_DOMAIN = "demo.pawshare.test";
 const DEMO_PASSWORD = "PawShare@123";
@@ -30,11 +32,26 @@ const LISTED_FROM = new Date("2026-01-01T00:00:00Z");
 const PHOTO_BASE = `${process.env.CLIENT_URL || "http://localhost:5173"}/demo-pets`;
 
 const SHELTERS = [
-  { key: "koramangala", name: "Happy Tails Shelter", city: "Koramangala", coords: [77.6245, 12.9352] },
-  { key: "indiranagar", name: "Whisker Walk Rescue", city: "Indiranagar", coords: [77.6408, 12.9784] },
-  { key: "hsr", name: "Stray Hearts Trust", city: "HSR Layout", coords: [77.6387, 12.9121] },
-  { key: "bengaluru", name: "Bengaluru Paws Collective", city: "Bengaluru", coords: [77.5946, 12.9716] },
+  {
+    key: "koramangala", name: "Happy Tails Shelter", city: "Koramangala", coords: [77.6245, 12.9352],
+    about: "Happy Tails Shelter rehomes dogs, rabbits and small pets surrendered by families in Koramangala. Volunteers walk and socialise every animal daily so adopters know what each one is like at home.",
+  },
+  {
+    key: "indiranagar", name: "Whisker Walk Rescue", city: "Indiranagar", coords: [77.6408, 12.9784],
+    about: "Whisker Walk Rescue takes in street cats from Indiranagar and nearby areas. Every cat is vaccinated and spayed or neutered before adoption.",
+  },
+  {
+    key: "hsr", name: "Stray Hearts Trust", city: "HSR Layout", coords: [77.6387, 12.9121],
+    about: "Stray Hearts Trust rescues injured and abandoned dogs around HSR Layout and nurses them back to health. We match each dog with a family and check in for the first few months after adoption.",
+  },
+  {
+    key: "bengaluru", name: "Bengaluru Paws Collective", city: "Bengaluru", coords: [77.5946, 12.9716],
+    about: "Bengaluru Paws Collective is a network of foster homes across the city. We place animals in foster care while they recover or wait for a permanent family.",
+  },
 ];
+
+// The about text the first demo seeds wrote; re-runs swap it for the real one above.
+const PLACEHOLDER_ABOUT = /^Demo shelter in /;
 
 // Same order as mockPets. The API has no hamster species, so Tofu and Peanut are "other"; the client
 // reads "hamster" in the breed and shows them as hamsters.
@@ -108,6 +125,12 @@ const BRUNO = {
 };
 const ADOPTED_DAYS_AGO = 35;
 
+const BRUNO_REVIEW = {
+  rating: 5,
+  comment: "Bruno settled in within a week. The team called twice to check on us.",
+  daysAfterAdoption: 10,
+};
+
 const locationFor = ({ city, coords }) => ({
   city,
   state: "Karnataka",
@@ -118,6 +141,9 @@ const locationFor = ({ city, coords }) => ({
 const upsertShelter = async (s, password) => {
   const email = `shelter.${s.key}@${DEMO_DOMAIN}`;
   const user = (await User.findOne({ email })) || new User({ email });
+  // Keep an about text someone has edited since; only fill in a missing or placeholder one.
+  const currentAbout = user.verification?.about;
+  const about = !currentAbout || PLACEHOLDER_ABOUT.test(currentAbout) ? s.about : currentAbout;
   user.set({
     name: s.name,
     password,
@@ -127,7 +153,7 @@ const upsertShelter = async (s, password) => {
     verification: {
       status: "approved",
       registrationNumber: `DEMO-${s.key.toUpperCase()}`,
-      about: `Demo shelter in ${s.city} for the PawShare neighborhood map.`,
+      about,
       submittedAt: LISTED_FROM,
       reviewedAt: LISTED_FROM,
     },
@@ -223,6 +249,22 @@ const seedAdoption = async (shelters, password, listingIndex) => {
     });
     await firstWeek.save();
   }
+
+  // Ananya's review of Stray Hearts for Bruno. Only created when missing, so edits made in the app survive.
+  if (!(await Review.exists({ application: application._id }))) {
+    const reviewedAt = new Date(application.decidedAt.getTime() + BRUNO_REVIEW.daysAfterAdoption * DAY_MS);
+    const review = new Review({
+      shelter: owner._id,
+      reviewer: adopter._id,
+      application: application._id,
+      rating: BRUNO_REVIEW.rating,
+      comment: BRUNO_REVIEW.comment,
+      createdAt: reviewedAt,
+      updatedAt: reviewedAt,
+    });
+    await review.save({ timestamps: false });
+  }
+  await Review.refreshShelterRating(owner._id);
 
   return { adopter, bruno };
 };

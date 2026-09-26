@@ -41,7 +41,7 @@ npm run dev                 # http://localhost:5000/api/health → {"status":"ok
 
 ### Demo accounts
 
-Created by `npm run seed:demo`. Every account uses the password `PawShare@123`.
+Created by `npm run seed:demo`. Every account uses the password `PawShare@123`. Each shelter is verified and has a short public about text.
 
 | Email | Role | What's there |
 |---|---|---|
@@ -49,7 +49,7 @@ Created by `npm run seed:demo`. Every account uses the password `PawShare@123`.
 | `shelter.indiranagar@demo.pawshare.test` | shelter | Whisker Walk Rescue: Mochi, Luna, Sushi |
 | `shelter.hsr@demo.pawshare.test` | shelter | Stray Hearts Trust: Pepper, Rocky, Peanut, and Bruno (adopted) |
 | `shelter.bengaluru@demo.pawshare.test` | shelter | Bengaluru Paws Collective (no pets yet) |
-| `adopter@demo.pawshare.test` | adopter | Ananya Rao. Adopted Bruno from Stray Hearts Trust 35 days before the first seed: 1-week check-in done, 1-month overdue, 3-month still to come. |
+| `adopter@demo.pawshare.test` | adopter | Ananya Rao. Adopted Bruno from Stray Hearts Trust 35 days before the first seed: 1-week check-in done, 1-month overdue, 3-month still to come. Left Stray Hearts a 5-star review for Bruno. |
 
 ---
 
