@@ -2,8 +2,13 @@
 // from client/src/data/mockPets.js.
 // Usage (from the server folder):  npm run seed:demo
 //
+// Also one demo adopter (Ananya Rao) who adopted a 10th animal, Bruno, from Stray Hearts Trust 35 days
+// ago, so the check-in screens have data: 1 week done, 1 month overdue, 3 months still to come.
+//
 // Safe to re-run: shelters are matched by email and animals by (shelter, name), then updated in place,
 // so ids stay the same (favorites and /adopt/:id links keep working) and nothing else is deleted.
+// Bruno's approved application and its check-ins are only created once; later runs leave them (and any
+// updates logged since) alone, and Bruno always stays "adopted".
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
@@ -11,6 +16,8 @@ const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const Animal = require("../models/Animal");
+const Application = require("../models/Application");
+const CheckIn = require("../models/CheckIn");
 
 const DEMO_DOMAIN = "demo.pawshare.test";
 const DEMO_PASSWORD = "PawShare@123";
@@ -88,6 +95,19 @@ const ANIMALS = [
   },
 ];
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const ADOPTER = { email: `adopter@${DEMO_DOMAIN}`, name: "Ananya Rao", city: "HSR Layout", coords: [77.6387, 12.9121] };
+
+// Not in ANIMALS: Bruno is adopted, so he isn't on the map and has no photo (the client draws his face).
+const BRUNO = {
+  shelter: "hsr", name: "Bruno", species: "dog", breed: "Labrador mix", ageMonths: 36,
+  gender: "male", size: "large", vaccinated: true, neutered: true, listingType: "adoption",
+  temperament: ["Gentle", "Good with kids"],
+  description: "Bruno is a big, soft Labrador mix who leans on your legs for pats. Calm indoors and good with children.",
+};
+const ADOPTED_DAYS_AGO = 35;
+
 const locationFor = ({ city, coords }) => ({
   city,
   state: "Karnataka",
@@ -143,7 +163,68 @@ const seedDemo = async ({ log = () => {} } = {}) => {
   }
   log(`Animals: ${animals.map((a) => `${a.name} (${a.status})`).join(", ")}`);
 
-  return { shelters, animals };
+  const { adopter, bruno } = await seedAdoption(shelters, password, animals.length);
+  log(`Adopter: ${adopter.name} (${adopter.email}) adopted ${bruno.name}`);
+
+  return { shelters, animals, adopter, bruno };
+};
+
+// Ananya adopts Bruno: an approved application from 35 days ago with the server's own check-in schedule.
+const seedAdoption = async (shelters, password, listingIndex) => {
+  const adopter = (await User.findOne({ email: ADOPTER.email })) || new User({ email: ADOPTER.email });
+  adopter.set({ name: ADOPTER.name, password, role: "adopter", location: locationFor(ADOPTER) });
+  await adopter.save();
+
+  const { shelter: key, ...fields } = BRUNO;
+  const owner = shelters[key];
+  const decidedAt = new Date(Date.now() - ADOPTED_DAYS_AGO * DAY_MS);
+  const bruno = (await Animal.findOne({ owner: owner._id, name: fields.name })) || new Animal({ owner: owner._id });
+  if (bruno.isNew) {
+    bruno.healthRecords = [
+      { title: "Vaccination (DHPPi + rabies)", date: new Date(decidedAt.getTime() - 40 * DAY_MS), vetName: "Dr. Meera Iyer", notes: "Annual boosters done." },
+      { title: "Neutered", date: new Date(decidedAt.getTime() - 25 * DAY_MS), vetName: "Dr. Meera Iyer", notes: "Healed well, stitches out after 10 days." },
+    ];
+  }
+  bruno.set({
+    ...fields,
+    status: "adopted", // never back to available, even on re-runs
+    photos: [],
+    location: locationFor(SHELTERS.find((s) => s.key === key)),
+    createdAt: new Date(LISTED_FROM.getTime() + listingIndex * 60 * 1000),
+    updatedAt: new Date(),
+  });
+  await bruno.save({ timestamps: false });
+
+  let application = await Application.findOne({ animal: bruno._id, applicant: adopter._id, status: "approved" });
+  if (!application) {
+    application = new Application({
+      animal: bruno._id,
+      applicant: adopter._id,
+      shelter: owner._id,
+      type: "adoption",
+      status: "approved",
+      message: "We have a ground-floor flat with a balcony and I work from home most days.",
+      answers: { homeType: "apartment", hasYard: false, hasChildren: false, otherPets: "None", hoursAlonePerDay: 3, experience: "Grew up with two Labradors." },
+      shelterNote: "Lovely match. Bruno is all yours!",
+      decidedAt,
+      createdAt: new Date(decidedAt.getTime() - 4 * DAY_MS),
+      updatedAt: decidedAt,
+    });
+    await application.save({ timestamps: false });
+  }
+
+  // The same helper the server calls on approval, dated from the approval, so labels and due dates match.
+  if (!(await CheckIn.exists({ application: application._id }))) {
+    const [firstWeek] = await CheckIn.scheduleFor(application, application.decidedAt);
+    firstWeek.set({
+      status: "completed",
+      completedAt: new Date(firstWeek.dueDate.getTime() + DAY_MS),
+      healthUpdate: { condition: "good", weightKg: 31.5, eatingWell: true, vetVisit: false, notes: "Settling in, loves the balcony" },
+    });
+    await firstWeek.save();
+  }
+
+  return { adopter, bruno };
 };
 
 module.exports = seedDemo;
@@ -156,6 +237,7 @@ if (require.main === module) {
       await mongoose.connect(process.env.MONGODB_URI);
       await seedDemo({ log: console.log });
       console.log(`Done. Shelter logins: shelter.<area>@${DEMO_DOMAIN} / ${DEMO_PASSWORD}`);
+      console.log(`Adopter login: ${ADOPTER.email} / ${DEMO_PASSWORD}`);
     } catch (err) {
       console.error("Demo seed failed:", err.message);
       process.exitCode = 1;
