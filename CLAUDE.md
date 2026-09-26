@@ -53,7 +53,8 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 ```
 client/src/
   api/          client.js, animals.js, auth.js, applications.js, uploads.js (Cloudinary photo + document upload), threads.js, checkins.js,
-                users.js (public profiles, reviews list, adoption history), reviews.js, verification.js
+                users.js (public profiles, reviews list, adoption history), reviews.js, verification.js,
+                admin.js (shelter verification decisions, every animal / every review of a shelter, paged through)
   components/
     ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar, Field, ChoiceField, LoadingWindow
     auth/       RequireAuth, FormError
@@ -61,18 +62,22 @@ client/src/
     map/        Neighborhood, SceneBackdrop, Legend
     apply/      ApplyWizard, Answers (read-only answers, shared), ApplicationDetail
     inbox/      ReadingPane (the shelter's view of one application, with Approve / Reject)
-    shelter/    PetForm (add/edit listing) + TagField, HealthLogField, PhotoField, PetPreview
+    shelter/    PetForm (add/edit listing) + TagField, HealthLogField, PhotoField, PetPreview, ListingFoot (Edit / Remove with
+                the pending-application guard, shared by MY_PETS/ and the admin's Listings)
+    admin/      PanelIcons, VerificationSection, ReviewsSection, ListingsSection (the CONTROL_PANEL.EXE sections)
     messages/   ContactList, ChatPane, MessageButton (starts a thread, then opens /messages/:threadId)
     checkins/   Timeline (1 WEEK · 1 MONTH · 3 MONTHS stops), HealthLog + WeightChart, CheckInForm (CHECKUP.EXE modal)
     shelters/   ShelterLink (a shelter name → /shelters/:id), Stars (pixel-art stars, RatingSummary), StarInput (radio group),
                 ReviewWindow (REVIEW.EXE modal), RateShelter ("Rate <Shelter>" / your review, under an approved application)
   context/      AuthContext.jsx, FavoritesContext.jsx, UnreadContext.jsx (unread message count, polled every 15s),
-                CheckInsContext.jsx (the taskbar's check-ins count, polled every minute; useCheckInsTask)
-  hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js, usePolling.js
+                CheckInsContext.jsx (the taskbar's check-ins count, polled every minute; useCheckInsTask),
+                AdminContext.jsx (admins: shelters waiting for verification, polled every minute; useAdminTask)
+  hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js, usePolling.js, useLoad.js
   data/         mockPets.js
   pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, ShelterInboxPage.jsx, MyPetsPage.jsx, PetEditorPage.jsx,
                 MessagesPage.jsx, CheckInsPage.jsx (PET_DIARY.EXE), ShelterCheckInsPage.jsx (CHECKINS.EXE), ShelterProfilePage.jsx
-                (<NAME>.INFO, tabs picked by the URL hash), VerificationPage.jsx (VERIFY.EXE), LoginPage.jsx, SignupPage.jsx, DevKit.jsx
+                (<NAME>.INFO, tabs picked by the URL hash), VerificationPage.jsx (VERIFY.EXE), AdminPage.jsx (CONTROL_PANEL.EXE,
+                /admin/:section), LoginPage.jsx, SignupPage.jsx, DevKit.jsx
   styles/       tokens.css, global.css
 ```
 
@@ -94,6 +99,12 @@ Demo photos live in `client/public/demo-pets/<id>.jpg`; raw source photos go in 
 
 Modals stack: only the top one answers Escape and traps Tab (REVIEW.EXE opens over <PET>.APP). The server has no
 "my review" endpoint, so `findMyReview` pages through the shelter's reviews to find the one for an application.
+
+Admins: `/admin` is CONTROL_PANEL.EXE (icon grid, then Verification / Reviews / Listings sections in the same window).
+The server lets an admin approve or reject from any status and never requires a note; the UI is stricter on purpose
+(pending → approve/reject, approved → revoke, reject and revoke need a note). Review pet names come from
+`/applications/received`, which returns every application for an admin. The listing editor sends an admin back to
+`/admin/listings` when it was opened from there (router state `from: 'admin'`).
 
 Messages aren't pushed: the open chat polls every 5s, the contact list and the unread count every 15s, all
 paused while the tab is hidden (`usePolling`).

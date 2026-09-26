@@ -1,0 +1,12 @@
+/* A listing card's footer (MY_PETS/, the admin's Listings): pill + Edit / Remove, or the confirm */
+.foot.listing-foot { gap: 8px; flex-wrap: wrap; }
+.foot-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.confirm.listing-confirm {
+  display: grid; gap: 8px; margin: 0 12px 12px; padding: 10px;
+  background: var(--pink-soft); border: 2px solid var(--ink); border-radius: 10px;
+}
+.confirm p { margin: 0; font-size: 14px; line-height: 1.4; }
+.confirm p:first-child { font-weight: 500; }
+.confirm .confirm-small { color: var(--ink-soft); font-size: 13px; }
+.confirm .confirm-err { color: #B8325B; font-size: 13px; }
+.confirm .btn:disabled { cursor: not-allowed; opacity: .55; box-shadow: none; }

@@ -1,5 +1,6 @@
 // Demo data for the frontend neighborhood map: one verified shelter per area and the 9 pets
-// from client/src/data/mockPets.js.
+// from client/src/data/mockPets.js, plus two unverified shelters for the admin control panel:
+// Paws & Whiskers Foundation (verification pending) and Little Paws Home (not submitted yet).
 // Usage (from the server folder):  npm run seed:demo
 //
 // Also one demo adopter (Ananya Rao) who adopted a 10th animal, Bruno, from Stray Hearts Trust 35 days
@@ -10,6 +11,8 @@
 // Bruno's approved application, its check-ins and Ananya's review of Stray Hearts are only created once;
 // later runs leave them (and any updates or edits since) alone, and Bruno always stays "adopted".
 // Shelter about texts are public on /shelters/:id; a re-run only replaces the old placeholder wording.
+// The unverified shelters get their verification request only when they're first created; after that an
+// admin decision or a resubmission is never overwritten by a re-run.
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
@@ -47,6 +50,24 @@ const SHELTERS = [
   {
     key: "bengaluru", name: "Bengaluru Paws Collective", city: "Bengaluru", coords: [77.5946, 12.9716],
     about: "Bengaluru Paws Collective is a network of foster homes across the city. We place animals in foster care while they recover or wait for a permanent family.",
+  },
+];
+
+// No pets, so the map is unchanged. Their verification is only set on the first run.
+const UNVERIFIED_SHELTERS = [
+  {
+    key: "jpnagar", name: "Paws & Whiskers Foundation", city: "JP Nagar", coords: [77.5857, 12.9063],
+    verification: {
+      status: "pending",
+      registrationNumber: "KA-BLR-TR-2024-0417",
+      about: "Paws & Whiskers Foundation is a volunteer-run trust that rescues cats and dogs from the streets of JP Nagar and Jayanagar. We foster them in volunteers' homes until they are healthy and ready for adoption.",
+      website: "https://example.org/pww",
+    },
+    submittedDaysAgo: 2,
+  },
+  {
+    key: "whitefield", name: "Little Paws Home", city: "Whitefield", coords: [77.75, 12.9698],
+    verification: { status: "unsubmitted" },
   },
 ];
 
@@ -162,6 +183,21 @@ const upsertShelter = async (s, password) => {
   return user;
 };
 
+const upsertUnverifiedShelter = async (s, password) => {
+  const email = `shelter.${s.key}@${DEMO_DOMAIN}`;
+  const user = (await User.findOne({ email })) || new User({ email });
+  user.set({ name: s.name, password, role: "shelter", location: locationFor(s) });
+  if (user.isNew) {
+    user.isVerified = false;
+    user.verification = {
+      ...s.verification,
+      ...(s.submittedDaysAgo && { submittedAt: new Date(Date.now() - s.submittedDaysAgo * DAY_MS) }),
+    };
+  }
+  await user.save();
+  return user;
+};
+
 const seedDemo = async ({ log = () => {} } = {}) => {
   const password = await bcrypt.hash(DEMO_PASSWORD, 10);
   const shelters = {};
@@ -169,6 +205,10 @@ const seedDemo = async ({ log = () => {} } = {}) => {
     shelters[s.key] = await upsertShelter(s, password);
   }
   log(`Shelters: ${SHELTERS.map((s) => `${s.name} (${s.city})`).join(", ")}`);
+  for (const s of UNVERIFIED_SHELTERS) {
+    const user = await upsertUnverifiedShelter(s, password);
+    log(`Unverified shelter: ${s.name} (${s.city}), verification ${user.verification.status}`);
+  }
 
   const animals = [];
   for (const [i, { shelter: key, ...fields }] of ANIMALS.entries()) {

@@ -13,6 +13,7 @@ import { RatingSummary, Stars } from '../components/shelters/Stars.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
 import { useCheckInsTask } from '../context/CheckInsContext.jsx'
+import { useAdminTask } from '../context/AdminContext.jsx'
 import { getAdoptionHistory, getProfile, getReviews } from '../api/users.js'
 import { getAnimals, petLook } from '../api/animals.js'
 import { messagesTaskLabel } from '../utils/messages.js'
@@ -353,6 +354,7 @@ export default function ShelterProfilePage() {
   const location = useLocation()
   const shelter = useShelter(id)
   const checkInsTask = useCheckInsTask(navigate)
+  const adminTask = useAdminTask(navigate)
   const tab = TABS.find((t) => `#${t.id}` === location.hash)?.id || 'general'
   const pick = (next) => navigate({ hash: `#${next}` }, { replace: true })
   const isOwn = user?.id === id
@@ -388,6 +390,7 @@ export default function ShelterProfilePage() {
                   ? { id: 'apps', label: 'Applications', onClick: () => navigate('/applications'), hideOnSmall: true }
                   : { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals'), hideOnSmall: true },
                 profileTask(user, navigate, { current: isOwn }),
+                adminTask,
                 checkInsTask,
                 { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
                 { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
