@@ -12,6 +12,7 @@ import { messagesTaskLabel } from '../utils/messages.js'
 import { createAnimal, getAnimalRecord, updateAnimal } from '../api/animals.js'
 import { editTitle, emptyForm, formFromAnimal } from '../utils/listing.js'
 import { firstName } from '../utils/auth.js'
+import { profileTask } from '../utils/shelters.js'
 import './PetEditorPage.css'
 
 // The listing being edited, straight from the API. status: 'loading' | 'ready' | 'error' (error: the Error)
@@ -46,6 +47,7 @@ function Shell({ title, children }) {
         items={[
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt'), hideOnSmall: true },
           { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
+          profileTask(user, navigate),
           checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },

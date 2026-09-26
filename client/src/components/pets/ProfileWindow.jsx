@@ -6,6 +6,7 @@ import Pill from '../ui/Pill.jsx'
 import Button from '../ui/Button.jsx'
 import PetFace from './PetFace.jsx'
 import MessageButton from '../messages/MessageButton.jsx'
+import ShelterLink from '../shelters/ShelterLink.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useFavorites } from '../../context/FavoritesContext.jsx'
 import { SPECIES_LABEL } from '../../utils/pets.js'
@@ -42,7 +43,11 @@ export default function ProfileWindow({ pet, onClose, fallbackFocus }) {
             )}
             <div>
               <h2 id={titleId}>{pet.name}</h2>
-              <p className="sub">{`${SPECIES_LABEL[pet.species]} · ${pet.shelter}, ${pet.area}`}</p>
+              <p className="sub">
+                {`${SPECIES_LABEL[pet.species]} · `}
+                <ShelterLink id={pet.shelterId} name={pet.shelter} />
+                {`, ${pet.area}`}
+              </p>
               <Pill status={pet.status} />
             </div>
           </div>

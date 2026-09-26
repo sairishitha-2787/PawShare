@@ -2,6 +2,9 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import './Modal.css'
 
+// open dialogs, innermost last: only the top one answers Escape and traps Tab (REVIEW.EXE opens over <PET>.APP)
+const stack = []
+
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 // Children are usually a <Window onClose>; its X button is marked data-autofocus and gets focus on open.
@@ -23,8 +26,10 @@ export default function Modal({ open, onClose, labelledBy, fallbackFocus, childr
     const dialog = dialogRef.current
     const first = dialog.querySelector('[data-autofocus]') || dialog.querySelector(FOCUSABLE) || dialog
     first.focus()
+    stack.push(dialog)
 
     function onKeyDown(e) {
+      if (stack[stack.length - 1] !== dialog) return
       if (e.key === 'Escape') {
         onCloseRef.current()
       } else if (e.key === 'Tab') {
@@ -44,6 +49,7 @@ export default function Modal({ open, onClose, labelledBy, fallbackFocus, childr
     document.addEventListener('keydown', onKeyDown)
     return () => {
       document.removeEventListener('keydown', onKeyDown)
+      stack.splice(stack.indexOf(dialog), 1)
       const target = trigger && trigger.isConnected && trigger !== document.body ? trigger : fallbackRef.current?.()
       target?.focus()
     }

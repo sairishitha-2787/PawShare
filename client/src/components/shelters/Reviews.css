@@ -1,0 +1,38 @@
+/* REVIEW.EXE */
+.review-form { padding: 16px; display: grid; gap: 14px; }
+.review-form h2 { margin: 0; font-family: var(--pixel); font-size: 18px; letter-spacing: .03em; line-height: 1.2; overflow-wrap: anywhere; }
+.review-form .sub { margin: 4px 0 0; color: var(--ink-soft); font-size: 14px; }
+.review-actions, .rate-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.review-form .btn, .rate .btn { font-size: 13px; padding: 7px 16px; }
+.review-form .btn:disabled, .rate .btn:disabled { cursor: progress; opacity: .75; }
+
+.star-input { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.star-input button {
+  padding: 3px; border: 2px solid transparent; border-radius: 8px; background: none; cursor: pointer; line-height: 0;
+}
+.star-input button:hover { border-color: var(--ink); background: var(--cream); }
+.star-input button:focus-visible { outline: 3px solid var(--hot); outline-offset: 1px; }
+.star-input[aria-invalid="true"] button { border-color: var(--hot); }
+.star-count { margin-left: 8px; font-family: var(--pixel); font-size: 12px; letter-spacing: .03em; }
+
+/* "Rate <Shelter>" / your review, under an approved application */
+.rate {
+  display: grid; gap: 10px; background: var(--cream); border: 2px solid var(--ink); border-radius: 10px; padding: 10px 12px;
+}
+.rate-shelter { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-weight: 600; }
+.rate-mine { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.rate-mine p { flex-basis: 100%; margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+.rate-label { font-family: var(--pixel); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+.rate .rate-actions { justify-content: flex-start; }
+.rate-err { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; }
+.rate-note {
+  margin: 0; font-weight: 600; background: var(--mint); border: 2px solid var(--ink); border-radius: 10px; padding: 6px 10px;
+}
+.rate-note:focus { outline: none; }
+.rate-note:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+/* the in-place "Delete your review?" question */
+.rate .confirm { display: grid; gap: 10px; background: var(--sun); border: 2px solid var(--ink); border-radius: 10px; padding: 10px 12px; }
+.rate .confirm p { margin: 0; font-weight: 600; }
+.rate .confirm p:focus { outline: none; }
+.rate .confirm p:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+

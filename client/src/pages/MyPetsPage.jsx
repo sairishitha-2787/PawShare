@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import Chip from '../components/ui/Chip.jsx'
 import Pill from '../components/ui/Pill.jsx'
@@ -17,6 +17,7 @@ import { deleteAnimal, getMyAnimals, toListing } from '../api/animals.js'
 import { LISTING_STATUSES, LISTING_STATUS_COLOR, LISTING_STATUS_LABEL } from '../utils/listing.js'
 import { inboxTaskLabel } from '../utils/applications.js'
 import { firstName } from '../utils/auth.js'
+import { profileTask, verifyLinkLabel } from '../utils/shelters.js'
 import './MyPetsPage.css'
 
 const FILTERS = ['all', ...LISTING_STATUSES]
@@ -170,7 +171,10 @@ function MyPets() {
 
       <div className="mypets-stack">
         {notVerified && (
-          <p className="mypets-note sun">Your shelter needs admin verification before you can list animals.</p>
+          <p className="mypets-note sun">
+            Your shelter needs admin verification before you can list animals.{' '}
+            <Link to="/shelter/verification">{verifyLinkLabel(user)}</Link>
+          </p>
         )}
         {done && (
           <p className="mypets-note mint" role="status">{done}</p>
@@ -224,6 +228,7 @@ function MyPets() {
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
           { id: 'mypets', label: 'My pets' },
           { id: 'inbox', label: inboxTaskLabel(pendingTotal), onClick: () => navigate('/shelter/applications') },
+          profileTask(user, navigate),
           checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },

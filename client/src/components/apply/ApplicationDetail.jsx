@@ -7,6 +7,8 @@ import Button from '../ui/Button.jsx'
 import FormError from '../auth/FormError.jsx'
 import PetFace from '../pets/PetFace.jsx'
 import MessageButton from '../messages/MessageButton.jsx'
+import ShelterLink from '../shelters/ShelterLink.jsx'
+import RateShelter from '../shelters/RateShelter.jsx'
 import { Review, TypeAnswers, HomeAnswers } from './Answers.jsx'
 import { applicationPet, withdrawApplication } from '../../api/applications.js'
 import { APP_STATUS_COLOR, APP_STATUS_LABEL, TYPE_LABEL } from '../../utils/applications.js'
@@ -89,7 +91,6 @@ export default function ApplicationDetail({ application, canReapply, onClose, on
   const pet = applicationPet(application)
   const shelter = application.shelter?.name || 'The shelter'
   const { status, type } = application
-  const place = [application.shelter?.name, pet.area].filter(Boolean).join(', ')
 
   // after a withdraw the button is gone, so focus moves to the new status
   const lastStatus = useRef(status)
@@ -106,7 +107,16 @@ export default function ApplicationDetail({ application, canReapply, onClose, on
             <PetFace pet={pet} size={64} />
             <div>
               <h2 id={titleId}>{pet.name}</h2>
-              <p className="sub">{[SPECIES_LABEL[pet.species], place].filter(Boolean).join(' · ')}</p>
+              <p className="sub">
+                {SPECIES_LABEL[pet.species]}
+                {application.shelter?.name && (
+                  <>
+                    {' · '}
+                    <ShelterLink id={application.shelter._id} name={application.shelter.name} />
+                  </>
+                )}
+                {pet.area && `${application.shelter?.name ? ', ' : ' · '}${pet.area}`}
+              </p>
               <span className="type-tag">{TYPE_LABEL[type]}</span>
             </div>
           </div>
@@ -128,6 +138,7 @@ export default function ApplicationDetail({ application, canReapply, onClose, on
               </div>
             </div>
           )}
+          {status === 'approved' && <RateShelter application={application} petName={pet.name} />}
 
           {application.shelterNote && (
             <Review title={`Note from ${shelter}`} heading="h3">

@@ -47,18 +47,16 @@ export async function squareImage(file) {
   })
 }
 
-// Squares the file, then uploads it. onProgress gets 0–1. Resolves to { url, publicId }.
+// Posts one file to Cloudinary. resourceType: 'image' | 'auto'. onProgress gets 0–1. Resolves to { url, publicId }.
 // XMLHttpRequest rather than fetch, because fetch can't report upload progress.
-export async function uploadPetPhoto(file, onProgress) {
-  if (!canUpload) throw new Error('Photo uploads aren’t set up. Paste an image URL instead.')
-  const blob = await squareImage(file)
+function sendToCloudinary(file, filename, resourceType, onProgress) {
   const body = new FormData()
-  body.append('file', blob, 'photo.jpg')
+  body.append('file', file, filename)
   body.append('upload_preset', UPLOAD_PRESET)
 
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
-    xhr.open('POST', `https://api.cloudinary.com/v1_1/${encodeURIComponent(CLOUD_NAME)}/image/upload`)
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${encodeURIComponent(CLOUD_NAME)}/${resourceType}/upload`)
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) onProgress?.(e.loaded / e.total)
     }
@@ -75,7 +73,30 @@ export async function uploadPetPhoto(file, onProgress) {
         reject(new Error(data?.error?.message || `Upload failed (${xhr.status})`))
       }
     }
-    xhr.onerror = () => reject(new Error('Couldn’t reach the photo server.'))
+    xhr.onerror = () => reject(new Error('Couldn’t reach the upload server.'))
     xhr.send(body)
   })
+}
+
+// Squares the file, then uploads it. onProgress gets 0–1. Resolves to { url, publicId }.
+export async function uploadPetPhoto(file, onProgress) {
+  if (!canUpload) throw new Error('Photo uploads aren’t set up. Paste an image URL instead.')
+  const blob = await squareImage(file)
+  return sendToCloudinary(blob, 'photo.jpg', 'image', onProgress)
+}
+
+// Verification documents: a PDF or an image, uploaded as it is.
+const DOCUMENT_TYPES = ['application/pdf', 'image/']
+
+// null if the file is fine, otherwise what's wrong with it
+export function checkDocumentFile(file) {
+  if (!DOCUMENT_TYPES.some((t) => file.type.startsWith(t))) return 'Pick a PDF or an image.'
+  if (file.size > MAX_PHOTO_BYTES) return 'Pick a file under 5 MB.'
+  return null
+}
+
+// Uploads a verification document unchanged. onProgress gets 0–1. Resolves to { url, publicId }.
+export function uploadDocument(file, onProgress) {
+  if (!canUpload) return Promise.reject(new Error('Uploads aren’t set up. Paste a link instead.'))
+  return sendToCloudinary(file, file.name, 'auto', onProgress)
 }

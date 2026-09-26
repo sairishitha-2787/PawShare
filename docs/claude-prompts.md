@@ -551,6 +551,77 @@ Update the "Done when" checks to use Bruno instead of Rocky. Everything else as 
 
 ---
 
+## Session 16 — Shelter profiles
+
+```text
+Run `git checkout main && git pull`, then create `feature/shelter-profiles` from main.
+
+Read CLAUDE.md and README.md sections "Reviews", "Users" and "Verification & admin", plus server/models +
+controllers for User, Review and verification (read only). Check: what GET /api/users/:id returns for a shelter
+(stats, rating, ratingCount, isVerified, about/website?), GET /:id/reviews paging, GET /:id/adoption-history,
+review rules (one per approved application, who can edit/delete, rating 1–5, comment length), and the
+verification request fields and statuses. Tell me what you found first.
+
+Seed (the only server/ change allowed): Ananya (adopter@demo.pawshare.test) leaves a 5-star review of Stray
+Hearts Trust for Bruno's adoption: "Bruno settled in within a week. The team called twice to check on us."
+Keep the seed idempotent and don't overwrite the review if it already exists.
+
+Build:
+1. /shelters/:id (public). Window "<SHELTER NAME>.INFO" styled as a Properties dialog with Silkscreen tabs:
+   GENERAL · PETS · REVIEWS · HISTORY (tabs are real buttons with aria-selected; #reviews etc. deep-link a tab).
+   - Header on every tab: shelter name, area, a VERIFIED mint badge (or "Not verified yet" in sun), the rating as
+     5 pixel-art SVG stars in --sun with a 2px ink outline (half stars allowed) + "4.8 (12 reviews)".
+   - GENERAL: about text, website (link), member since, stats as small label/value pairs (animals listed,
+     adoptions, fosters, active listings). Contact is not shown publicly; "Message this shelter" button instead
+     (adopters only; opens messenger with { recipientId }).
+   - PETS: the shelter's available animals as the same PetCard grid; clicking opens the profile window.
+   - REVIEWS: newest first, paged ("Load more"). Each: reviewer first name, stars, date, comment, which pet.
+   - HISTORY: GET adoption-history as a list: pet face/photo, name, Adopted/Fostered, month + year.
+2. Link every shelter name in the app to /shelters/:id: pet profile window, list cards, My applications,
+   messenger header, check-in diary.
+3. Leave a review: in My applications (approved) and the pet diary, if the adopter hasn't reviewed that
+   application yet, show "Rate <Shelter>". Modal window "REVIEW.EXE": 5 clickable/keyboard-accessible stars
+   (arrow keys change the rating, radio-group semantics), comment textarea with the server's max length,
+   "Send review". Existing review → "Edit your review" / "Delete" (confirm inside the window). Refresh the
+   rating after saving.
+4. Shelter verification: /shelter/verification (shelters). Window "VERIFY.EXE". Shows the current status from
+   GET /verification/me (unsubmitted / pending / approved / rejected with the admin's note). If unsubmitted or
+   rejected: form with registration number, about, website (optional), document (optional; upload with the
+   session 13 helper, or a URL). Pending → "Waiting for an admin to review your request." Approved → mint
+   "Your shelter is verified." The existing "not verified" sun notes elsewhere link here.
+5. Taskbar for shelters: "My profile" task button → their own /shelters/:id.
+6. Works at 400px (tabs scroll sideways inside their own row if needed). Append this prompt to
+   docs/claude-prompts.md as "Session 16 — Shelter profiles".
+
+Done when: /shelters/<Stray Hearts id> shows VERIFIED, 5 stars "5.0 (1 review)", Ananya's review, and Bruno in
+HISTORY; clicking "Stray Hearts Trust" in Rocky's profile opens it; an adopter with an approved application can
+leave, edit and delete a review and the rating updates; a new shelter account can submit a verification request
+and then sees "Waiting for an admin". Lint and build pass.
+Commits: "feat(server): demo review" and "feat(shelters): profiles, reviews, verification requests".
+```
+
+Follow-up after the findings (the public profile had no about text or website, and no adoptions/fosters split):
+
+```text
+Go with 2: add `about` and `website` (from verification) to the public GET /api/users/:id for shelters only,
+plus a server test for it. Don't expose registrationNumber, documentUrl or the admin note. Mention the change
+in the PR description so Poojitha sees it.
+
+Since the about text is now public, give the 4 demo shelters realistic about texts in the seed (2 sentences
+each, e.g. "Whisker Walk Rescue takes in street cats from Indiranagar and nearby areas. Every cat is vaccinated
+and spayed or neutered before adoption."), no website. Keep the seed idempotent, updating the about text
+if it still has the old "Demo shelter in..." wording.
+
+Stats on GENERAL: "Available now" (availableCount), "Adopted" and "Fostered" (split from adoption history by
+type). Drop "animals listed".
+
+Everything else as you proposed: client-side owner filter for PETS (fine for the demo), first names for
+reviewers, match pets to reviews through the application id, find my own review by paging, add shelterId in
+toPet. Go ahead.
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

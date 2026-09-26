@@ -1,0 +1,9 @@
+/* pixel-art rating stars: sun fill, 2px ink outline, paper when empty */
+.stars { display: inline-flex; gap: 1px; vertical-align: middle; }
+.pstar { display: block; flex: none; }
+.pstar-empty { fill: var(--paper); }
+.pstar-fill { fill: var(--sun); }
+.pstar-line { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: miter; }
+
+.rating { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-weight: 600; }
+.rating.none { font-weight: 400; color: var(--ink-soft); }

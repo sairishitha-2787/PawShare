@@ -52,7 +52,8 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 
 ```
 client/src/
-  api/          client.js, animals.js, auth.js, applications.js, uploads.js (Cloudinary photo upload), threads.js, checkins.js
+  api/          client.js, animals.js, auth.js, applications.js, uploads.js (Cloudinary photo + document upload), threads.js, checkins.js,
+                users.js (public profiles, reviews list, adoption history), reviews.js, verification.js
   components/
     ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar, Field, ChoiceField, LoadingWindow
     auth/       RequireAuth, FormError
@@ -63,12 +64,15 @@ client/src/
     shelter/    PetForm (add/edit listing) + TagField, HealthLogField, PhotoField, PetPreview
     messages/   ContactList, ChatPane, MessageButton (starts a thread, then opens /messages/:threadId)
     checkins/   Timeline (1 WEEK · 1 MONTH · 3 MONTHS stops), HealthLog + WeightChart, CheckInForm (CHECKUP.EXE modal)
+    shelters/   ShelterLink (a shelter name → /shelters/:id), Stars (pixel-art stars, RatingSummary), StarInput (radio group),
+                ReviewWindow (REVIEW.EXE modal), RateShelter ("Rate <Shelter>" / your review, under an approved application)
   context/      AuthContext.jsx, FavoritesContext.jsx, UnreadContext.jsx (unread message count, polled every 15s),
                 CheckInsContext.jsx (the taskbar's check-ins count, polled every minute; useCheckInsTask)
   hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js, usePolling.js
   data/         mockPets.js
   pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, ShelterInboxPage.jsx, MyPetsPage.jsx, PetEditorPage.jsx,
-                MessagesPage.jsx, CheckInsPage.jsx (PET_DIARY.EXE), ShelterCheckInsPage.jsx (CHECKINS.EXE), LoginPage.jsx, SignupPage.jsx, DevKit.jsx
+                MessagesPage.jsx, CheckInsPage.jsx (PET_DIARY.EXE), ShelterCheckInsPage.jsx (CHECKINS.EXE), ShelterProfilePage.jsx
+                (<NAME>.INFO, tabs picked by the URL hash), VerificationPage.jsx (VERIFY.EXE), LoginPage.jsx, SignupPage.jsx, DevKit.jsx
   styles/       tokens.css, global.css
 ```
 
@@ -77,7 +81,7 @@ client/src/
 ```js
 { id, name, species: 'dog'|'cat'|'bird'|'bunny'|'guinea'|'hamster', status: 'available'|'urgent'|'pending',
   listingType: 'adoption'|'foster'|'both',
-  age, breed, sex, size, shelter, area, vax, tags: [], blurb,
+  age, breed, sex, size, shelter, shelterId, area, vax, tags: [], blurb,
   colors: { fur, dark, bg }, photoUrl?: string, health?: [{ title, date?, vetName?, notes? }] }
 ```
 `house` is derived from species (dog→dog, cat→cat, bird→bird, bunny/guinea/hamster→hutch). Map positions are **not** stored on the pet;
@@ -87,6 +91,9 @@ Hamsters use the guinea cartoon face. The API has no hamster species: they are `
 Listing form state, validation and the API body live in `utils/listing.js`. Photos: `VITE_CLOUDINARY_CLOUD_NAME` +
 `VITE_CLOUDINARY_UPLOAD_PRESET` (unsigned); without them the form takes a pasted image URL.
 Demo photos live in `client/public/demo-pets/<id>.jpg`; raw source photos go in `PHOTOS/`, which is git-ignored.
+
+Modals stack: only the top one answers Escape and traps Tab (REVIEW.EXE opens over <PET>.APP). The server has no
+"my review" endpoint, so `findMyReview` pages through the shelter's reviews to find the one for an application.
 
 Messages aren't pushed: the open chat polls every 5s, the contact list and the unread count every 15s, all
 paused while the tab is hidden (`usePolling`).

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Navigate, useMatch, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useMatch, useNavigate } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import Chip from '../components/ui/Chip.jsx'
 import Pill from '../components/ui/Pill.jsx'
@@ -19,6 +19,7 @@ import { getMyAnimals } from '../api/animals.js'
 import { APP_STATUSES, APP_STATUS_COLOR, APP_STATUS_LABEL, applicantName, inboxTaskLabel, wantsTo } from '../utils/applications.js'
 import { formatShort } from '../utils/dates.js'
 import { firstName } from '../utils/auth.js'
+import { profileTask, verifyLinkLabel } from '../utils/shelters.js'
 import './ShelterInboxPage.css'
 
 const FILTERS = [...APP_STATUSES, 'all']
@@ -138,7 +139,8 @@ function Inbox() {
       <div className="inbox-stack">
         {notVerified && (
           <p className="inbox-note">
-            Your shelter isn&apos;t verified yet. You can review applications, but new listings need admin approval.
+            Your shelter isn&apos;t verified yet. You can review applications, but new listings need admin approval.{' '}
+            <Link to="/shelter/verification">{verifyLinkLabel(user)}</Link>
           </p>
         )}
 
@@ -220,6 +222,7 @@ function Inbox() {
           { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
           { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
           { id: 'inbox', label: inboxTaskLabel(pendingTotal) },
+          profileTask(user, navigate),
           checkInsTask,
           { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
           { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },

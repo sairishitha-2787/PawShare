@@ -15,6 +15,8 @@ import CheckInsPage from './pages/CheckInsPage.jsx'
 import ShelterCheckInsPage from './pages/ShelterCheckInsPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import SignupPage from './pages/SignupPage.jsx'
+import ShelterProfilePage from './pages/ShelterProfilePage.jsx'
+import VerificationPage from './pages/VerificationPage.jsx'
 import RequireAuth from './components/auth/RequireAuth.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { FavoritesProvider } from './context/FavoritesContext.jsx'
@@ -59,6 +61,9 @@ createRoot(document.getElementById('root')).render(
           {/* post-adoption check-ins: the adopter's pet diary, and the shelter's overview */}
           <Route path="/checkins" element={<RequireAuth><CheckInsPage /></RequireAuth>} />
           <Route path="/shelter/checkins" element={<RequireAuth><ShelterCheckInsPage /></RequireAuth>} />
+          {/* a shelter's public profile (#general, #pets, #reviews, #history pick the tab), and its verification request */}
+          <Route path="/shelters/:id" element={<ShelterProfilePage />} />
+          <Route path="/shelter/verification" element={<RequireAuth><VerificationPage /></RequireAuth>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dev/kit" element={<DevKit />} />

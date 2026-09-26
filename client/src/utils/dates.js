@@ -20,3 +20,8 @@ export function formatShort(date) {
 export function formatLong(date) {
   return new Date(date).toLocaleDateString('en-IN', DAY_MONTH_YEAR)
 }
+
+// A moment → "Aug 2026"
+export function formatMonth(date) {
+  return new Date(date).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })
+}

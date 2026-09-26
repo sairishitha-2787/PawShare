@@ -73,6 +73,8 @@ export function toPet(a) {
     sex: SEX[a.gender] || 'Unknown',
     size: SIZE[a.size] || capitalize(a.size || ''),
     shelter: a.owner?.name || 'Unknown shelter',
+    // the owner's user id, for links to /shelters/:id (the owner is populated as { _id, name, ... })
+    shelterId: a.owner?._id || null,
     area: a.location?.city || '',
     vax: a.vaccinated ? 'Up to date' : 'Not yet',
     // the API stores temperament lowercased; show it in sentence case like the reference

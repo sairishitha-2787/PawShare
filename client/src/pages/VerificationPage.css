@@ -1,0 +1,45 @@
+/* VERIFY.EXE: one window, taskbar below */
+.verify-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.verify { max-width: 640px; width: 100%; justify-self: center; align-self: start; }
+.verify-waiting { position: relative; min-height: 260px; }
+
+.verify-body { padding: 16px; display: grid; gap: 14px; }
+.verify-body > p { margin: 0; }
+.verify .btn { font-size: 13px; padding: 7px 16px; text-decoration: none; }
+.verify .btn:disabled { cursor: progress; opacity: .75; }
+.verify .btn:disabled:active { transform: none; box-shadow: 2px 2px 0 var(--ink); }
+
+.verify-note {
+  margin: 0; font-weight: 600; border: 2px solid var(--ink); border-radius: 10px; padding: 8px 12px; box-shadow: 3px 3px 0 var(--ink);
+}
+.verify-note.mint { background: var(--mint); }
+.verify-note.sun { background: var(--sun); }
+.verify-note.pink { background: var(--pink-soft); display: grid; gap: 4px; }
+.verify-note p { margin: 0; }
+.verify-note:focus { outline: none; }
+.verify-note:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+.verify-admin { font-weight: 400; overflow-wrap: anywhere; }
+.verify-small { font-size: 14px; font-weight: 400; color: var(--ink-soft); }
+.verify-note .verify-small { color: var(--ink); }
+
+.verify-sent { margin: 0; display: grid; gap: 8px; }
+.verify-sent div { display: grid; gap: 2px; }
+.verify-sent dt { font-family: var(--pixel); font-size: 10px; letter-spacing: .05em; color: var(--ink-soft); }
+.verify-sent dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.verify-sent a { color: var(--ink); }
+
+.verify-form { display: grid; gap: 14px; }
+.doc-field { display: grid; gap: 8px; }
+.doc-upload { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.doc-upload .field-hint { flex-basis: 100%; }
+/* upload progress: a framed bar that fills in pink (as in the listing form) */
+.doc-bar { position: relative; width: min(220px, 100%); height: 22px; border: 2px solid var(--ink); border-radius: 6px; background: var(--paper); overflow: hidden; }
+.doc-bar i { position: absolute; inset: 0 auto 0 0; background: var(--pink); transition: width .15s; }
+.doc-bar span { position: relative; display: block; text-align: center; font-family: var(--pixel); font-size: 11px; line-height: 18px; }
+
+.verify-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.verify-actions.start { justify-content: flex-start; }
+
+@media (max-width: 520px) {
+  .verify-body { padding: 12px; }
+}
