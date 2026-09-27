@@ -82,6 +82,10 @@ export function toPet(a) {
     blurb: a.description || '',
     // { title, date?, vetName?, notes? }, oldest first as the shelter entered them
     health: a.healthRecords || [],
+    // for Near me distances and sorting nearby results: [lng, lat] (or null), age in months, listing date
+    coords: a.location?.coordinates?.coordinates || null,
+    ageMonths: a.ageMonths,
+    listedAt: a.createdAt,
   }
 }
 
@@ -105,6 +109,22 @@ export async function getAnimals(filters = {}, options) {
     query: { status: 'available,pending', sort: 'oldest', limit: 50, ...filters },
     ...options,
   })
+  return animals.map(toPet).filter(Boolean)
+}
+
+// One page of GET /animals for the Adopt page's search. query: see apiQuery in utils/search.js.
+// → { pets, total }, total being every match on the server.
+export async function searchAnimals(query, page, options) {
+  const { animals, total } = await request('/animals', { query: { ...query, page, limit: 50 }, ...options })
+  return { pets: animals.map(toPet).filter(Boolean), total }
+}
+
+// GET /animals/nearby: every match within radius km of [lng, lat], nearest first (the server's order; it
+// sends no distances and has no paging, so this takes its maximum of 100). The server can't combine its
+// text search with a distance search, so q isn't sent here: the caller matches the keyword itself.
+export async function getNearbyAnimals(query, [lng, lat], radius, options) {
+  const { q: _q, sort: _sort, ...filters } = query
+  const { animals } = await request('/animals/nearby', { query: { ...filters, lng, lat, radius, limit: 100 }, ...options })
   return animals.map(toPet).filter(Boolean)
 }
 

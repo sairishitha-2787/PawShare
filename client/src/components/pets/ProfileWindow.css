@@ -35,3 +35,4 @@
   .hlog li { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+.phead .pdist { display: block; color: var(--ink); font-weight: 500; }

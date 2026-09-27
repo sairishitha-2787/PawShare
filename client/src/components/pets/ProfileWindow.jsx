@@ -11,6 +11,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { useFavorites } from '../../context/FavoritesContext.jsx'
 import { SPECIES_LABEL } from '../../utils/pets.js'
 import { formatDay } from '../../utils/dates.js'
+import { formatDistance } from '../../utils/geo.js'
 import './ProfileWindow.css'
 
 // primary button label per status; every one goes to the application page
@@ -47,6 +48,8 @@ export default function ProfileWindow({ pet, onClose, fallbackFocus }) {
                 {`${SPECIES_LABEL[pet.species]} · `}
                 <ShelterLink id={pet.shelterId} name={pet.shelter} />
                 {`, ${pet.area}`}
+                {/* Near me on: how far away the pet is */}
+                {pet.distanceKm != null && <span className="pdist">{formatDistance(pet.distanceKm)}</span>}
               </p>
               <Pill status={pet.status} />
             </div>

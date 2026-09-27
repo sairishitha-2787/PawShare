@@ -1,0 +1,40 @@
+/* FIND_PETS.EXE: a tabbed sheet of fields with the buttons stacked on the right, like the classic Find Files dialog */
+.modal.find-modal { width: min(780px, 100%); }
+
+.find { display: grid; grid-template-columns: minmax(0, 1fr) 132px; gap: 16px; padding: 16px 16px 14px; }
+.find-sheet { display: grid; min-width: 0; }
+.find-tab {
+  justify-self: start; position: relative; z-index: 1; margin-bottom: -2px; padding: 4px 14px 5px;
+  font-family: var(--pixel); font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
+  background: var(--paper); border: 2px solid var(--ink); border-bottom-color: var(--paper); border-radius: 10px 10px 0 0;
+}
+.find-panel {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; padding: 14px;
+  border: 2px solid var(--ink); border-radius: 0 10px 10px 10px; background: var(--paper);
+  box-shadow: inset 3px 3px 0 var(--lav-soft);
+}
+.find-col { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.find-wide { grid-column: 1 / -1; padding-top: 12px; border-top: 2px dashed var(--lav); }
+
+.find select {
+  width: 100%; font-family: var(--body); font-size: 15px; color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); padding: 7px 8px;
+}
+.find select:focus { outline: 3px solid var(--hot); outline-offset: 2px; }
+
+.find-btns { display: grid; gap: 10px; align-content: start; padding-top: 25px; }
+.find-btns .btn { width: 100%; padding-block: 7px; }
+.find-glass { width: 64px; height: 64px; justify-self: center; margin-top: 8px; }
+
+/* the status bar along the bottom edge */
+.find-status {
+  margin: 0; padding: 5px 12px; border-top: 2px solid var(--ink); background: var(--cream);
+  font-size: 13px; color: var(--ink-soft);
+}
+
+@media (max-width: 640px) {
+  .find { grid-template-columns: minmax(0, 1fr); }
+  .find-panel { grid-template-columns: minmax(0, 1fr); }
+  .find-btns { grid-template-columns: 1fr 1fr; padding-top: 0; }
+  .find-glass { display: none; }
+}

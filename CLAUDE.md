@@ -65,6 +65,8 @@ client/src/
     shelter/    PetForm (add/edit listing) + TagField, HealthLogField, PhotoField, PetPreview, ListingFoot (Edit / Remove with
                 the pending-application guard, shared by MY_PETS/ and the admin's Listings)
     admin/      PanelIcons, VerificationSection, ReviewsSection, ListingsSection (the CONTROL_PANEL.EXE sections)
+    search/     FindPetsWindow (FIND_PETS.EXE), ActiveFilters (removable chips under the toolbar), NearMe (toggle, area
+                picker, radius chips), NearbyShelters (NEARBY_SHELTERS/)
     messages/   ContactList, ChatPane, MessageButton (starts a thread, then opens /messages/:threadId)
     checkins/   Timeline (1 WEEK · 1 MONTH · 3 MONTHS stops), HealthLog + WeightChart, CheckInForm (CHECKUP.EXE modal)
     shelters/   ShelterLink (a shelter name → /shelters/:id), Stars (pixel-art stars, RatingSummary), StarInput (radio group),
@@ -72,7 +74,8 @@ client/src/
   context/      AuthContext.jsx, FavoritesContext.jsx, UnreadContext.jsx (unread message count, polled every 15s),
                 CheckInsContext.jsx (the taskbar's check-ins count, polled every minute; useCheckInsTask),
                 AdminContext.jsx (admins: shelters waiting for verification, polled every minute; useAdminTask)
-  hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js, usePolling.js, useLoad.js
+  hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js, usePolling.js, useLoad.js,
+                useAnimalSearch.js (the Adopt page's results, 50 at a time), useNearMe.js (browser location or area picker)
   data/         mockPets.js
   pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, ShelterInboxPage.jsx, MyPetsPage.jsx, PetEditorPage.jsx,
                 MessagesPage.jsx, CheckInsPage.jsx (PET_DIARY.EXE), ShelterCheckInsPage.jsx (CHECKINS.EXE), ShelterProfilePage.jsx
@@ -96,6 +99,13 @@ Hamsters use the guinea cartoon face. The API has no hamster species: they are `
 Listing form state, validation and the API body live in `utils/listing.js`. Photos: `VITE_CLOUDINARY_CLOUD_NAME` +
 `VITE_CLOUDINARY_UPLOAD_PRESET` (unsigned); without them the form takes a pasted image URL.
 Demo photos live in `client/public/demo-pets/<id>.jpg`; raw source photos go in `PHOTOS/`, which is git-ignored.
+
+Adopt search: every filter lives in the URL query string (`utils/search.js`: parseFilters / toSearch / apiQuery) and is
+filtered on the server; the map pages through 9 per street and loads 50 at a time. "Near me" (`?near=<area key>` or
+`lng,lat`, `&radius=5|10|25`) uses GET /animals/nearby, which sends no distances (the client computes them in
+`utils/geo.js`), has no paging (max 100) and can't take `q`, so the keyword is matched on the client there.
+The default order is listing order (API `sort=oldest`), so each pet keeps its house; "Oldest" in FIND_PETS.EXE is `eldest`.
+FAVORITES/ still uses an unfiltered load so saved pets show whatever the search.
 
 Modals stack: only the top one answers Escape and traps Tab (REVIEW.EXE opens over <PET>.APP). The server has no
 "my review" endpoint, so `findMyReview` pages through the shelter's reviews to find the one for an application.

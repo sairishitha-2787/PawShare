@@ -9,8 +9,8 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
 
 // Children are usually a <Window onClose>; its X button is marked data-autofocus and gets focus on open.
 // On close, focus goes back to whatever had it on open; if that element is gone by then,
-// fallbackFocus() can return another element to focus instead.
-export default function Modal({ open, onClose, labelledBy, fallbackFocus, children }) {
+// fallbackFocus() can return another element to focus instead. className is added to the dialog box (e.g. a wider one).
+export default function Modal({ open, onClose, labelledBy, fallbackFocus, className = '', children }) {
   const dialogRef = useRef(null)
   const onCloseRef = useRef(onClose)
   const fallbackRef = useRef(fallbackFocus)
@@ -58,7 +58,7 @@ export default function Modal({ open, onClose, labelledBy, fallbackFocus, childr
   if (!open) return null
   return createPortal(
     <div className="scrim" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div ref={dialogRef} className="modal" role="dialog" aria-modal="true" aria-labelledby={labelledBy} tabIndex={-1}>
+      <div ref={dialogRef} className={`modal ${className}`.trim()} role="dialog" aria-modal="true" aria-labelledby={labelledBy} tabIndex={-1}>
         {children}
       </div>
     </div>,

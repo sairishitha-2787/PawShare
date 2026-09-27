@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import Chip from '../components/ui/Chip.jsx'
 import SegToggle from '../components/ui/SegToggle.jsx'
+import Button from '../components/ui/Button.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
 import Taskbar from '../components/ui/Taskbar.jsx'
@@ -11,6 +12,10 @@ import Legend from '../components/map/Legend.jsx'
 import PetCard from '../components/pets/PetCard.jsx'
 import FavoritesPanel from '../components/pets/FavoritesPanel.jsx'
 import ProfileWindow from '../components/pets/ProfileWindow.jsx'
+import FindPetsWindow from '../components/search/FindPetsWindow.jsx'
+import ActiveFilters from '../components/search/ActiveFilters.jsx'
+import NearbyShelters from '../components/search/NearbyShelters.jsx'
+import { NearMeToggle, NearRow } from '../components/search/NearMe.jsx'
 import { useFavorites } from '../context/FavoritesContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
@@ -21,46 +26,23 @@ import { firstName } from '../utils/auth.js'
 import { applicationsTaskLabel, inboxTaskLabel } from '../utils/applications.js'
 import { useMyApplications } from '../hooks/useMyApplications.js'
 import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
-import { matchesFilter } from '../utils/pets.js'
+import { useLoad } from '../hooks/useLoad.js'
+import { useAnimalSearch } from '../hooks/useAnimalSearch.js'
+import { useNearMe } from '../hooks/useNearMe.js'
+import { SPECIES, emptyMessage, filterCount, parseFilters, toSearch } from '../utils/search.js'
+import { DEFAULT_RADIUS, distanceKm, parseNear } from '../utils/geo.js'
 import { mockPets } from '../data/mockPets.js'
 import { getAnimal, getAnimals } from '../api/animals.js'
 import { profileTask } from '../utils/shelters.js'
 import './AdoptPage.css'
 
-const SPECIES = [
-  { value: 'all', label: 'All', word: 'PETS' },
-  { value: 'dog', label: 'Dogs', word: 'DOGS' },
-  { value: 'cat', label: 'Cats', word: 'CATS' },
-  { value: 'bird', label: 'Birds', word: 'BIRDS' },
-  { value: 'small', label: 'Small pets', word: 'SMALL PETS' },
-]
 const VIEWS = [{ value: 'map', label: 'Map' }, { value: 'list', label: 'Full list' }]
 // VITE_USE_MOCK=true skips the API and shows the sample pets
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
-const MOCK_LOAD = { status: 'ready', pets: mockPets }
 
-// Loads the pets once; retry() tries again after a failure. status: 'loading' | 'ready' | 'error'
-function usePets() {
-  const [load, setLoad] = useState(USE_MOCK ? MOCK_LOAD : { status: 'loading', pets: [] })
-  const [attempt, setAttempt] = useState(0)
-
-  useEffect(() => {
-    if (USE_MOCK) return
-    const ctrl = new AbortController()
-    getAnimals({}, { signal: ctrl.signal })
-      .then((pets) => setLoad({ status: 'ready', pets }))
-      .catch((err) => {
-        if (err.name !== 'AbortError') setLoad({ status: 'error', pets: [] })
-      })
-    return () => ctrl.abort()
-  }, [attempt])
-
-  const retry = () => {
-    setLoad({ status: 'loading', pets: [] })
-    setAttempt((n) => n + 1)
-  }
-  return { ...load, retry }
-}
+// Every available and pending pet, unfiltered, for FAVORITES/ and the taskbar's favorites count
+// (a saved pet stays there whatever the search).
+const loadAllPets = USE_MOCK ? async () => mockPets : (options) => getAnimals({}, options)
 
 // The pet for a /adopt/:petId link, fetched with getAnimal (the list may not have it, or may not be loaded yet).
 // null while loading, or if it doesn't exist or has been adopted.
@@ -82,8 +64,7 @@ function useProfilePet(petId) {
 }
 
 export default function AdoptPage() {
-  const { status, pets, retry } = usePets()
-  const [filter, setFilter] = useState({ species: 'all', urgent: false })
+  const all = useLoad(loadAllPets)
   const { favs } = useFavorites()
   const { user, loading: authLoading, logout } = useAuth()
   const { count: unread } = useUnread()
@@ -95,25 +76,62 @@ export default function AdoptPage() {
   const pendingIn = (list) => (list.status === 'ready' ? list.applications.filter((a) => a.status === 'pending').length : null)
   // the view lives in the URL hash (#list) so it survives a refresh
   const location = useLocation()
-  const { hash } = location
+  const { hash, search, pathname } = location
   const navigate = useNavigate()
   const checkInsTask = useCheckInsTask(navigate)
   const adminTask = useAdminTask(navigate)
   const view = hash === '#list' ? 'list' : 'map'
-  const setView = (v) => navigate({ hash: v === 'list' ? '#list' : '' }, { replace: true })
+  const setView = (v) => navigate({ search, hash: v === 'list' ? '#list' : '' }, { replace: true })
 
-  const matches = (p) => matchesFilter(p, filter)
-  const shown = pets.filter(matches)
-  const noneWord = SPECIES.find((s) => s.value === filter.species).word
+  // the search lives in the query string (see utils/search.js), so it can be shared and survives a refresh
+  const filters = useMemo(() => parseFilters(search), [search])
+  const searchKey = toSearch(filters)
+  const { status, pets, total, hasMore, loadingMore, loadMore, retry } = useAnimalSearch(searchKey)
+  // the browser's location arrives later, so a change starts from the latest URL rather than this render's
+  const latest = useRef({ filters, pathname, hash })
+  useEffect(() => {
+    latest.current = { filters, pathname, hash }
+  })
+  const setFilters = (change) => {
+    const { filters: f, pathname: path, hash: h } = latest.current
+    navigate({ pathname: path, search: toSearch({ ...f, ...change }), hash: h }, { replace: true })
+  }
+  const clearAll = () => navigate({ pathname, hash }, { replace: true })
+  const [finding, setFinding] = useState(false)
+  const nearMe = useNearMe((key) => setFilters({ near: parseNear(key) }))
+  const { near } = filters
 
-  // the open profile lives in the URL too: /adopt/:petId (keeps #list if it's there)
+  // every pet loaded so far: the search results, then the rest (for FAVORITES/ and profiles)
+  const known = useMemo(() => {
+    const ids = new Set(pets.map((p) => p.id))
+    return [...pets, ...(all.data || []).filter((p) => !ids.has(p.id))]
+  }, [pets, all.data])
+
+  // the open profile lives in the URL too: /adopt/:petId (keeps the search and #list if they're there)
   const petId = useMatch('/adopt/:petId')?.params.petId
   const fetchedPet = useProfilePet(petId)
-  const profilePet = pets.find((p) => p.id === petId) || fetchedPet
-  const showPet = (id) => navigate({ pathname: `/adopt/${id}`, hash })
-  const closePet = () => navigate({ pathname: '/adopt', hash }, { replace: true })
+  const openPet = known.find((p) => p.id === petId) || fetchedPet
+  // with Near me on, a pet that isn't in the results (a favorite further away) still gets its distance
+  const profilePet =
+    openPet && near && openPet.distanceKm == null && openPet.coords
+      ? { ...openPet, distanceKm: distanceKm(near.coords, openPet.coords) }
+      : openPet
+  const showPet = (id) => navigate({ pathname: `/adopt/${id}`, search, hash })
+  const closePet = () => navigate({ pathname: '/adopt', search, hash }, { replace: true })
   // if the button that opened the profile is gone (unfavorited in the FAVORITES/ panel), focus the pet's house
   const houseFor = (id) => () => document.querySelector(`.house[data-pet-id="${CSS.escape(id)}"]`)
+
+  const moreCount = filterCount(filters)
+  // shown in whichever view is on screen: LOADING, ERROR + Retry, or the no-results ERROR (OK clears the search)
+  const searchStatus = (
+    <SearchStatus
+      status={status}
+      empty={pets.length === 0}
+      message={emptyMessage(filters)}
+      onRetry={retry}
+      onClear={searchKey ? clearAll : retry}
+    />
+  )
 
   return (
     <div className="desk">
@@ -122,51 +140,61 @@ export default function AdoptPage() {
         <p>Mockup · Neighborhood view · sample pets from Bengaluru shelters</p>
       </header>
 
-      <Window title={<>NEIGHBORHOOD.EXE — <span>{shown.length}</span> pets nearby</>} aria-label="Neighborhood">
+      <Window
+        title={
+          status === 'ready'
+            ? <>NEIGHBORHOOD.EXE — <span>{total}</span> {total === 1 ? 'pet' : 'pets'} found</>
+            : 'NEIGHBORHOOD.EXE — searching'
+        }
+        aria-label="Neighborhood"
+      >
         <div className="toolbar">
           <div className="chips" role="group" aria-label="Species">
             {SPECIES.map((s) => (
-              <Chip key={s.value} pressed={filter.species === s.value} onClick={() => setFilter((f) => ({ ...f, species: s.value }))}>
+              <Chip key={s.value} pressed={filters.species === s.value} onClick={() => setFilters({ species: s.value })}>
                 {s.label}
               </Chip>
             ))}
           </div>
           <label className="urgent">
-            <input
-              type="checkbox"
-              checked={filter.urgent}
-              onChange={(e) => setFilter((f) => ({ ...f, urgent: e.target.checked }))}
-            />
+            <input type="checkbox" checked={filters.urgent} onChange={(e) => setFilters({ urgent: e.target.checked })} />
             Needs a foster urgently
           </label>
+          <Button onClick={() => setFinding(true)} aria-haspopup="dialog">
+            {moreCount ? `More filters (${moreCount})` : 'More filters'}
+          </Button>
+          <NearMeToggle near={near} nearMe={nearMe} onOff={() => setFilters({ near: null, radius: DEFAULT_RADIUS })} />
           <SegToggle options={VIEWS} value={view} onChange={setView} />
         </div>
+        <NearRow near={near} radius={filters.radius} nearMe={nearMe} onRadius={(radius) => setFilters({ radius })} />
+        <ActiveFilters filters={filters} onChange={setFilters} onClearAll={clearAll} />
 
         <div className="main" hidden={view !== 'map'}>
-          <Neighborhood pets={pets} isDimmed={(p) => !matches(p)} onOpen={showPet}>
-            <LoadStatus status={status} onRetry={retry} />
-            {status === 'ready' && shown.length === 0 && (
-              <ErrorDialog
-                message={`NO ${noneWord} NEED AN URGENT FOSTER RIGHT NOW.`}
-                onOk={() => setFilter((f) => ({ ...f, urgent: false }))}
-              />
-            )}
+          {/* keyed by the search, so a new search starts on the first street */}
+          <Neighborhood key={searchKey} pets={pets} total={total} onMore={loadMore} onOpen={showPet}>
+            {view === 'map' && searchStatus}
           </Neighborhood>
           <aside className="side">
-            <Legend pets={shown} />
-            <FavoritesPanel pets={pets} onOpen={showPet} />
+            <Legend pets={pets} />
+            {near && <NearbyShelters pets={pets} radius={filters.radius} />}
+            <FavoritesPanel pets={known} onOpen={showPet} />
           </aside>
         </div>
 
         <div className="list" hidden={view !== 'list'}>
-          {status !== 'ready' ? (
-            <div className="list-status"><LoadStatus status={status} onRetry={retry} /></div>
-          ) : shown.length ? (
-            shown.map((p) => <PetCard key={p.id} pet={p} onOpen={showPet} />)
+          {status === 'ready' && pets.length ? (
+            <>
+              {pets.map((p) => <PetCard key={p.id} pet={p} onOpen={showPet} />)}
+              {hasMore && (
+                <div className="list-more">
+                  <Button onClick={loadMore} disabled={loadingMore}>
+                    {loadingMore ? 'Loading...' : `Show more (${total - pets.length} more)`}
+                  </Button>
+                </div>
+              )}
+            </>
           ) : (
-            <Window as="div" title="ERROR" barColor="pink" dots={false} className="list-err">
-              <div className="body">NO PETS MATCH THESE FILTERS.</div>
-            </Window>
+            <div className="list-status">{view === 'list' && searchStatus}</div>
           )}
         </div>
       </Window>
@@ -175,7 +203,7 @@ export default function AdoptPage() {
         items={[
           { label: 'Neighborhood.exe' },
           { label: 'Key.txt', hideOnSmall: true },
-          { id: 'fav', label: `Favorites (${pets.filter((p) => favs.has(p.id)).length})`, hideOnSmall: true },
+          { id: 'fav', label: `Favorites (${known.filter((p) => favs.has(p.id)).length})`, hideOnSmall: true },
           // nothing while a saved login is being checked, so "Log in" doesn't flash up
           ...(isAdopter ? [{ id: 'apps', label: applicationsTaskLabel(pendingIn(myApps)), onClick: () => navigate('/applications') }] : []),
           ...(isShelter
@@ -199,14 +227,30 @@ export default function AdoptPage() {
         ]}
       />
 
+      {finding && (
+        <FindPetsWindow
+          filters={filters}
+          onFind={(f) => {
+            setFilters(f)
+            setFinding(false)
+          }}
+          onClearAll={() => {
+            clearAll()
+            setFinding(false)
+          }}
+          onClose={() => setFinding(false)}
+        />
+      )}
       {profilePet && <ProfileWindow key={profilePet.id} pet={profilePet} onClose={closePet} fallbackFocus={houseFor(profilePet.id)} />}
     </div>
   )
 }
 
-// LOADING... window while the pets load, the ERROR window with Retry if the server can't be reached
-function LoadStatus({ status, onRetry }) {
+// LOADING... while the pets load, ERROR + Retry if the server can't be reached, and the ERROR window when
+// nothing matches (its OK clears the search)
+function SearchStatus({ status, empty, message, onRetry, onClear }) {
   if (status === 'loading') return <LoadingWindow />
   if (status === 'error') return <ErrorDialog message="COULDN'T REACH THE SHELTER SERVER." okLabel="Retry" onOk={onRetry} />
+  if (empty) return <ErrorDialog message={message} onOk={onClear} />
   return null
 }
