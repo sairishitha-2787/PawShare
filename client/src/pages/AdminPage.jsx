@@ -226,23 +226,9 @@ function ControlPanel() {
   )
 }
 
-// Anyone else who finds /admin
-function AdminsOnly() {
-  const navigate = useNavigate()
-  return (
-    <div className="desk admin-desk">
-      <header className="brand">
-        <h1>PAW<span>SHARE</span> OS</h1>
-      </header>
-      <div className="cp-wait cp-denied">
-        <ErrorDialog message="ADMINS ONLY." onOk={() => navigate('/adopt')} />
-      </div>
-    </div>
-  )
-}
-
 // /admin, /admin/verification, /admin/reviews, /admin/listings (behind RequireAuth): CONTROL_PANEL.EXE, admins only.
+// Anyone else goes back to the neighborhood, like every other page that isn't for your role.
 export default function AdminPage() {
   const { user } = useAuth()
-  return user.role === 'admin' ? <ControlPanel /> : <AdminsOnly />
+  return user.role === 'admin' ? <ControlPanel /> : <Navigate to="/adopt" replace />
 }

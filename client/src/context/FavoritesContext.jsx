@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useAuth } from './AuthContext.jsx'
 
 const KEY = 'pawshare-favs'
 const FavoritesContext = createContext(null)
@@ -13,8 +14,19 @@ function load() {
 }
 
 // Set of favorite pet ids, kept in localStorage so it survives a refresh.
+// Logging out (or a 401 that logs you out) empties the folder, so the next person on this browser starts fresh.
 export function FavoritesProvider({ children }) {
   const [favs, setFavs] = useState(load)
+  const { user } = useAuth()
+  const hadUser = useRef(false)
+
+  useEffect(() => {
+    if (user) hadUser.current = true
+    else if (hadUser.current) {
+      hadUser.current = false
+      setFavs(new Set())
+    }
+  }, [user])
 
   useEffect(() => {
     try {

@@ -348,7 +348,7 @@ export default function ShelterProfilePage() {
   const tab = TABS.find((t) => `#${t.id}` === location.hash)?.id || 'general'
   const pick = (next) => navigate({ hash: `#${next}` }, { replace: true })
 
-  const title = shelter.status === 'ready' ? `${shelter.profile.name.toUpperCase()}.INFO` : 'SHELTER.INFO'
+  const title = shelter.status === 'ready' ? `${shelter.profile.name.trim().toUpperCase().replace(/\s+/g, '_')}.INFO` : 'SHELTER.INFO'
 
   return (
     <div className="desk sp-desk">

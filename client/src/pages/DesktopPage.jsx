@@ -25,7 +25,7 @@ import { useTaskCounts } from '../context/TaskCountsContext.jsx'
 import { useLoad } from '../hooks/useLoad.js'
 import { getAnimals } from '../api/animals.js'
 import { mockPets } from '../data/mockPets.js'
-import { firstName } from '../utils/auth.js'
+import { displayName } from '../utils/auth.js'
 import { shelterPath } from '../utils/shelters.js'
 import { petOfTheDay, plural } from '../utils/shell.js'
 import './DesktopPage.css'
@@ -89,7 +89,7 @@ function Welcome({ user, counts }) {
   return (
     <p className="home-welcome">
       {/* a shelter's name is the organisation's, so it isn't cut to a first name */}
-      Welcome back, <b>{user.role === 'shelter' ? user.name : firstName(user.name)}</b>.{' '}
+      Welcome back, <b>{displayName(user)}</b>.{' '}
       {items.length > 0 ? (
         <>
           {items.map((item, i) => (

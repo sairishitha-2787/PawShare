@@ -51,7 +51,7 @@ export default function TagField({ tags, onChange, error }) {
           id={id}
           value={draft}
           maxLength={MAX.tag + 10}
-          placeholder="Add your own, e.g. Loves cuddles"
+          placeholder="e.g. Loves fetch"
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
             // Enter adds the tag instead of submitting the form

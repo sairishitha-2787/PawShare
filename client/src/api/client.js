@@ -1,7 +1,11 @@
 // fetch wrapper for the PawShare API. Resolves to the parsed JSON body; on a non-2xx response it throws
 // an Error carrying the server's `message` (plus .status and .data). A network failure throws with status 0.
 // A saved login token is sent as `Authorization: Bearer <token>`; a 401 on such a request clears it.
-const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '')
+// The local API is only assumed in dev: a production build without VITE_API_URL has no API at all
+// (the shell shows "API URL NOT CONFIGURED." instead of quietly calling localhost).
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '')
+export const API_CONFIGURED = Boolean(API_URL)
+const BASE_URL = API_URL.replace(/\/+$/, '')
 const TOKEN_KEY = 'pawshare-token'
 
 // localStorage can throw (private mode, blocked storage): then the token just isn't kept.
@@ -31,6 +35,7 @@ export function onUnauthorized(fn) {
 
 // query: plain object → ?key=value (undefined, null and '' are skipped). body: sent as JSON.
 export async function request(path, { query, body, headers, ...options } = {}) {
+  if (!API_CONFIGURED) throw Object.assign(new Error('API URL NOT CONFIGURED.'), { status: 0 })
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(query || {})) {
     if (value !== undefined && value !== null && value !== '') params.set(key, value)
