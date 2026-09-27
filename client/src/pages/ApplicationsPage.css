@@ -1,5 +1,5 @@
 /* MY_APPLICATIONS/: one folder window, centered on the grid, taskbar below */
-.apps-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.apps-desk { grid-template-rows: auto 1fr; }
 .apps { max-width: 720px; width: 100%; justify-self: center; align-self: start; }
 
 .apps-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-bottom: 2px dashed var(--grid); }

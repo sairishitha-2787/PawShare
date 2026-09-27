@@ -747,6 +747,45 @@ stay live, new listings are blocked until re-approved."
 
 ---
 
+## Session 19 — Desktop home and shell
+
+```text
+Run `git checkout main && git pull`, then create `feature/desktop-shell` from main.
+
+Read CLAUDE.md, README "Users" (PUT /api/users/me fields and rules) and client/src/main.jsx + Taskbar
+(read only for server/). Tell me the current routes first.
+
+1. Routes: move the neighborhood map to /adopt (keep /adopt/:petId working; "/" no longer shows the map).
+   Check every link, redirect and "Back to the neighborhood" button still goes to the map.
+2. "/" = desktop home on the grid background:
+   - Left column of desktop icons (hand-drawn SVGs in our style, Silkscreen labels, keyboard focusable,
+     open on click/Enter): ADOPT.EXE (map), for everyone; then by role — adopters: APPLICATIONS, PET_DIARY,
+     MESSENGER, FAVORITES; shelters: MY_PETS, INBOX, CHECKINS, MESSENGER, MY_PROFILE; admins: CONTROL_PANEL.
+     Logged out: ADOPT.EXE, LOG_IN, SIGN_UP. Counts from existing hooks shown as small pink badges.
+   - A "README.TXT" window (sun title bar): 3 short lines on what PawShare is (shelters list pets, adopters
+     find them on the map, apply, chat, check in after adoption) + "Open the neighborhood" primary button.
+   - A "PET_OF_THE_DAY.JPG" window: one available pet (urgent first, picked by date so it's stable for the day)
+     with photo/face, name, shelter and "Meet <Name>" → opens the profile.
+   - Logged in: a small "Welcome back, <first name>" line with what needs attention (e.g. "1 check-in due,
+     2 unread messages") linking to each place.
+   Below 700px the icons become a 3-column grid above the windows.
+3. Taskbar on every page via one shared layout (remove per-page copies): the "start" button now opens a
+   Start menu (Silkscreen items, keyboard accessible, Esc closes): Home, Neighborhood, the role's pages,
+   Account settings, Log in/Log out. Keep the existing task buttons and clock.
+4. /account (RequireAuth): Window "SETTINGS.EXE": name, phone, city/state per PUT /users/me rules, email shown
+   read-only, "Save changes" → mint "Saved." Server errors in the pink ERROR box.
+5. 404: any unknown route shows a Window "FILE NOT FOUND" (pink title bar): "We couldn't find <path>." with
+   buttons "Go home" and "Open the neighborhood". Not a joke; the ERROR window stays the only joke.
+6. Update CLAUDE.md folder layout and routes. Works at 400px. Append this prompt to docs/claude-prompts.md as
+   "Session 19 — Desktop home and shell".
+
+Done when: "/" shows the desktop with role-correct icons for a logged-out visitor, Ananya, a shelter and the
+admin; the Start menu reaches every page; /adopt/mochi still opens Mochi; editing your name in Settings updates
+the taskbar name; /nope shows FILE NOT FOUND. Lint and build pass. Commit: "feat(shell): desktop home, start menu, settings, 404".
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

@@ -6,7 +6,6 @@ import SegToggle from '../components/ui/SegToggle.jsx'
 import Button from '../components/ui/Button.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import Neighborhood from '../components/map/Neighborhood.jsx'
 import Legend from '../components/map/Legend.jsx'
 import PetCard from '../components/pets/PetCard.jsx'
@@ -17,15 +16,7 @@ import ActiveFilters from '../components/search/ActiveFilters.jsx'
 import NearbyShelters from '../components/search/NearbyShelters.jsx'
 import { NearMeToggle, NearRow } from '../components/search/NearMe.jsx'
 import { useFavorites } from '../context/FavoritesContext.jsx'
-import { useAuth } from '../context/AuthContext.jsx'
-import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckInsTask } from '../context/CheckInsContext.jsx'
-import { useAdminTask } from '../context/AdminContext.jsx'
-import { messagesTaskLabel } from '../utils/messages.js'
-import { firstName } from '../utils/auth.js'
-import { applicationsTaskLabel, inboxTaskLabel } from '../utils/applications.js'
-import { useMyApplications } from '../hooks/useMyApplications.js'
-import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
+import { usePublishTaskCount } from '../context/TaskCountsContext.jsx'
 import { useLoad } from '../hooks/useLoad.js'
 import { useAnimalSearch } from '../hooks/useAnimalSearch.js'
 import { useNearMe } from '../hooks/useNearMe.js'
@@ -33,7 +24,6 @@ import { SPECIES, emptyMessage, filterCount, parseFilters, toSearch } from '../u
 import { DEFAULT_RADIUS, distanceKm, parseNear } from '../utils/geo.js'
 import { mockPets } from '../data/mockPets.js'
 import { getAnimal, getAnimals } from '../api/animals.js'
-import { profileTask } from '../utils/shelters.js'
 import './AdoptPage.css'
 
 const VIEWS = [{ value: 'map', label: 'Map' }, { value: 'list', label: 'Full list' }]
@@ -66,20 +56,10 @@ function useProfilePet(petId) {
 export default function AdoptPage() {
   const all = useLoad(loadAllPets)
   const { favs } = useFavorites()
-  const { user, loading: authLoading, logout } = useAuth()
-  const { count: unread } = useUnread()
-  // adopters get an Applications task with their pending count, shelters (and admins) an Inbox task
-  const isAdopter = user?.role === 'adopter'
-  const isShelter = user?.role === 'shelter' || user?.role === 'admin'
-  const myApps = useMyApplications(isAdopter)
-  const received = useReceivedApplications(isShelter)
-  const pendingIn = (list) => (list.status === 'ready' ? list.applications.filter((a) => a.status === 'pending').length : null)
   // the view lives in the URL hash (#list) so it survives a refresh
   const location = useLocation()
   const { hash, search, pathname } = location
   const navigate = useNavigate()
-  const checkInsTask = useCheckInsTask(navigate)
-  const adminTask = useAdminTask(navigate)
   const view = hash === '#list' ? 'list' : 'map'
   const setView = (v) => navigate({ search, hash: v === 'list' ? '#list' : '' }, { replace: true })
 
@@ -106,6 +86,15 @@ export default function AdoptPage() {
     const ids = new Set(pets.map((p) => p.id))
     return [...pets, ...(all.data || []).filter((p) => !ids.has(p.id))]
   }, [pets, all.data])
+  usePublishTaskCount('favorites', known.filter((p) => favs.has(p.id)).length)
+
+  // /adopt#favorites (the Start menu's and the desktop's FAVORITES): bring the FAVORITES/ window into view
+  useEffect(() => {
+    if (hash !== '#favorites') return
+    const panel = document.getElementById('favorites')
+    panel?.scrollIntoView({ block: 'center' })
+    panel?.focus({ preventScroll: true })
+  }, [hash])
 
   // the open profile lives in the URL too: /adopt/:petId (keeps the search and #list if they're there)
   const petId = useMatch('/adopt/:petId')?.params.petId
@@ -199,33 +188,6 @@ export default function AdoptPage() {
         </div>
       </Window>
 
-      <Taskbar
-        items={[
-          { label: 'Neighborhood.exe' },
-          { label: 'Key.txt', hideOnSmall: true },
-          { id: 'fav', label: `Favorites (${known.filter((p) => favs.has(p.id)).length})`, hideOnSmall: true },
-          // nothing while a saved login is being checked, so "Log in" doesn't flash up
-          ...(isAdopter ? [{ id: 'apps', label: applicationsTaskLabel(pendingIn(myApps)), onClick: () => navigate('/applications') }] : []),
-          ...(isShelter
-            ? [
-                { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
-                { id: 'inbox', label: inboxTaskLabel(pendingIn(received)), onClick: () => navigate('/shelter/applications') },
-                profileTask(user, navigate),
-              ]
-            : []),
-          ...(user
-            ? [
-                adminTask,
-                checkInsTask,
-                { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
-                { id: 'me', label: `${firstName(user.name)} · ${user.role}` },
-                { id: 'logout', label: 'Log out', onClick: logout },
-              ]
-            : authLoading
-              ? []
-              : [{ id: 'login', label: 'Log in', onClick: () => navigate('/login', { state: { from: location } }) }]),
-        ]}
-      />
 
       {finding && (
         <FindPetsWindow

@@ -1,5 +1,5 @@
 /* INBOX.EXE: toolbar, then the message list and the reading pane side by side; taskbar below */
-.inbox-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.inbox-desk { grid-template-rows: auto 1fr; }
 /* the unverified note (if any) and the window */
 .inbox-stack { display: grid; gap: 14px; align-content: start; min-width: 0; }
 .inbox { width: 100%; }

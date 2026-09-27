@@ -3,17 +3,10 @@ import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import PetForm from '../components/shelter/PetForm.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckInsTask } from '../context/CheckInsContext.jsx'
-import { useAdminTask } from '../context/AdminContext.jsx'
-import { messagesTaskLabel } from '../utils/messages.js'
 import { createAnimal, getAnimalRecord, updateAnimal } from '../api/animals.js'
 import { editTitle, emptyForm, formFromAnimal } from '../utils/listing.js'
-import { firstName } from '../utils/auth.js'
-import { profileTask } from '../utils/shelters.js'
 import './PetEditorPage.css'
 
 // The listing being edited, straight from the API. status: 'loading' | 'ready' | 'error' (error: the Error)
@@ -32,11 +25,6 @@ function useAnimalRecord(id) {
 }
 
 function Shell({ title, children }) {
-  const { user, logout } = useAuth()
-  const { count: unread } = useUnread()
-  const navigate = useNavigate()
-  const checkInsTask = useCheckInsTask(navigate)
-  const adminTask = useAdminTask(navigate)
   return (
     <div className="desk editor-desk">
       <header className="brand">
@@ -45,18 +33,6 @@ function Shell({ title, children }) {
       <Window title={title} className="editor" aria-label={title}>
         {children}
       </Window>
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt'), hideOnSmall: true },
-          { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
-          profileTask(user, navigate),
-          adminTask,
-          checkInsTask,
-          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
-          { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-          { id: 'logout', label: 'Log out', onClick: logout },
-        ]}
-      />
     </div>
   )
 }

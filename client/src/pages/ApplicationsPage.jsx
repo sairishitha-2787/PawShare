@@ -7,18 +7,14 @@ import Button from '../components/ui/Button.jsx'
 import Modal from '../components/ui/Modal.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import PetFace from '../components/pets/PetFace.jsx'
 import ApplicationDetail from '../components/apply/ApplicationDetail.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckInsTask } from '../context/CheckInsContext.jsx'
-import { messagesTaskLabel } from '../utils/messages.js'
+import { usePublishTaskCount } from '../context/TaskCountsContext.jsx'
 import { useMyApplications } from '../hooks/useMyApplications.js'
 import { applicationPet, canApplyAgain, isActive } from '../api/applications.js'
-import { APP_STATUSES, APP_STATUS_COLOR, APP_STATUS_LABEL, TYPE_LABEL, applicationsTaskLabel } from '../utils/applications.js'
+import { APP_STATUSES, APP_STATUS_COLOR, APP_STATUS_LABEL, TYPE_LABEL } from '../utils/applications.js'
 import { formatShort } from '../utils/dates.js'
-import { firstName } from '../utils/auth.js'
 import './ApplicationsPage.css'
 
 const FILTERS = ['all', ...APP_STATUSES]
@@ -62,16 +58,14 @@ function Missing({ onClose }) {
 }
 
 function MyApplications() {
-  const { user, logout } = useAuth()
-  const { count: unread } = useUnread()
   const navigate = useNavigate()
   const { status, applications, retry, refresh, patch } = useMyApplications()
-  const checkInsTask = useCheckInsTask(navigate)
   const [filter, setFilter] = useState('all')
 
   const counts = { all: applications.length }
   for (const s of APP_STATUSES) counts[s] = applications.filter((a) => a.status === s).length
   const shown = filter === 'all' ? applications : applications.filter((a) => a.status === filter)
+  usePublishTaskCount('applications', status === 'ready' ? counts.pending : null)
 
   // the open application lives in the URL: /applications/:id
   const openId = useMatch('/applications/:id')?.params.id
@@ -123,16 +117,6 @@ function MyApplications() {
         </div>
       </Window>
 
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
-          { id: 'apps', label: applicationsTaskLabel(status === 'ready' ? counts.pending : null) },
-          checkInsTask,
-          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
-          { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-          { id: 'logout', label: 'Log out', onClick: logout },
-        ]}
-      />
 
       {open && (
         <ApplicationDetail

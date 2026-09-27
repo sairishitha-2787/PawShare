@@ -1,5 +1,5 @@
 /* VERIFY.EXE: one window, taskbar below */
-.verify-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.verify-desk { grid-template-rows: auto 1fr; }
 .verify { max-width: 640px; width: 100%; justify-self: center; align-self: start; }
 .verify-waiting { position: relative; min-height: 260px; }
 

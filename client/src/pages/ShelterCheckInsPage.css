@@ -1,5 +1,5 @@
 /* CHECKINS.EXE: status chips, then one row per adopted/fostered pet; taskbar below */
-.ci-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.ci-desk { grid-template-rows: auto 1fr; }
 .ci-win { max-width: 820px; width: 100%; justify-self: center; align-self: start; }
 
 .ci-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-bottom: 2px dashed var(--grid); }

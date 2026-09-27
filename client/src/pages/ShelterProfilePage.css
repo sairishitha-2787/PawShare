@@ -1,5 +1,5 @@
 /* <SHELTER NAME>.INFO: a Properties dialog. Tabs sit on the sheet; the selected one joins it. */
-.sp-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.sp-desk { grid-template-rows: auto 1fr; }
 .sp { max-width: 820px; width: 100%; justify-self: center; align-self: start; }
 .sp-waiting { position: relative; min-height: 300px; }
 

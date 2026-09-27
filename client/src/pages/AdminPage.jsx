@@ -4,22 +4,17 @@ import Window from '../components/ui/Window.jsx'
 import Button from '../components/ui/Button.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import { ListingsIcon, ReviewsIcon, VerifyIcon } from '../components/admin/PanelIcons.jsx'
 import VerificationSection from '../components/admin/VerificationSection.jsx'
 import ReviewsSection from '../components/admin/ReviewsSection.jsx'
 import ListingsSection from '../components/admin/ListingsSection.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckInsTask } from '../context/CheckInsContext.jsx'
-import { useAdmin, useAdminTask } from '../context/AdminContext.jsx'
+import { usePublishTaskCount } from '../context/TaskCountsContext.jsx'
+import { useAdmin } from '../context/AdminContext.jsx'
 import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
 import { useLoad } from '../hooks/useLoad.js'
 import { getAllAnimals, getShelters } from '../api/admin.js'
 import { getReviews } from '../api/users.js'
-import { messagesTaskLabel } from '../utils/messages.js'
-import { inboxTaskLabel } from '../utils/applications.js'
-import { firstName } from '../utils/auth.js'
 import { SECTIONS, SECTION_TITLE, plural, verificationLabel, verifyStatusOf } from '../utils/admin.js'
 import './AdminPage.css'
 
@@ -111,13 +106,9 @@ function Wait({ load, label, error }) {
 }
 
 function ControlPanel() {
-  const { user, logout } = useAuth()
-  const { count: unread } = useUnread()
   const { refresh: refreshWaiting } = useAdmin()
   const navigate = useNavigate()
   const location = useLocation()
-  const checkInsTask = useCheckInsTask(navigate)
-  const adminTask = useAdminTask(navigate, { current: true })
 
   const param = useMatch('/admin/:section')?.params.section
   const section = SECTIONS.includes(param) ? param : null
@@ -159,7 +150,7 @@ function ControlPanel() {
     reviews: reviewStats.status === 'ready' ? [...reviewStats.data.values()].reduce((n, s) => n + s.count, 0) : null,
     listings: animals.status === 'ready' ? animals.data.length : null,
   }
-  const pendingApps = apps.status === 'ready' ? apps.applications.filter((a) => a.status === 'pending').length : null
+  usePublishTaskCount('inbox', apps.status === 'ready' ? apps.applications.filter((a) => a.status === 'pending').length : null)
 
   const afterDecision = () => {
     shelters.refresh()
@@ -231,25 +222,12 @@ function ControlPanel() {
           )}
         </Window>
       </div>
-
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt'), hideOnSmall: true },
-          adminTask,
-          { id: 'inbox', label: inboxTaskLabel(pendingApps), onClick: () => navigate('/shelter/applications'), hideOnSmall: true },
-          checkInsTask,
-          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
-          { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-          { id: 'logout', label: 'Log out', onClick: logout },
-        ]}
-      />
     </div>
   )
 }
 
 // Anyone else who finds /admin
 function AdminsOnly() {
-  const { user, logout } = useAuth()
   const navigate = useNavigate()
   return (
     <div className="desk admin-desk">
@@ -259,13 +237,6 @@ function AdminsOnly() {
       <div className="cp-wait cp-denied">
         <ErrorDialog message="ADMINS ONLY." onOk={() => navigate('/adopt')} />
       </div>
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
-          { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-          { id: 'logout', label: 'Log out', onClick: logout },
-        ]}
-      />
     </div>
   )
 }

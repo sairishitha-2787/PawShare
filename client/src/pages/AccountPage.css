@@ -1,0 +1,15 @@
+/* SETTINGS.EXE: one window, centered on the grid */
+.settings-desk { grid-template-rows: auto 1fr; }
+.settings { max-width: 480px; width: 100%; justify-self: center; align-self: start; }
+.settings form { padding: 18px; display: grid; gap: 14px; }
+.settings input[readonly] { background: var(--cream); color: var(--ink-soft); }
+.settings-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.settings-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.settings-foot .btn { font-size: 13px; padding: 7px 16px; }
+.settings-foot .btn:disabled { cursor: progress; opacity: .75; }
+.settings-saved {
+  margin: 0; font-size: 15px; padding: 4px 12px; background: var(--mint);
+  border: 2px solid var(--ink); border-radius: 10px; box-shadow: 3px 3px 0 var(--ink);
+}
+
+@media (max-width: 440px) { .settings-row { grid-template-columns: minmax(0, 1fr); } }

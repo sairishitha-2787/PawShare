@@ -53,10 +53,12 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 ```
 client/src/
   api/          client.js, animals.js, auth.js, applications.js, uploads.js (Cloudinary photo + document upload), threads.js, checkins.js,
-                users.js (public profiles, reviews list, adoption history), reviews.js, verification.js,
+                users.js (public profiles, reviews list, adoption history, updateMe), reviews.js, verification.js,
                 admin.js (shelter verification decisions, every animal / every review of a shelter, paged through)
   components/
     ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar, Field, ChoiceField, LoadingWindow
+    shell/      ShellLayout (the layout route around every page: the page, then the one shared taskbar), StartMenu
+    desktop/    DesktopIcons (the home page's hand-drawn icons, same 48×48 style as admin/PanelIcons)
     auth/       RequireAuth, FormError
     pets/       PetFace, House, Pin, PetCard, ProfileWindow
     map/        Neighborhood, SceneBackdrop, Legend
@@ -73,16 +75,50 @@ client/src/
                 ReviewWindow (REVIEW.EXE modal), RateShelter ("Rate <Shelter>" / your review, under an approved application)
   context/      AuthContext.jsx, FavoritesContext.jsx, UnreadContext.jsx (unread message count, polled every 15s),
                 CheckInsContext.jsx (the taskbar's check-ins count, polled every minute; useCheckInsTask),
-                AdminContext.jsx (admins: shelters waiting for verification, polled every minute; useAdminTask)
+                AdminContext.jsx (admins: shelters waiting for verification, polled every minute; useAdminTask),
+                TaskCountsContext.jsx (the shell's numbers: pending applications + the three above; usePublishTaskCount)
   hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js, usePolling.js, useLoad.js,
                 useAnimalSearch.js (the Adopt page's results, 50 at a time), useNearMe.js (browser location or area picker)
   data/         mockPets.js
-  pages/        AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, ShelterInboxPage.jsx, MyPetsPage.jsx, PetEditorPage.jsx,
+  pages/        DesktopPage.jsx (the "/" desktop), AdoptPage.jsx, ApplyPage.jsx, ApplicationsPage.jsx, ShelterInboxPage.jsx, MyPetsPage.jsx, PetEditorPage.jsx,
                 MessagesPage.jsx, CheckInsPage.jsx (PET_DIARY.EXE), ShelterCheckInsPage.jsx (CHECKINS.EXE), ShelterProfilePage.jsx
                 (<NAME>.INFO, tabs picked by the URL hash), VerificationPage.jsx (VERIFY.EXE), AdminPage.jsx (CONTROL_PANEL.EXE,
-                /admin/:section), LoginPage.jsx, SignupPage.jsx, DevKit.jsx
+                /admin/:section), AccountPage.jsx (SETTINGS.EXE), NotFoundPage.jsx (FILE NOT FOUND), LoginPage.jsx,
+                SignupPage.jsx, DevKit.jsx
+  utils/        one file per area (search, geo, listing, applications, checkins, messages, shelters, ...); shell.js has the
+                Start menu's role pages and petOfTheDay
   styles/       tokens.css, global.css
 ```
+
+## Routes
+
+Every route sits inside `ShellLayout` (main.jsx), so the taskbar is never part of a page: don't add one.
+
+| Path | Page |
+|---|---|
+| `/` | DesktopPage: role icons, README.TXT, PET_OF_THE_DAY.JPG, the "Welcome back" line |
+| `/adopt`, `/adopt/:petId` | AdoptPage (the neighborhood map; the open profile is in the URL). `#list` = Full list, `#favorites` = scroll to FAVORITES/ |
+| `/apply/:petId` | ApplyPage |
+| `/applications`, `/applications/:id` | ApplicationsPage (adopter) |
+| `/shelter/applications`, `/shelter/applications/:id` | ShelterInboxPage (shelter, admin) |
+| `/shelter/animals`, `/shelter/animals/new`, `/shelter/animals/:id/edit` | MyPetsPage, PetEditorPage |
+| `/messages`, `/messages/:threadId` | MessagesPage |
+| `/checkins`, `/shelter/checkins` | CheckInsPage (adopter), ShelterCheckInsPage |
+| `/shelters/:id` | ShelterProfilePage (public) |
+| `/shelter/verification` | VerificationPage (shelter) |
+| `/admin`, `/admin/:section` | AdminPage (admin) |
+| `/account` | AccountPage |
+| `/login`, `/signup`, `/dev/kit` | LoginPage, SignupPage, DevKit |
+| `*` | NotFoundPage |
+
+All but `/`, `/adopt…`, `/shelters/:id`, `/login`, `/signup` and `/dev/kit` are behind RequireAuth. "Back to the neighborhood",
+login/signup redirects and "not for your role" redirects go to `/adopt`, not `/`.
+
+The shell's taskbar shows one task per place (the current page is a plain label). Below 520px only start, the current page,
+tasks with a count above zero and the clock stay; the Start menu has everything. A page that holds a fresher list than the
+shell (the inbox after an approve, say) publishes its count with `usePublishTaskCount('inbox' | 'applications' | 'favorites', n)`;
+otherwise the shell refetches applications on each navigation. PUT /users/me replaces `location` whole, so AccountPage
+sends it back with country and coordinates kept, then calls `updateUser` so the taskbar name changes at once.
 
 ## Pet data shape (frontend)
 

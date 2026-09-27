@@ -1,5 +1,5 @@
 /* CONTROL_PANEL.EXE: summary row, then the icon grid or one section; taskbar below */
-.admin-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.admin-desk { grid-template-rows: auto 1fr; }
 .admin-stack { display: grid; gap: 14px; align-content: start; min-width: 0; }
 .cpanel { width: 100%; }
 

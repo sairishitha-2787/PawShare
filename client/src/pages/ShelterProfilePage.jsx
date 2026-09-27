@@ -4,22 +4,16 @@ import Window from '../components/ui/Window.jsx'
 import Button from '../components/ui/Button.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import PetCard from '../components/pets/PetCard.jsx'
 import PetFace from '../components/pets/PetFace.jsx'
 import ProfileWindow from '../components/pets/ProfileWindow.jsx'
 import MessageButton from '../components/messages/MessageButton.jsx'
 import { RatingSummary, Stars } from '../components/shelters/Stars.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckInsTask } from '../context/CheckInsContext.jsx'
-import { useAdminTask } from '../context/AdminContext.jsx'
 import { getAdoptionHistory, getProfile, getReviews } from '../api/users.js'
 import { getAnimals, petLook } from '../api/animals.js'
-import { messagesTaskLabel } from '../utils/messages.js'
 import { formatLong, formatMonth } from '../utils/dates.js'
 import { firstName } from '../utils/auth.js'
-import { profileTask } from '../utils/shelters.js'
 import './ShelterProfilePage.css'
 
 // Properties-dialog tabs; the URL hash picks one (#reviews), so any tab can be linked to.
@@ -348,16 +342,11 @@ function Profile({ id, profile, history, tab, onPick }) {
 // /shelters/:id (public): <SHELTER NAME>.INFO, a Properties dialog with GENERAL · PETS · REVIEWS · HISTORY.
 export default function ShelterProfilePage() {
   const { id } = useParams()
-  const { user, logout, loading: authLoading } = useAuth()
-  const { count: unread } = useUnread()
   const navigate = useNavigate()
   const location = useLocation()
   const shelter = useShelter(id)
-  const checkInsTask = useCheckInsTask(navigate)
-  const adminTask = useAdminTask(navigate)
   const tab = TABS.find((t) => `#${t.id}` === location.hash)?.id || 'general'
   const pick = (next) => navigate({ hash: `#${next}` }, { replace: true })
-  const isOwn = user?.id === id
 
   const title = shelter.status === 'ready' ? `${shelter.profile.name.toUpperCase()}.INFO` : 'SHELTER.INFO'
 
@@ -380,27 +369,6 @@ export default function ShelterProfilePage() {
           </div>
         )}
       </Window>
-
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
-          ...(user
-            ? [
-                user.role === 'adopter'
-                  ? { id: 'apps', label: 'Applications', onClick: () => navigate('/applications'), hideOnSmall: true }
-                  : { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals'), hideOnSmall: true },
-                profileTask(user, navigate, { current: isOwn }),
-                adminTask,
-                checkInsTask,
-                { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
-                { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-                { id: 'logout', label: 'Log out', onClick: logout },
-              ]
-            : authLoading
-              ? []
-              : [{ id: 'login', label: 'Log in', onClick: () => navigate('/login', { state: { from: location } }) }]),
-        ]}
-      />
     </div>
   )
 }

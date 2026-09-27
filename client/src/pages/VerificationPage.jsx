@@ -1,22 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import Button from '../components/ui/Button.jsx'
 import Field from '../components/ui/Field.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import FormError from '../components/auth/FormError.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckInsTask } from '../context/CheckInsContext.jsx'
 import { VERIFY_LIMITS, getMyVerification, requestVerification } from '../api/verification.js'
 import { canUpload, checkDocumentFile, uploadDocument } from '../api/uploads.js'
-import { messagesTaskLabel } from '../utils/messages.js'
 import { formatLong } from '../utils/dates.js'
-import { firstName } from '../utils/auth.js'
 import { isHttpUrl } from '../utils/listing.js'
-import { profileTask, shelterPath } from '../utils/shelters.js'
+import { shelterPath } from '../utils/shelters.js'
 import './VerificationPage.css'
 
 // GET /verification/me. status: 'loading' | 'ready' | 'error'; set() swaps in the request just sent.
@@ -269,10 +264,7 @@ function Status({ verification, userId, onSent }) {
 }
 
 function Verify() {
-  const { user, logout, refreshUser } = useAuth()
-  const { count: unread } = useUnread()
-  const navigate = useNavigate()
-  const checkInsTask = useCheckInsTask(navigate)
+  const { user, refreshUser } = useAuth()
   const load = useVerification()
 
   // the login copy of the user may be old: an admin may have decided since
@@ -298,19 +290,6 @@ function Verify() {
           </div>
         )}
       </Window>
-
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt'), hideOnSmall: true },
-          { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals'), hideOnSmall: true },
-          { id: 'inbox', label: 'Inbox', onClick: () => navigate('/shelter/applications'), hideOnSmall: true },
-          profileTask(user, navigate),
-          checkInsTask,
-          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
-          { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-          { id: 'logout', label: 'Log out', onClick: logout },
-        ]}
-      />
     </div>
   )
 }
@@ -318,6 +297,6 @@ function Verify() {
 // /shelter/verification (behind RequireAuth): VERIFY.EXE, shelters only.
 export default function VerificationPage() {
   const { user } = useAuth()
-  if (user.role !== 'shelter') return <Navigate to="/" replace />
+  if (user.role !== 'shelter') return <Navigate to="/adopt" replace />
   return <Verify />
 }

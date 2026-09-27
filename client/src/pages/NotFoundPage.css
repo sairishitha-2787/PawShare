@@ -1,0 +1,8 @@
+/* FILE NOT FOUND: one window, centered on the grid */
+.missing-desk { grid-template-rows: auto 1fr; }
+.missing { max-width: 440px; width: 100%; justify-self: center; align-self: center; }
+.missing-body { padding: 18px; display: grid; gap: 16px; }
+.missing-body p { margin: 0; font-size: 16px; overflow-wrap: anywhere; }
+.missing-body code { font-family: var(--pixel); font-size: 13px; background: var(--pink-soft); border: 2px solid var(--ink); border-radius: 6px; padding: 0 6px; }
+.missing-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.missing-actions .btn { font-size: 13px; padding: 7px 16px; text-decoration: none; }

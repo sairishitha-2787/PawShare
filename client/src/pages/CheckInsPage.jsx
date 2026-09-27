@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import Button from '../components/ui/Button.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import PetFace from '../components/pets/PetFace.jsx'
 import Timeline from '../components/checkins/Timeline.jsx'
 import HealthLog from '../components/checkins/HealthLog.jsx'
@@ -12,14 +11,11 @@ import CheckInForm from '../components/checkins/CheckInForm.jsx'
 import ShelterLink from '../components/shelters/ShelterLink.jsx'
 import RateShelter from '../components/shelters/RateShelter.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckIns, useCheckInsTask } from '../context/CheckInsContext.jsx'
+import { useCheckIns } from '../context/CheckInsContext.jsx'
 import { getMyCheckIns } from '../api/checkins.js'
 import { applicationPet, getMyApplications } from '../api/applications.js'
 import { groupByApplication, isDue } from '../utils/checkins.js'
-import { messagesTaskLabel } from '../utils/messages.js'
 import { formatShort } from '../utils/dates.js'
-import { firstName } from '../utils/auth.js'
 import './CheckInsPage.css'
 
 // One diary section per approved application (newest first), with its check-ins.
@@ -111,13 +107,9 @@ function PetSection({ entry, saved, onFill }) {
 }
 
 function Diary() {
-  const { user, logout } = useAuth()
-  const { count: unread } = useUnread()
   const { refresh: refreshCount } = useCheckIns()
-  const navigate = useNavigate()
   const { hash } = useLocation()
   const { status, pets, retry, refresh } = useDiary()
-  const checkInsTask = useCheckInsTask(navigate, { current: true })
   // { entry, checkIn } while CHECKUP.EXE is open; checkIn null = an ad-hoc update
   const [filling, setFilling] = useState(null)
   const [savedFor, setSavedFor] = useState(null) // application id with the "saved" note
@@ -169,16 +161,6 @@ function Diary() {
         </div>
       </Window>
 
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt'), hideOnSmall: true },
-          { id: 'apps', label: 'Applications', onClick: () => navigate('/applications'), hideOnSmall: true },
-          checkInsTask,
-          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
-          { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-          { id: 'logout', label: 'Log out', onClick: logout },
-        ]}
-      />
 
       {filling && (
         <CheckInForm
