@@ -84,8 +84,8 @@ client/src/
                 MessagesPage.jsx, CheckInsPage.jsx (PET_DIARY.EXE), ShelterCheckInsPage.jsx (CHECKINS.EXE), ShelterProfilePage.jsx
                 (<NAME>.INFO, tabs picked by the URL hash), VerificationPage.jsx (VERIFY.EXE), AdminPage.jsx (CONTROL_PANEL.EXE,
                 /admin/:section), AccountPage.jsx (SETTINGS.EXE), NotFoundPage.jsx (FILE NOT FOUND), LoginPage.jsx,
-                SignupPage.jsx, DevKit.jsx
-  utils/        one file per area (search, geo, listing, applications, checkins, messages, shelters, ...); shell.js has the
+                SignupPage.jsx, DevKit.jsx (dev builds only)
+  utils/        one file per area (pure helpers have a *.test.js next to them, run by `npm test` / Vitest) (search, geo, listing, applications, checkins, messages, shelters, ...); shell.js has the
                 Start menu's role pages and petOfTheDay
   styles/       tokens.css, global.css
 ```
@@ -93,6 +93,9 @@ client/src/
 ## Routes
 
 Every route sits inside `ShellLayout` (main.jsx), so the taskbar is never part of a page: don't add one.
+Pages other than DesktopPage and AdoptPage are `React.lazy`; ShellLayout's Suspense shows a LOADING... window meanwhile.
+`/dev/kit` is only registered when `import.meta.env.DEV`. A production build without `VITE_API_URL` shows "API URL NOT CONFIGURED."
+instead of any page (dev falls back to localhost:5000). Deploying: `docs/DEPLOY.md`; demo script and reset: `docs/DEMO.md`.
 
 | Path | Page |
 |---|---|
@@ -159,4 +162,4 @@ paused while the tab is hidden (`usePolling`).
 
 - Small commits, one feature per commit, message style `feat(map): ...`, `fix(ui): ...`.
 - After UI work, run the dev server and compare against the reference side by side at 1200px and 400px.
-- Run `npm run lint` and `npm run build` before saying a session is done.
+- Run `npm run lint`, `npm test` and `npm run build` before saying a session is done.

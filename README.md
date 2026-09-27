@@ -4,7 +4,9 @@ Pet adoption and community foster care platform. Shelters and caregivers list an
 
 **Team:** Sai Rishitha (24WU0101123) · Poojitha Arigela (24WU0101144) · Vedha Sri (24WU0104032)
 
-**Stack:** MongoDB · Express 5 · React · Node.js — this repo currently holds the backend API (`server/`).
+**Stack:** MongoDB · Express 5 · React 18 + Vite · Node.js. The API is in `server/`, the web app in `client/` (see [Frontend](#frontend)).
+
+![The neighborhood map](docs/screenshots/neighborhood-map.png)
 
 ---
 
@@ -38,6 +40,7 @@ npm run dev                 # http://localhost:5000/api/health → {"status":"ok
 | `npm test` | Run the test suite on an in-memory MongoDB — no Atlas needed |
 | `npm run create-admin -- <email> <password> ["Name"]` | Create an admin, or promote an existing user. Admins can't sign up through the API. |
 | `npm run seed:demo` | Add the demo shelters, pets and adopter below. Safe to re-run: updates them in place. |
+| `npm run seed:demo -- --reset` | Before a demo: delete what the demo accounts created since (applications, messages, reviews, check-ins), put the demo back as seeded, then seed. Refuses to run with `NODE_ENV=production` or a `MONGODB_URI` without "pawshare". See [docs/DEMO.md](docs/DEMO.md). |
 
 ### Demo accounts
 
@@ -54,9 +57,91 @@ Created by `npm run seed:demo`. Every account uses the password `PawShare@123`. 
 | `adopter@demo.pawshare.test` | adopter | Ananya Rao. Adopted Bruno from Stray Hearts Trust 35 days before the first seed: 1-week check-in done, 1-month overdue, 3-month still to come. Left Stray Hearts a 5-star review for Bruno. |
 | admin | admin | Not seeded: create your own with `npm run create-admin`. |
 
-The seed only sets the two unverified shelters' verification when it first creates them, so approving, rejecting or resubmitting survives a re-run.
+The seed only sets the two unverified shelters' verification when it first creates them, so approving, rejecting or resubmitting survives a re-run (`--reset` puts them back to pending / not submitted).
+
+The 7-minute demo script for the review, with every login, is in [docs/DEMO.md](docs/DEMO.md). Deployment notes are in [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ---
+
+## Frontend
+
+The React app in `client/`: a retro "PawShare OS" desktop where every block is a window and the pets live in houses on a
+neighborhood map. The approved design is `design/neighborhood-reference.html`; `CLAUDE.md` has the design rules and routes.
+
+| Desktop home | Neighborhood map |
+|---|---|
+| ![Desktop home](docs/screenshots/desktop-home.png) | ![Neighborhood map](docs/screenshots/neighborhood-map.png) |
+| **Pet profile** | **Messenger** |
+| ![Pet profile](docs/screenshots/pet-profile.png) | ![Messenger](docs/screenshots/messenger.png) |
+
+### Setup
+
+Start the API first (see [Getting started](#getting-started)), then:
+
+```bash
+cd client
+npm install
+cp .env.example .env.local   # optional: the defaults work with the API on :5000
+npm run dev                  # http://localhost:5173
+```
+
+The API's `CLIENT_URL` must match the address the app runs on (`http://localhost:5173`), or the browser blocks its requests (CORS).
+Log in with any account from [Demo accounts](#demo-accounts).
+
+### Environment variables (`client/.env.local`)
+
+Vite only exposes variables that start with `VITE_`, and they're fixed when the app is built, so restart `npm run dev` after a change.
+They end up in the browser: never put a secret in one.
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `VITE_API_URL` | in production | `http://localhost:5000/api` (dev only) | The API's base URL, including `/api`. A production build without it shows "API URL NOT CONFIGURED." |
+| `VITE_USE_MOCK` | no | `false` | `true` shows the built-in sample pets without an API (a backup for demos). |
+| `VITE_CLOUDINARY_CLOUD_NAME` | no | – | Cloudinary cloud for photo and document uploads. |
+| `VITE_CLOUDINARY_UPLOAD_PRESET` | no | – | An unsigned upload preset. Without both Cloudinary variables, forms take a pasted image link instead. |
+
+### Scripts (run inside `client/`)
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server with hot reload on :5173. Also serves `/dev/kit`, a gallery of the UI components. |
+| `npm run build` | Production build into `client/dist/`. Pages other than the desktop and the map are split out and loaded when first opened. |
+| `npm run preview` | Serve the production build locally. |
+| `npm run lint` | Oxlint. |
+| `npm test` | Vitest unit tests for the pure helpers: API → pet mapping, date labels, search filters and matching, check-in due states. |
+
+Deploying (Vercel for the client, `client/vercel.json` for SPA routes): see [docs/DEPLOY.md](docs/DEPLOY.md).
+
+### Folder structure
+
+```
+client/
+├── index.html            # loads the Silkscreen + Fredoka fonts
+├── vercel.json           # SPA rewrites for Vercel
+├── public/demo-pets/     # the demo pets' photos (the seed points at them)
+└── src/
+    ├── main.jsx          # routes; every page sits in ShellLayout (page + the one taskbar)
+    ├── api/              # fetch wrapper (client.js: base URL, token, 401 handling) + one file per API area
+    ├── components/
+    │   ├── ui/           # Window, Button, Chip, Pill, Modal, ErrorDialog, LoadingWindow, Taskbar, fields
+    │   ├── shell/        # ShellLayout, StartMenu
+    │   ├── map/          # Neighborhood (the street), SceneBackdrop, Legend
+    │   ├── pets/         # PetFace, House, Pin, ProfileWindow, FavoritesPanel
+    │   └── …             # apply, inbox, shelter, messages, checkins, shelters, search, admin, desktop, auth
+    ├── context/          # Auth, Favorites, Unread, CheckIns, Admin, TaskCounts
+    ├── hooks/            # data loading and polling (useAnimalSearch, useNearMe, usePolling, …)
+    ├── pages/            # one per route (DesktopPage, AdoptPage, ApplyPage, MessagesPage, AdminPage, …)
+    ├── utils/            # pure helpers per area (search, geo, dates, checkins, …) + their *.test.js
+    ├── data/mockPets.js  # sample pets for VITE_USE_MOCK
+    └── styles/           # tokens.css (colours, fonts) and global.css
+```
+
+Plain CSS with variables, one `.css` file per component, all shapes hand-drawn in SVG: no UI or icon libraries.
+
+**Accessibility:** a "Skip to content" link, a visible focus ring on everything, keyboard-only use (houses, Start menu, dialogs
+that trap Tab and close on Escape), labelled inputs and icon buttons, and no animations under `prefers-reduced-motion`.
+One known exception, kept on purpose to match the reference design: the pink "SHARE" in the PAWSHARE OS logo has a
+2.8:1 contrast with the background, below the 4.5:1 AA ratio. It's the only text that doesn't pass.
 
 ## Project structure
 
@@ -229,10 +314,12 @@ Rejecting an approved shelter revokes it; existing listings stay live, new listi
 
 ```bash
 cd server
-npm test
+npm test          # API
+cd ../client
+npm test          # frontend helpers (Vitest)
 ```
 
-69 tests across auth, animals, applications, messaging, check-ins, reviews, verification and robustness. They start a throwaway in-memory MongoDB (downloaded automatically on the first run), so they never touch your real database.
+70 tests across auth, animals, applications, messaging, check-ins, reviews, verification and robustness. They start a throwaway in-memory MongoDB (downloaded automatically on the first run), so they never touch your real database.
 
 ## Photo credits
 
