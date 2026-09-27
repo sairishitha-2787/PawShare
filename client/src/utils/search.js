@@ -130,7 +130,14 @@ export function apiQuery(f) {
   }
 }
 
-const labelOf = (options, value) => options.find((o) => o.value === value)?.label ?? value
+// The nearby endpoint can't take q, so useAnimalSearch matches the keyword itself: every word has to be
+// somewhere in the name, breed or description (any case).
+export function matchesKeyword(pet, q) {
+  const text = `${pet.name} ${pet.breed} ${pet.blurb}`.toLowerCase()
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every((w) => text.includes(w))
+}
+
+const labelOf =(options, value) => options.find((o) => o.value === value)?.label ?? value
 
 // The FIND_PETS.EXE filters that are set, as removable chips: [{ id, label, without(filters) }].
 // Species, urgent and Near me have their own controls in the toolbar, so they aren't repeated here.
