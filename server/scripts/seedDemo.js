@@ -13,6 +13,14 @@
 // Shelter about texts are public on /shelters/:id; a re-run only replaces the old placeholder wording.
 // The unverified shelters get their verification request only when they're first created; after that an
 // admin decision or a resubmission is never overwritten by a re-run.
+//
+// Before a demo:  npm run seed:demo -- --reset
+// First deletes what the demo accounts (*@demo.pawshare.test) have created since: their applications, message
+// threads (with every message in them), reviews and check-ins. Ananya's seeded adoption of Bruno stays: its
+// application and review are kept (the review's rating and text put back), its later check-ins go back to
+// pending and any extra health updates are removed. The two unverified shelters go back to pending / not
+// submitted. Then the normal seed runs, which puts the 9 map pets back to their seeded status. Nothing else
+// is approved. Refuses to run when NODE_ENV=production or MONGODB_URI doesn't mention "pawshare".
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
@@ -23,6 +31,8 @@ const Animal = require("../models/Animal");
 const Application = require("../models/Application");
 const CheckIn = require("../models/CheckIn");
 const Review = require("../models/Review");
+const Thread = require("../models/Thread");
+const Message = require("../models/Message");
 
 const DEMO_DOMAIN = "demo.pawshare.test";
 const DEMO_PASSWORD = "PawShare@123";
@@ -183,16 +193,19 @@ const upsertShelter = async (s, password) => {
   return user;
 };
 
+// An unverified shelter's verification as the seed first creates it (also what --reset puts back)
+const initialVerification = (s) => ({
+  ...s.verification,
+  ...(s.submittedDaysAgo && { submittedAt: new Date(Date.now() - s.submittedDaysAgo * DAY_MS) }),
+});
+
 const upsertUnverifiedShelter = async (s, password) => {
   const email = `shelter.${s.key}@${DEMO_DOMAIN}`;
   const user = (await User.findOne({ email })) || new User({ email });
   user.set({ name: s.name, password, role: "shelter", location: locationFor(s) });
   if (user.isNew) {
     user.isVerified = false;
-    user.verification = {
-      ...s.verification,
-      ...(s.submittedDaysAgo && { submittedAt: new Date(Date.now() - s.submittedDaysAgo * DAY_MS) }),
-    };
+    user.verification = initialVerification(s);
   }
   await user.save();
   return user;
@@ -309,14 +322,92 @@ const seedAdoption = async (shelters, password, listingIndex) => {
   return { adopter, bruno };
 };
 
+// --reset only runs against a PawShare database outside production. Throws with the reason otherwise.
+const assertSafeToReset = ({ uri = process.env.MONGODB_URI || "", nodeEnv = process.env.NODE_ENV } = {}) => {
+  if (nodeEnv === "production") throw new Error("refusing to reset: NODE_ENV is production");
+  if (!uri.includes("pawshare")) throw new Error('refusing to reset: MONGODB_URI doesn\'t contain "pawshare"');
+};
+
+// Deletes what the demo accounts created after seeding and puts the seeded records back (see the top of
+// this file). Run seedDemo afterwards to restore the pets. → counts of what was deleted or reset.
+const resetDemo = async ({ log = () => {} } = {}) => {
+  const demoUsers = await User.find({ email: { $regex: `@${DEMO_DOMAIN.replace(/\./g, "\\.")}$` } }, "_id email role");
+  const ids = demoUsers.map((u) => u._id);
+
+  // Ananya's seeded adoption of Bruno, which is kept
+  const adopter = demoUsers.find((u) => u.email === ADOPTER.email);
+  const strayHearts = demoUsers.find((u) => u.email === `shelter.${BRUNO.shelter}@${DEMO_DOMAIN}`);
+  const bruno = adopter && strayHearts && (await Animal.findOne({ owner: strayHearts._id, name: BRUNO.name }));
+  const brunoApp =
+    bruno && (await Application.findOne({ animal: bruno._id, applicant: adopter._id, status: "approved" }));
+  const keep = brunoApp ? [brunoApp._id] : [];
+
+  const applications = await Application.deleteMany({ applicant: { $in: ids }, _id: { $nin: keep } });
+  const threadIds = (await Thread.find({ participants: { $in: ids } }, "_id")).map((t) => t._id);
+  const messages = await Message.deleteMany({ $or: [{ thread: { $in: threadIds } }, { sender: { $in: ids } }] });
+  const threads = await Thread.deleteMany({ _id: { $in: threadIds } });
+  const reviews = await Review.deleteMany({ reviewer: { $in: ids }, application: { $nin: keep } });
+  // every check-in of a deleted application, and any health update logged on Bruno since the seed
+  const checkIns = await CheckIn.deleteMany({
+    adopter: { $in: ids },
+    $or: [{ application: { $nin: keep } }, { kind: "adhoc" }],
+  });
+
+  // Bruno's schedule as seeded: 1 week done, the later ones still to do
+  let reopened = 0;
+  if (brunoApp) {
+    const scheduled = await CheckIn.find({ application: brunoApp._id, kind: "scheduled" }).sort({ dueDate: 1 });
+    for (const c of scheduled.slice(1)) {
+      if (c.status === "pending" && !c.healthUpdate) continue;
+      c.set({ status: "pending", completedAt: undefined, healthUpdate: undefined });
+      await c.save();
+      reopened += 1;
+    }
+    await Review.updateOne(
+      { application: brunoApp._id },
+      { rating: BRUNO_REVIEW.rating, comment: BRUNO_REVIEW.comment },
+    );
+  }
+
+  // the unverified shelters wait for the admin again (an approval in a rehearsal is undone, not the other way round)
+  for (const s of UNVERIFIED_SHELTERS) {
+    await User.updateOne(
+      { email: `shelter.${s.key}@${DEMO_DOMAIN}` },
+      { isVerified: false, verification: initialVerification(s) },
+    );
+  }
+
+  for (const u of demoUsers.filter((u) => u.role === "shelter")) await Review.refreshShelterRating(u._id);
+
+  const counts = {
+    applications: applications.deletedCount,
+    threads: threads.deletedCount,
+    messages: messages.deletedCount,
+    reviews: reviews.deletedCount,
+    checkIns: checkIns.deletedCount,
+    reopenedCheckIns: reopened,
+  };
+  log(
+    `Reset: deleted ${counts.applications} applications, ${counts.threads} threads, ${counts.messages} messages, ` +
+      `${counts.reviews} reviews, ${counts.checkIns} check-ins; reopened ${reopened} of Bruno's check-ins` +
+      (brunoApp ? "" : " (Bruno's seeded adoption wasn't found; the seed will create it)"),
+  );
+  return counts;
+};
+
 module.exports = seedDemo;
+module.exports.resetDemo = resetDemo;
+module.exports.assertSafeToReset = assertSafeToReset;
 module.exports.DEMO_DOMAIN = DEMO_DOMAIN;
 module.exports.DEMO_PASSWORD = DEMO_PASSWORD;
 
 if (require.main === module) {
+  const reset = process.argv.includes("--reset");
   (async () => {
     try {
+      if (reset) assertSafeToReset();
       await mongoose.connect(process.env.MONGODB_URI);
+      if (reset) await resetDemo({ log: console.log });
       await seedDemo({ log: console.log });
       console.log(`Done. Shelter logins: shelter.<area>@${DEMO_DOMAIN} / ${DEMO_PASSWORD}`);
       console.log(`Adopter login: ${ADOPTER.email} / ${DEMO_PASSWORD}`);
