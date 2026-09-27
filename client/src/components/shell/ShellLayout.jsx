@@ -1,6 +1,8 @@
+import { Suspense } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Taskbar from '../ui/Taskbar.jsx'
 import ErrorDialog from '../ui/ErrorDialog.jsx'
+import LoadingWindow from '../ui/LoadingWindow.jsx'
 import StartMenu from './StartMenu.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useCheckInsTask } from '../../context/CheckInsContext.jsx'
@@ -119,11 +121,14 @@ export default function ShellLayout() {
       <div className="shell">
         <div className="shell-page" id="page" tabIndex={-1}>
           {API_MISSING ? (
-            <div className="shell-error">
+            <div className="shell-wait">
               <ErrorDialog message="API URL NOT CONFIGURED." onOk={() => window.location.reload()} />
             </div>
           ) : (
-            <Outlet />
+            // lazy pages (main.jsx) load here; the taskbar below stays put meanwhile
+            <Suspense fallback={<div className="shell-wait"><LoadingWindow label="Opening the program" /></div>}>
+              <Outlet />
+            </Suspense>
           )}
         </div>
         <div className="desk shell-bar">

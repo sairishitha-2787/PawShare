@@ -3,7 +3,7 @@
 .shell-page { display: grid; min-width: 0; }
 .shell-page > * { min-width: 0; }
 .shell-page:focus { outline: none; }
-.shell-error { position: relative; min-height: 60vh; }
+.shell-wait { position: relative; min-height: 60vh; }
 
 /* first Tab stop on every page; off screen until focused */
 .skip-link {
