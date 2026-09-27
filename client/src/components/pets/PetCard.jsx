@@ -4,6 +4,7 @@ import Button from '../ui/Button.jsx'
 import PetFace from './PetFace.jsx'
 import ShelterLink from '../shelters/ShelterLink.jsx'
 import { houseTypeFor } from '../../utils/pets.js'
+import { formatDistance } from '../../utils/geo.js'
 import './PetCard.css'
 
 const BAR = { dog: 'pink', cat: 'lav', bird: 'mint', hutch: 'sun' }
@@ -29,6 +30,7 @@ export default function PetCard({ pet, onOpen, detail, foot }) {
               </>
             )}
           </p>
+          {pet.distanceKm != null && <p className="dist">{formatDistance(pet.distanceKm)}</p>}
         </div>
       </div>
       {foot ?? (

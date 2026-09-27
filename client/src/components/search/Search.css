@@ -1,0 +1,27 @@
+/* rows under the Adopt toolbar: the Near me picker / radius, and the active filter chips */
+.subrow {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px;
+  border-bottom: 2px dashed var(--lav); font-size: 14px;
+}
+.subrow b { font-weight: 600; }
+
+.afilters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.afchip {
+  display: inline-flex; align-items: center; gap: 7px; font-family: var(--body); font-size: 13px; color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 999px; background: var(--lav-soft); padding: 1px 8px 1px 11px; cursor: pointer;
+}
+.afchip svg { width: 10px; height: 10px; }
+.afchip:hover { background: var(--pink-soft); }
+.clear-link {
+  font-family: var(--pixel); font-size: 11px; letter-spacing: .03em; color: var(--ink); background: none; border: 0;
+  padding: 2px 0; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer;
+}
+.clear-link:hover { color: var(--hot); }
+
+/* NEARBY_SHELTERS/ */
+.nshelters { padding: 10px 12px 12px; font-size: 14px; }
+.nshelters ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.nshelters li { display: grid; gap: 1px; padding-top: 8px; border-top: 2px dashed var(--mint); }
+.nshelters li:first-child { border-top: 0; padding-top: 0; }
+.nshelters small { color: var(--ink-soft); font-size: 12px; font-variant-numeric: tabular-nums; }
+.nshelters p { margin: 0; color: var(--ink-soft); }

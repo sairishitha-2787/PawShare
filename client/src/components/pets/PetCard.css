@@ -4,3 +4,4 @@
 .card h4 { margin: 0; font-family: var(--pixel); font-size: 15px; }
 .card p { margin: 0; font-size: 13px; color: var(--ink-soft); }
 .card .foot { display: flex; justify-content: space-between; align-items: center; padding: 0 12px 12px; }
+.card .dist { color: var(--ink); font-weight: 500; }

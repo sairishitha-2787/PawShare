@@ -622,6 +622,61 @@ toPet. Go ahead.
 
 ---
 
+## Session 17 — Search, filters and nearby
+
+```text
+Run `git checkout main && git pull`, then create `feature/search-nearby` from main.
+
+Read CLAUDE.md, README.md "Animals — /api/animals" and server/models/Animal + the animals controller (read only).
+Check the exact query params (species, breed, size, gender, ageGroup and its values, minAge/maxAge, city,
+temperament, listingType, status, q, page, limit ≤ 50, sort values) and GET /nearby (lng, lat, radius km,
+nearest first; does it return distance?). Check whether the seeded shelters/animals have GeoJSON coordinates.
+Tell me what you found first.
+
+Seed (the only server/ change allowed): if animals or shelters lack coordinates, set real ones per area
+([lng, lat]): Koramangala [77.6245, 12.9352], Indiranagar [77.6408, 12.9784], HSR Layout [77.6389, 12.9116],
+Bengaluru [77.5946, 12.9716]. Keep it idempotent.
+
+Build on the Adopt page:
+1. Server-side filtering: the page now loads with GET /animals using the filters (not client-side), paging
+   through results with the existing "Next street" buttons (9 per street; fetch 50 at a time as needed).
+   Species chips map to the server's species (Hamster = other + breed "hamster"); "Needs a foster urgently" =
+   listingType foster + status available. Keep the dimming behaviour only for the quick chips if that's simpler;
+   otherwise non-matching pets simply aren't shown.
+2. "More filters" button opens a Window "FIND_PETS.EXE" (styled like the classic Find Files dialog, two columns
+   of fields, "Find now" primary + "Clear all"): keyword (q), breed, age group chips (server values, friendly
+   labels like "Puppy/kitten", "Young", "Adult", "Senior"), size chips, gender chips, temperament toggle chips,
+   listing type (Adopt / Foster / Either), city, and a sort dropdown (Newest, Youngest, Oldest, Nearest when a
+   location is set). Active filters show as removable chips under the toolbar ("Size: Small ×"). All filters live
+   in the URL query string so a search can be shared and survives refresh.
+3. Nearby: a "Near me" toggle in the toolbar. On click, ask for the browser location (navigator.geolocation);
+   if denied or unavailable, show a small picker of areas (Koramangala, Indiranagar, HSR Layout, Bengaluru
+   centre) with the coordinates above. Radius chips 5 / 10 / 25 km. Uses GET /animals/nearby with the same
+   filters. Show the distance on each list card and in the profile window ("2.4 km away"), rounded to 0.1 km.
+4. NEARBY_SHELTERS/ panel in the sidebar under KEY.TXT when "Near me" is on: shelters from the nearby results,
+   grouped with count of pets and nearest distance, each linking to /shelters/:id.
+5. Empty results still use the ERROR window joke, with wording that fits the filters
+   ("NO PETS MATCH THESE FILTERS." + OK = Clear all).
+6. Legend counts, title count ("NEIGHBORHOOD.EXE — 12 pets found") and list view all follow the same results.
+7. Works at 400px (FIND_PETS.EXE becomes one column). Append this prompt to docs/claude-prompts.md as
+   "Session 17 — Search, filters and nearby".
+
+Done when: filtering Size Small + Cats shows only the small cats; searching breed "golden" shows Biscuit and
+Rocky; the URL keeps the filters after refresh; "Near me" → Indiranagar (picker) → 5 km shows Mochi/Luna/Sushi
+first with distances, and NEARBY_SHELTERS lists Whisker Walk Rescue nearest; a filter with no results shows the
+ERROR window and OK clears it. Lint and build pass.
+Commits: "feat(server): demo coordinates" (only if needed) and "feat(adopt): search, filters and nearby".
+```
+
+What Claude found: every seeded shelter and animal already had coordinates (HSR Layout is [77.6387, 12.9121],
+about 60 m from the value above), so there was no server commit. /nearby sends no distance (the client works it
+out), has no paging (up to 100 results) and can't take q (MongoDB won't mix a text search with $near), so the
+keyword is matched on the client while Near me is on. The API's sort=oldest means oldest listing, so the
+"Oldest" option sends sort=eldest; the default order stays listing order ("Map order") so each demo pet keeps
+its reference house.
+
+---
+
 ## Session 18 — Admin control panel
 
 ```text
