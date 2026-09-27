@@ -1,5 +1,5 @@
 /* LOGIN.EXE / NEW_USER.EXE: one window, centered on the grid */
-.auth-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr; }
+.auth-desk { grid-template-rows: auto 1fr; }
 .auth { max-width: 420px; width: 100%; justify-self: center; align-self: center; }
 .auth form { padding: 18px; display: grid; gap: 14px; }
 .auth .intro { margin: 0; font-size: 15px; color: var(--ink-soft); }

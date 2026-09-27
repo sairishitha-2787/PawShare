@@ -6,21 +6,16 @@ import Pill from '../components/ui/Pill.jsx'
 import Button from '../components/ui/Button.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import PetFace from '../components/pets/PetFace.jsx'
 import ReadingPane from '../components/inbox/ReadingPane.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckInsTask } from '../context/CheckInsContext.jsx'
-import { useAdminTask } from '../context/AdminContext.jsx'
-import { messagesTaskLabel } from '../utils/messages.js'
+import { usePublishTaskCount } from '../context/TaskCountsContext.jsx'
 import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
 import { applicationPet } from '../api/applications.js'
 import { getMyAnimals } from '../api/animals.js'
-import { APP_STATUSES, APP_STATUS_COLOR, APP_STATUS_LABEL, applicantName, inboxTaskLabel, wantsTo } from '../utils/applications.js'
+import { APP_STATUSES, APP_STATUS_COLOR, APP_STATUS_LABEL, applicantName, wantsTo } from '../utils/applications.js'
 import { formatShort } from '../utils/dates.js'
-import { firstName } from '../utils/auth.js'
-import { profileTask, verifyLinkLabel } from '../utils/shelters.js'
+import { verifyLinkLabel } from '../utils/shelters.js'
 import './ShelterInboxPage.css'
 
 const FILTERS = [...APP_STATUSES, 'all']
@@ -79,13 +74,10 @@ function emptyText(filter, petName) {
 }
 
 function Inbox() {
-  const { user, logout } = useAuth()
-  const { count: unread } = useUnread()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const { status, applications, retry, refresh, patch } = useReceivedApplications()
   const ownAnimals = useOwnAnimals()
-  const checkInsTask = useCheckInsTask(navigate)
-  const adminTask = useAdminTask(navigate)
   const [petId, setPetId] = useState('')
 
   // the selected application lives in the URL: /shelter/applications/:id
@@ -108,7 +100,7 @@ function Inbox() {
   const counts = { all: forPet.length }
   for (const s of APP_STATUSES) counts[s] = forPet.filter((a) => a.status === s).length
   const shown = filter === 'all' ? forPet : forPet.filter((a) => a.status === filter)
-  const pendingTotal = status === 'ready' ? applications.filter((a) => a.status === 'pending').length : null
+  usePublishTaskCount('inbox', status === 'ready' ? applications.filter((a) => a.status === 'pending').length : null)
 
   // the other pending applications for the same pet, which approving this one rejects
   const othersPending = open?.animal?._id
@@ -218,20 +210,6 @@ function Inbox() {
           )}
         </Window>
       </div>
-
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
-          { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals') },
-          { id: 'inbox', label: inboxTaskLabel(pendingTotal) },
-          profileTask(user, navigate),
-          adminTask,
-          checkInsTask,
-          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
-          { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-          { id: 'logout', label: 'Log out', onClick: logout },
-        ]}
-      />
     </div>
   )
 }

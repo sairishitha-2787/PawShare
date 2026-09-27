@@ -1,5 +1,5 @@
 /* MY_PETS/: notes, then the window with Add a pet + status chips and the card grid; taskbar below */
-.mypets-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.mypets-desk { grid-template-rows: auto 1fr; }
 .mypets-stack { display: grid; gap: 14px; align-content: start; min-width: 0; }
 
 /* sun: not verified yet · mint: "Saved Kiwi." */

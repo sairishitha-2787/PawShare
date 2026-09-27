@@ -1,5 +1,5 @@
 /* APPLY.EXE: one window, centered on the grid */
-.apply-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr; }
+.apply-desk { grid-template-rows: auto 1fr; }
 .apply { max-width: 560px; width: 100%; justify-self: center; align-self: start; }
 .apply-wait { position: relative; min-height: 50vh; }
 

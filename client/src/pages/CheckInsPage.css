@@ -1,5 +1,5 @@
 /* PET_DIARY.EXE: one window, a section per pet, taskbar below */
-.diary-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.diary-desk { grid-template-rows: auto 1fr; }
 .diary { max-width: 760px; width: 100%; justify-self: center; align-self: start; }
 
 .diary-main { padding: 16px; display: grid; gap: 0; }

@@ -1,26 +1,20 @@
 import { useCallback, useEffect, useId, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import Window from '../components/ui/Window.jsx'
 import Chip from '../components/ui/Chip.jsx'
 import Pill from '../components/ui/Pill.jsx'
 import Modal from '../components/ui/Modal.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import PetFace from '../components/pets/PetFace.jsx'
 import HealthLog from '../components/checkins/HealthLog.jsx'
 import MessageButton from '../components/messages/MessageButton.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckInsTask } from '../context/CheckInsContext.jsx'
-import { useAdminTask } from '../context/AdminContext.jsx'
 import { getReceivedCheckIns } from '../api/checkins.js'
 import { petLook } from '../api/animals.js'
 import { CONDITION_COLOR, CONDITION_LABEL, groupByApplication, stopState, summarize } from '../utils/checkins.js'
-import { messagesTaskLabel } from '../utils/messages.js'
 import { formatShort } from '../utils/dates.js'
 import { firstName } from '../utils/auth.js'
-import { profileTask } from '../utils/shelters.js'
 import './ShelterCheckInsPage.css'
 
 const FILTERS = [
@@ -125,12 +119,7 @@ function LogWindow({ row, onClose }) {
 }
 
 function ShelterCheckIns() {
-  const { user, logout } = useAuth()
-  const { count: unread } = useUnread()
-  const navigate = useNavigate()
   const { status, rows, retry } = useAdoptions()
-  const checkInsTask = useCheckInsTask(navigate, { current: true })
-  const adminTask = useAdminTask(navigate)
   const [filter, setFilter] = useState('all')
   const [openId, setOpenId] = useState(null)
 
@@ -172,19 +161,6 @@ function ShelterCheckIns() {
         </div>
       </Window>
 
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt'), hideOnSmall: true },
-          { id: 'mypets', label: 'My pets', onClick: () => navigate('/shelter/animals'), hideOnSmall: true },
-          { id: 'inbox', label: 'Inbox', onClick: () => navigate('/shelter/applications'), hideOnSmall: true },
-          profileTask(user, navigate),
-          adminTask,
-          checkInsTask,
-          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
-          { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-          { id: 'logout', label: 'Log out', onClick: logout },
-        ]}
-      />
 
       {open && <LogWindow key={open.applicationId} row={open} onClose={() => setOpenId(null)} />}
     </div>

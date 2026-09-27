@@ -4,18 +4,12 @@ import Window from '../components/ui/Window.jsx'
 import Button from '../components/ui/Button.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import ContactList from '../components/messages/ContactList.jsx'
 import ChatPane from '../components/messages/ChatPane.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckInsTask } from '../context/CheckInsContext.jsx'
-import { useAdminTask } from '../context/AdminContext.jsx'
 import { listThreads } from '../api/threads.js'
 import { usePolling } from '../hooks/usePolling.js'
-import { messagesTaskLabel } from '../utils/messages.js'
-import { firstName } from '../utils/auth.js'
-import { profileTask } from '../utils/shelters.js'
 import './MessagesPage.css'
 
 const LIST_POLL_MS = 15000
@@ -50,11 +44,9 @@ function useThreads() {
 }
 
 export default function MessagesPage() {
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const unread = useUnread()
   const navigate = useNavigate()
-  const checkInsTask = useCheckInsTask(navigate)
-  const adminTask = useAdminTask(navigate)
   const location = useLocation()
   const threads = useThreads()
 
@@ -153,21 +145,6 @@ export default function MessagesPage() {
           </div>
         )}
       </Window>
-
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt'), hideOnSmall: true },
-          ...(user.role === 'adopter'
-            ? [{ id: 'apps', label: 'Applications', onClick: () => navigate('/applications'), hideOnSmall: true }]
-            : [{ id: 'inbox', label: 'Inbox', onClick: () => navigate('/shelter/applications'), hideOnSmall: true }]),
-          profileTask(user, navigate),
-          adminTask,
-          checkInsTask,
-          { id: 'msgs', label: messagesTaskLabel(unread.count) },
-          { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-          { id: 'logout', label: 'Log out', onClick: logout },
-        ]}
-      />
     </div>
   )
 }

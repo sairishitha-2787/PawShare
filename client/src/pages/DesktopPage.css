@@ -1,0 +1,53 @@
+/* "/": icons down the left, the windows beside them; below 700px the icons are a 3-column grid on top */
+.home-desk { grid-template-rows: auto 1fr; }
+.home { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 18px 24px; align-items: start; }
+
+.home-icons { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.home-icon {
+  display: grid; justify-items: center; gap: 6px; padding: 10px 6px 8px;
+  border: 2px dashed transparent; border-radius: 12px; color: var(--ink); text-decoration: none; text-align: center;
+}
+.home-icon:hover { background: var(--lav-soft); border-color: var(--ink); }
+.home-icon:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; background: var(--lav-soft); }
+.home-icon:active .home-art { transform: translate(1px, 1px); }
+.home-art { position: relative; display: block; width: 52px; height: 52px; }
+.home-art svg { display: block; }
+.home-badge {
+  position: absolute; top: -6px; right: -14px; min-width: 24px; height: 24px; padding: 0 5px;
+  display: grid; place-items: center; font-family: var(--pixel); font-weight: 400; font-size: 11px; line-height: 1;
+  background: var(--pink); border: 2px solid var(--ink); border-radius: 999px; box-shadow: 2px 2px 0 var(--ink);
+}
+.home-label {
+  font-family: var(--pixel); font-size: 11px; letter-spacing: .03em; line-height: 1.4;
+  background: var(--paper); border: 2px solid var(--ink); border-radius: 6px; padding: 1px 6px; overflow-wrap: anywhere;
+}
+
+.home-windows { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(290px, 100%), 1fr)); gap: 18px; align-items: start; }
+
+.home-welcome {
+  grid-column: 1 / -1; margin: 0; padding: 8px 12px; font-size: 15px; line-height: 1.45;
+  background: var(--mint-soft); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 3px 3px 0 var(--ink);
+}
+.home-welcome a { color: var(--ink); font-weight: 600; text-decoration-color: var(--hot); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+.readme-body { padding: 14px 16px 16px; display: grid; gap: 8px; }
+.readme-body p { margin: 0; font-size: 15px; line-height: 1.5; }
+.readme-body .btn { justify-self: start; margin-top: 6px; font-size: 13px; padding: 7px 16px; text-decoration: none; }
+
+.potd-msg { margin: 0; padding: 18px 16px; display: grid; gap: 10px; justify-items: start; color: var(--ink-soft); }
+.potd-msg p { margin: 0; }
+.potd-body { padding: 16px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px 16px; align-items: center; }
+.potd-face { display: block; border: 2px solid var(--ink); border-radius: 50%; }
+.potd-info { display: grid; gap: 4px; justify-items: start; }
+.potd-info h2 { margin: 0; font-family: var(--pixel); font-weight: 700; font-size: 20px; letter-spacing: .03em; }
+.potd-info p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.potd-meet { grid-column: 1 / -1; justify-self: start; font-size: 13px; padding: 7px 16px; text-decoration: none; }
+
+@media (max-width: 700px) {
+  .home { grid-template-columns: minmax(0, 1fr); }
+  .home-icons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .home-label { font-size: 10px; letter-spacing: 0; padding: 1px 4px; }
+}
+@media (max-width: 400px) {
+  .potd-body { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+}

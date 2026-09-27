@@ -1,5 +1,5 @@
 /* MESSENGER.EXE: contacts on the left, the open chat on the right; one at a time below 860px */
-.messages-desk { min-height: calc(100vh - 48px); grid-template-rows: auto 1fr auto; }
+.messages-desk { grid-template-rows: auto 1fr; }
 .messenger { width: 100%; align-self: start; }
 .messenger-wait { position: relative; min-height: 360px; }
 

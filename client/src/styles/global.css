@@ -21,7 +21,7 @@ body {
 :focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
 
 /* Page shell shared by every page (reference .desk) */
-.desk { max-width: 1120px; margin: 0 auto; display: grid; gap: 18px; }
+.desk { width: 100%; max-width: 1120px; margin: 0 auto; display: grid; gap: 18px; }
 
 /* visually hidden, still read by screen readers (and still clickable through its label) */
 .sr-only {

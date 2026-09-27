@@ -3,12 +3,13 @@ import { useFavorites } from '../../context/FavoritesContext.jsx'
 import './FavoritesPanel.css'
 
 // FAVORITES/ window: saved pets as pill buttons that open the profile. Port of renderFavs().
+// id="favorites" is the target of /adopt#favorites.
 export default function FavoritesPanel({ pets, onOpen }) {
   const { favs } = useFavorites()
   const saved = pets.filter((p) => favs.has(p.id))
 
   return (
-    <Window title="FAVORITES/" barColor="pink" as="div">
+    <Window title="FAVORITES/" barColor="pink" as="div" id="favorites" tabIndex={-1} aria-label="Favorites">
       <div className="favs">
         {saved.length ? (
           <>

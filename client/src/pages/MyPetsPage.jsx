@@ -5,20 +5,14 @@ import Chip from '../components/ui/Chip.jsx'
 import Button from '../components/ui/Button.jsx'
 import ErrorDialog from '../components/ui/ErrorDialog.jsx'
 import LoadingWindow from '../components/ui/LoadingWindow.jsx'
-import Taskbar from '../components/ui/Taskbar.jsx'
 import PetCard from '../components/pets/PetCard.jsx'
 import ListingFoot from '../components/shelter/ListingFoot.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useUnread } from '../context/UnreadContext.jsx'
-import { useCheckInsTask } from '../context/CheckInsContext.jsx'
-import { useAdminTask } from '../context/AdminContext.jsx'
-import { messagesTaskLabel } from '../utils/messages.js'
+import { usePublishTaskCount } from '../context/TaskCountsContext.jsx'
 import { useReceivedApplications } from '../hooks/useReceivedApplications.js'
 import { getMyAnimals, toListing } from '../api/animals.js'
 import { LISTING_STATUSES, LISTING_STATUS_LABEL } from '../utils/listing.js'
-import { inboxTaskLabel } from '../utils/applications.js'
-import { firstName } from '../utils/auth.js'
-import { profileTask, verifyLinkLabel } from '../utils/shelters.js'
+import { verifyLinkLabel } from '../utils/shelters.js'
 import './MyPetsPage.css'
 
 const FILTERS = ['all', ...LISTING_STATUSES]
@@ -54,11 +48,8 @@ function emptyText(filter) {
 }
 
 function MyPets() {
-  const { user, logout, refreshUser } = useAuth()
-  const { count: unread } = useUnread()
+  const { user, refreshUser } = useAuth()
   const navigate = useNavigate()
-  const checkInsTask = useCheckInsTask(navigate)
-  const adminTask = useAdminTask(navigate)
   const location = useLocation()
   const listings = useMyListings()
   const received = useReceivedApplications()
@@ -83,7 +74,7 @@ function MyPets() {
   const counts = { all: listings.animals.length }
   for (const s of LISTING_STATUSES) counts[s] = listings.animals.filter((a) => a.status === s).length
   const shown = filter === 'all' ? listings.animals : listings.animals.filter((a) => a.status === filter)
-  const pendingTotal = received.status === 'ready' ? received.applications.filter((a) => a.status === 'pending').length : null
+  usePublishTaskCount('inbox', received.status === 'ready' ? received.applications.filter((a) => a.status === 'pending').length : null)
   const appsFor = (id) => ({ status: received.status, list: received.applications.filter((a) => a.animal?._id === id) })
 
   const edit = (id) => navigate(`/shelter/animals/${encodeURIComponent(id)}/edit`)
@@ -151,20 +142,6 @@ function MyPets() {
           )}
         </Window>
       </div>
-
-      <Taskbar
-        items={[
-          { id: 'hood', label: 'Neighborhood.exe', onClick: () => navigate('/adopt') },
-          { id: 'mypets', label: 'My pets' },
-          { id: 'inbox', label: inboxTaskLabel(pendingTotal), onClick: () => navigate('/shelter/applications') },
-          profileTask(user, navigate),
-          adminTask,
-          checkInsTask,
-          { id: 'msgs', label: messagesTaskLabel(unread), onClick: () => navigate('/messages') },
-          { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
-          { id: 'logout', label: 'Log out', onClick: logout },
-        ]}
-      />
     </div>
   )
 }

@@ -56,9 +56,12 @@ export function AuthProvider({ children }) {
     [],
   )
 
+  // the user as the server just returned it (e.g. after PUT /users/me), so the taskbar name updates at once
+  const updateUser = useCallback((next) => setUser(next), [])
+
   const value = useMemo(
-    () => ({ user, token, loading, login, signup, logout, refreshUser }),
-    [user, token, loading, login, signup, logout, refreshUser],
+    () => ({ user, token, loading, login, signup, logout, refreshUser, updateUser }),
+    [user, token, loading, login, signup, logout, refreshUser, updateUser],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

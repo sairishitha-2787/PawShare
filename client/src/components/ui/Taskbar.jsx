@@ -4,8 +4,9 @@ import './Taskbar.css'
 const timeNow = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
 // items: [{ id, label, hideOnSmall, onClick }] – hideOnSmall tabs drop out below 520px; an item with onClick
-// is a button. "start" is a label only. null items are skipped.
-export default function Taskbar({ items = [] }) {
+// is a button. null items are skipped. start: the start button (the shell passes its Start menu); without it
+// "start" is a label only.
+export default function Taskbar({ items = [], start }) {
   const [time, setTime] = useState(timeNow)
 
   useEffect(() => {
@@ -15,7 +16,7 @@ export default function Taskbar({ items = [] }) {
 
   return (
     <footer className="taskbar">
-      <span className="start">start</span>
+      {start ?? <span className="start">start</span>}
       {items.filter(Boolean).map((item) => {
         const cls = item.hideOnSmall ? 'task hide-s' : 'task'
         return item.onClick ? (
