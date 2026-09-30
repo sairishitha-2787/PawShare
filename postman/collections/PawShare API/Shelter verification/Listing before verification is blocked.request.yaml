@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/animals"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Blocked",
+      "species": "dog",
+      "ageMonths": 12,
+      "size": "small"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{shelterToken}}"
+scripts:
+  - type: afterResponse
+    code: pm.test("status is 403", () => pm.response.to.have.status(403));
+    language: text/javascript
+order: 1000

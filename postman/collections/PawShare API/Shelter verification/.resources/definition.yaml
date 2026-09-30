@@ -1,0 +1,3 @@
+$kind: collection
+description: Shelters must be verified by an admin before publishing listings.
+order: 3000

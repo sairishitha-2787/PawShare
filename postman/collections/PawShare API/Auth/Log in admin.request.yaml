@@ -1,0 +1,21 @@
+$kind: http-request
+description: Needs an admin created with `npm run create-admin`.
+url: "{{baseUrl}}/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "{{adminEmail}}",
+      "password": "{{adminPassword}}"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("status is 2xx", () => pm.expect(pm.response.code).to.be.within(200, 299));
+      const json = pm.response.json();
+      if (json.token !== undefined) pm.collectionVariables.set("adminToken", json.token);
+    language: text/javascript
+order: 4000

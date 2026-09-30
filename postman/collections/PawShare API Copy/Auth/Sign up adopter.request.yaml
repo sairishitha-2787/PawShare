@@ -1,0 +1,37 @@
+$kind: http-request
+url: "{{baseUrl}}/auth/signup"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Asha Rao",
+      "email": "{{adopterEmail}}",
+      "password": "secret123",
+      "role": "adopter",
+      "phone": "9876543210",
+      "location": {
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "coordinates": {
+          "coordinates": [
+            78.4867,
+            17.385
+          ]
+        }
+      }
+    }
+scripts:
+  - type: beforeRequest
+    code: pm.collectionVariables.set("adopterEmail", `adopter.${Date.now()}@pawshare.test`);
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("status is 201", () => pm.response.to.have.status(201));
+      const json = pm.response.json();
+      if (json.token !== undefined) pm.collectionVariables.set("adopterToken", json.token);
+      if (json.user && json.user.id !== undefined) pm.collectionVariables.set("adopterId", json.user && json.user.id);
+    language: text/javascript
+order: 1000

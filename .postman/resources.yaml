@@ -1,0 +1,14 @@
+# Use this workspace to collaborate
+workspace:
+  id: 11ecafe2-56c6-41d6-8e9c-b57022b20152
+
+localResources:
+  collections:
+    - ../docs/PawShare.postman_collection.json
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/PawShare API: cdf0c980-1aa6-4d93-92c4-104ebf73194c
+    ../postman/collections/PawShare API Copy: 4b51886d-1719-4864-9b58-c70d496b9516

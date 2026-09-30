@@ -1,0 +1,3 @@
+$kind: collection
+description: Post-adoption check-ins (scheduled at 1 week, 1 month, 3 months) and health logs.
+order: 7000

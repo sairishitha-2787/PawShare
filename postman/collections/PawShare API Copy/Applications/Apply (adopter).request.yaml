@@ -1,0 +1,34 @@
+$kind: http-request
+description: "type: adoption | foster (foster may include fosterUntil). Animal moves to pending."
+url: "{{baseUrl}}/applications"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "animalId": "{{animalId}}",
+      "type": "adoption",
+      "message": "We'd love to give Bruno a home.",
+      "answers": {
+        "homeType": "house",
+        "hasYard": true,
+        "hasChildren": false,
+        "otherPets": "none",
+        "hoursAlonePerDay": 3,
+        "experience": "Had a lab for 10 years."
+      }
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{adopterToken}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("status is 201", () => pm.response.to.have.status(201));
+      const json = pm.response.json();
+      if (json.application && json.application._id !== undefined) pm.collectionVariables.set("applicationId", json.application && json.application._id);
+    language: text/javascript
+order: 1000

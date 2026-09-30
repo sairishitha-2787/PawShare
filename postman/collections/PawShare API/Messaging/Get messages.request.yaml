@@ -1,0 +1,15 @@
+$kind: http-request
+description: Oldest first. For older pages pass before=<_id of the oldest loaded message>.
+url: "{{baseUrl}}/threads/{{threadId}}/messages?limit=30"
+method: GET
+queryParams:
+  limit: "30"
+auth:
+  type: bearer
+  credentials:
+    token: "{{adopterToken}}"
+scripts:
+  - type: afterResponse
+    code: pm.test("status is 2xx", () => pm.expect(pm.response.code).to.be.within(200, 299));
+    language: text/javascript
+order: 6000

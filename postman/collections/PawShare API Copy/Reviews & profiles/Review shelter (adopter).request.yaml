@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{baseUrl}}/reviews"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "applicationId": "{{applicationId}}",
+      "rating": 5,
+      "comment": "Caring staff, smooth process."
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{adopterToken}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("status is 201", () => pm.response.to.have.status(201));
+      const json = pm.response.json();
+      if (json.review && json.review._id !== undefined) pm.collectionVariables.set("reviewId", json.review && json.review._id);
+    language: text/javascript
+order: 1000

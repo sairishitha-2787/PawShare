@@ -1,0 +1,23 @@
+$kind: collection
+description: |-
+  Every PawShare endpoint. Run the whole collection top to bottom with the Collection Runner: each request saves the tokens and ids the next ones need.
+
+  Before running: start the server (`npm run dev`) and create an admin with `npm run create-admin -- admin@pawshare.com "change-me-123"`, then set `adminEmail` / `adminPassword` in the collection variables if you used different ones.
+
+  Protected requests send `Authorization: Bearer <token>`.
+variables:
+  baseUrl: http://localhost:5000/api
+  adminEmail: admin@pawshare.com
+  adminPassword: change-me-123
+  adopterEmail: ""
+  shelterEmail: ""
+  adopterToken: ""
+  shelterToken: ""
+  adminToken: ""
+  adopterId: ""
+  shelterId: ""
+  animalId: ""
+  applicationId: ""
+  threadId: ""
+  checkInId: ""
+  reviewId: ""

@@ -1,0 +1,24 @@
+$kind: http-request
+description: Send { animalId } to message its shelter, or { recipientId } for a direct chat. Reuses an existing thread.
+url: "{{baseUrl}}/threads"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "animalId": "{{animalId}}"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{adopterToken}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("status is 2xx", () => pm.expect(pm.response.code).to.be.within(200, 299));
+      const json = pm.response.json();
+      if (json.thread && json.thread._id !== undefined) pm.collectionVariables.set("threadId", json.thread && json.thread._id);
+    language: text/javascript
+order: 1000

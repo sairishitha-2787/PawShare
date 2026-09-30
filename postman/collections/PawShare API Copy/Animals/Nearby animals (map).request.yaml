@@ -1,0 +1,13 @@
+$kind: http-request
+description: lng/lat of the user, radius in km (default 25). Nearest first. Accepts the same filters as search.
+url: "{{baseUrl}}/animals/nearby?lng=78.45&lat=17.40&radius=25"
+method: GET
+queryParams:
+  lng: "78.45"
+  lat: "17.40"
+  radius: "25"
+scripts:
+  - type: afterResponse
+    code: pm.test("status is 2xx", () => pm.expect(pm.response.code).to.be.within(200, 299));
+    language: text/javascript
+order: 3000

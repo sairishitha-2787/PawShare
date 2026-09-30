@@ -1,0 +1,60 @@
+$kind: http-request
+url: "{{baseUrl}}/animals"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Bruno",
+      "species": "dog",
+      "breed": "Labrador",
+      "ageMonths": 24,
+      "gender": "male",
+      "size": "large",
+      "color": "golden",
+      "description": "Friendly lab who loves fetch.",
+      "photos": [
+        {
+          "url": "https://placedog.net/500/400"
+        }
+      ],
+      "healthRecords": [
+        {
+          "title": "Rabies vaccine",
+          "date": "2026-06-01",
+          "vetName": "Dr. Rao"
+        }
+      ],
+      "vaccinated": true,
+      "neutered": true,
+      "temperament": [
+        "friendly",
+        "kid-safe",
+        "energetic"
+      ],
+      "listingType": "both",
+      "location": {
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "coordinates": {
+          "coordinates": [
+            78.4867,
+            17.385
+          ]
+        }
+      }
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{shelterToken}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("status is 201", () => pm.response.to.have.status(201));
+      const json = pm.response.json();
+      if (json.animal && json.animal._id !== undefined) pm.collectionVariables.set("animalId", json.animal && json.animal._id);
+    language: text/javascript
+order: 1000

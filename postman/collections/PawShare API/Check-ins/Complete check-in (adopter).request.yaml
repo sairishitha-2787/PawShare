@@ -1,0 +1,27 @@
+$kind: http-request
+url: "{{baseUrl}}/checkins/{{checkInId}}/complete"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "condition": "great",
+      "weightKg": 29.5,
+      "eatingWell": true,
+      "vetVisit": false,
+      "notes": "Settled in well, loves the garden.",
+      "photos": [
+        "https://placedog.net/400/300"
+      ]
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{adopterToken}}"
+scripts:
+  - type: afterResponse
+    code: pm.test("status is 2xx", () => pm.expect(pm.response.code).to.be.within(200, 299));
+    language: text/javascript
+order: 2000

@@ -1,0 +1,17 @@
+$kind: http-request
+description: "Filters (all optional): species, breed, size, gender, ageGroup (baby|young|adult|senior), minAge/maxAge (months), city, temperament (comma list, all must match), listingType (adoption|foster), status (default available), q (text search). Paging: page, limit (max 50). sort: newest|oldest|youngest|eldest."
+url: "{{baseUrl}}/animals?species=dog&size=large,medium&city=hyderabad&temperament=friendly&page=1&limit=12&sort=newest"
+method: GET
+queryParams:
+  species: dog
+  size: large,medium
+  city: hyderabad
+  temperament: friendly
+  page: "1"
+  limit: "12"
+  sort: newest
+scripts:
+  - type: afterResponse
+    code: pm.test("status is 2xx", () => pm.expect(pm.response.code).to.be.within(200, 299));
+    language: text/javascript
+order: 2000

@@ -1,0 +1,3 @@
+$kind: collection
+description: Sign up, log in, current user. Admins can't sign up — use the create-admin script.
+order: 2000

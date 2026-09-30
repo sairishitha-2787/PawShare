@@ -1,0 +1,13 @@
+$kind: http-request
+description: Only works while pending — returns 409 here because the application was just approved.
+url: "{{baseUrl}}/applications/{{applicationId}}/withdraw"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{adopterToken}}"
+scripts:
+  - type: afterResponse
+    code: pm.test("status is 409", () => pm.response.to.have.status(409));
+    language: text/javascript
+order: 6000

@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/checkins"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "animalId": "{{animalId}}",
+      "condition": "good",
+      "vetVisit": true,
+      "notes": "Annual vaccines done."
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{adopterToken}}"
+scripts:
+  - type: afterResponse
+    code: pm.test("status is 201", () => pm.response.to.have.status(201));
+    language: text/javascript
+order: 3000

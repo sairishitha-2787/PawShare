@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{baseUrl}}/threads/{{threadId}}/messages"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "text": "He's on Royal Canin adult — we'll send a starter bag."
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{shelterToken}}"
+scripts:
+  - type: afterResponse
+    code: pm.test("status is 201", () => pm.response.to.have.status(201));
+    language: text/javascript
+order: 3000

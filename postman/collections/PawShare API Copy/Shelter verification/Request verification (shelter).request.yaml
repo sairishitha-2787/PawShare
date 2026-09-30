@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/verification/request"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "registrationNumber": "AWBI/2026/0042",
+      "about": "Rescue shelter in Hyderabad caring for dogs and cats since 2015.",
+      "website": "https://example.org",
+      "documentUrl": "https://example.org/registration.pdf"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{shelterToken}}"
+scripts:
+  - type: afterResponse
+    code: pm.test("status is 201", () => pm.response.to.have.status(201));
+    language: text/javascript
+order: 2000

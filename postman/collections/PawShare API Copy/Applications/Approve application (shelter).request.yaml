@@ -1,0 +1,22 @@
+$kind: http-request
+description: "status: approved | rejected. Approving marks the animal adopted/fostered, rejects other pending applicants and schedules check-ins."
+url: "{{baseUrl}}/applications/{{applicationId}}/status"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "approved",
+      "note": "Welcome to the family!"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{shelterToken}}"
+scripts:
+  - type: afterResponse
+    code: pm.test("status is 2xx", () => pm.expect(pm.response.code).to.be.within(200, 299));
+    language: text/javascript
+order: 5000
