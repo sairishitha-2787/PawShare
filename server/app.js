@@ -26,6 +26,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/animals", animalRoutes);
 app.use("/api/geocode", require("./routes/geocodeRoutes"));
+app.use("/api/upload", require("./routes/uploadRoutes"));
 app.use("/api/applications", applicationRoutes);
 app.use("/api/threads", threadRoutes);
 app.use("/api/checkins", checkInRoutes);
