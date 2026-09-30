@@ -786,6 +786,71 @@ the taskbar name; /nope shows FILE NOT FOUND. Lint and build pass. Commit: "feat
 
 ---
 
+## Session 20 — Final polish and demo prep
+
+```text
+Session 20 — Final polish and demo prep. Run `git checkout main && git pull`, then create `feature/final-polish` from main.
+
+PART A — AUDIT (report first, don't fix yet). Run the app (server on your dev DB copy or in-memory + seed,
+client dev) and walk every route as each role: logged out, adopter (adopter@demo.pawshare.test), shelter
+(shelter.koramangala@demo...), admin. At 1200px and 400px. List, grouped by page:
+- visual inconsistencies against CLAUDE.md and design/neighborhood-reference.html (borders, shadows, fonts,
+  title bars, button styles, spacing, pill colours, text that says "TODO"/lorem/placeholder)
+- missing loading / empty / error states, dead buttons or links, wrong redirects, anything hidden behind hover
+- accessibility: keyboard order, visible focus, labels on inputs and icon buttons, Modal focus trap, contrast
+  of text on --sun/--mint/--pink, prefers-reduced-motion
+- console warnings/errors, React key warnings, failed requests
+- security/readiness: secrets or hard-coded URLs in client code, .env.example files complete, token cleared
+  on logout and on 401, DevKit reachable in production builds
+- bundle: `npm run build` size; routes that should be lazy-loaded; oversized images
+Show me the numbered list and wait.
+
+PART B — FIX (after I reply) everything I approve, plus:
+1. Only register /dev/kit when import.meta.env.DEV.
+2. Lazy-load route pages with React.lazy + a LOADING window fallback.
+3. A few Vitest unit tests for pure helpers (toPet mapping, date labels, filters/matching, check-in due states).
+   Add `npm test` in client/.
+4. Deployment prep (Vedha deploys): client/vercel.json with SPA rewrites to index.html, notes on
+   VITE_API_URL and server CLIENT_URL/CORS in docs/DEPLOY.md. Don't deploy anything.
+5. Demo reset: `npm run seed:demo -- --reset` in server/ that deletes applications, threads, messages,
+   reviews and check-ins created by demo accounts EXCEPT Bruno/Ananya's seeded ones, resets the 9 map pets
+   to their seeded status, and re-approves nothing else. Refuse to run if MONGODB_URI doesn't contain
+   "pawshare" or NODE_ENV=production. This is the only server/ change allowed.
+6. docs/DEMO.md: a 7-minute demo script for Review 2 in steps (who logs in, what to click, what to say), mapped
+   to each brief feature: listings with photos/health records, search+filters+nearby, map view, application
+   workflow + approval, messaging, check-ins, shelter profiles/ratings, admin verification. Include all demo
+   logins, a "before the demo" checklist (reset seed, both servers running, browser zoom 100%, incognito for
+   the second account) and a backup plan (VITE_USE_MOCK=true if the database is down).
+7. README.md: a "Frontend" section — setup, env vars, scripts, folder structure, and 4 screenshots saved in
+   docs/screenshots/ (desktop home, neighborhood map, pet profile, messenger) taken with Playwright at 1280px.
+8. Append this prompt to docs/claude-prompts.md as "Session 20 — Final polish and demo prep".
+
+Done when: the approved audit items are fixed; lint, build and client tests pass; `npm run seed:demo -- --reset`
+restores the demo state; DEMO.md walks through every brief feature. Commits split by topic
+(e.g. "fix(ui): audit fixes", "perf(client): lazy routes", "test(client): helper tests", "chore: deploy prep",
+"feat(server): demo reset", "docs: demo script and frontend readme").
+```
+
+Reply after the audit:
+
+```text
+Approved: all except 4 (leave the logo colour as in the reference, just note it in the README).
+Details:
+- 3: full name for shelters, first name for people.
+- 8: silent redirect to /adopt like other wrong-role pages.
+- 10: in DEMO.md, have Ananya apply live for a Happy Tails pet (e.g. Biscuit) so the shelter has something to
+  approve, and log in as shelter.koramangala for that part.
+- 11: yes, add the skip link.
+- 14: keep the localhost fallback only in dev; in a production build without VITE_API_URL, show the ERROR
+  window "API URL NOT CONFIGURED." instead of silently calling localhost.
+- 15: clear favorites on logout.
+- 16, 17: document in docs/DEPLOY.md (including "re-run npm run seed:demo with CLIENT_URL set to the Vercel URL
+  after deploying"). Don't change server files for these.
+Then do Part B items 1–8 as in the brief.
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

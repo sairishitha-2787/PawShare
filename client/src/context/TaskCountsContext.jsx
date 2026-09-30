@@ -12,8 +12,9 @@ const TaskCountsContext = createContext(null)
 const pendingIn = (list) => (list.status === 'ready' ? list.applications.filter((a) => a.status === 'pending').length : null)
 
 // Loads one user's applications and reports the pending count. Keyed by the user id, so a count never
-// carries over to the next account. Refetches quietly on every navigation (a page may have changed it).
-function ApplicationCounts({ role, pathname, onCount }) {
+// carries over to the next account. Refetches quietly on every navigation (a page may have changed it),
+// and when a page asks (nudge changes).
+function ApplicationCounts({ role, pathname, nudge, onCount }) {
   const isAdopter = role === 'adopter'
   const mine = useMyApplications(isAdopter)
   const received = useReceivedApplications(!isAdopter)
@@ -25,7 +26,7 @@ function ApplicationCounts({ role, pathname, onCount }) {
   useEffect(() => {
     if (first.current) first.current = false
     else refresh()
-  }, [pathname, refresh])
+  }, [pathname, nudge, refresh])
 
   useEffect(() => {
     onCount(count)
@@ -44,6 +45,8 @@ export function TaskCountsProvider({ children }) {
   const { count: admin } = useAdmin()
   const [apps, setApps] = useState(null) // { userId, count }
   const [published, setPublished] = useState({})
+  const [nudge, setNudge] = useState(0)
+  const refreshApplications = useCallback(() => setNudge((n) => n + 1), [])
 
   const userId = user?.id
   const onCount = useCallback((count) => setApps({ userId, count }), [userId])
@@ -71,11 +74,11 @@ export function TaskCountsProvider({ children }) {
     }),
     [user, published, appCount, checkIns, unread, admin],
   )
-  const value = useMemo(() => ({ counts, publish }), [counts, publish])
+  const value = useMemo(() => ({ counts, publish, refreshApplications }), [counts, publish, refreshApplications])
 
   return (
     <TaskCountsContext.Provider value={value}>
-      {user && <ApplicationCounts key={user.id} role={user.role} pathname={pathname} onCount={onCount} />}
+      {user && <ApplicationCounts key={user.id} role={user.role} pathname={pathname} nudge={nudge} onCount={onCount} />}
       {children}
     </TaskCountsContext.Provider>
   )
@@ -88,6 +91,15 @@ export function useTaskCounts() {
   if (!ctx) throw new Error('useTaskCounts must be used inside <TaskCountsProvider>')
   return ctx.counts
 }
+
+// → a function that refetches the applications count now, for a page that changed it without navigating
+// (APPLY.EXE after "Send application"). Does nothing outside the shell.
+// eslint-disable-next-line react/only-export-components
+export function useRefreshTaskCounts() {
+  const ctx = useContext(TaskCountsContext)
+  return ctx?.refreshApplications || noop
+}
+const noop = () => {}
 
 // A page's own count for a task ('applications' | 'inbox' | 'favorites'), shown instead of the shared one
 // while the page is mounted. n = null publishes nothing.

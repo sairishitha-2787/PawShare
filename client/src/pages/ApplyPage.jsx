@@ -8,6 +8,7 @@ import FormError from '../components/auth/FormError.jsx'
 import PetFace from '../components/pets/PetFace.jsx'
 import ApplyWizard, { STEP_COUNT } from '../components/apply/ApplyWizard.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useRefreshTaskCounts } from '../context/TaskCountsContext.jsx'
 import { getAnimal } from '../api/animals.js'
 import { getMyApplications, isActive } from '../api/applications.js'
 import { SPECIES_LABEL } from '../utils/pets.js'
@@ -120,7 +121,15 @@ export default function ApplyPage() {
   // null while the form is open; 'sent' with the new application, or 'applied' with the one the server
   // said was already there
   const [outcome, setOutcome] = useState(null)
-  const onSent = useCallback((application) => setOutcome({ kind: 'sent', application }), [])
+  // the page stays on /apply/:petId, so the shell wouldn't refetch the count on its own
+  const refreshCounts = useRefreshTaskCounts()
+  const onSent = useCallback(
+    (application) => {
+      setOutcome({ kind: 'sent', application })
+      refreshCounts()
+    },
+    [refreshCounts],
+  )
   const onAlreadyApplied = useCallback((application) => setOutcome({ kind: 'applied', application }), [])
 
   if (status === 'loading') {

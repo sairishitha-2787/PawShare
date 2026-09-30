@@ -55,7 +55,6 @@
 
 /* room for the centered LOADING... / ERROR window */
 .cp-wait { position: relative; min-height: 300px; }
-.cp-denied { min-height: 60vh; }
 
 @media (max-width: 720px) {
   .cp-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
