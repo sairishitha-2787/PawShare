@@ -52,6 +52,7 @@ a.sp-badge:hover { background: var(--pink-soft); }
 }
 .sp-stats div { background: var(--lav-soft); min-width: 120px; }
 .sp-props dt, .sp-stats dt { font-family: var(--pixel); font-size: 10px; letter-spacing: .05em; color: var(--ink-soft); }
+.sp-stats dt { color: var(--ink); }
 .sp-props dd, .sp-stats dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
 .sp-stats dd { font-family: var(--pixel); font-size: 20px; font-weight: 400; }
 .sp-props a { color: var(--ink); text-decoration-thickness: 2px; text-underline-offset: 2px; }

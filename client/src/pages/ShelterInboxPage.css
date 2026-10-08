@@ -31,6 +31,8 @@
 
 .inbox-panes { display: grid; grid-template-columns: minmax(280px, 2fr) minmax(0, 3fr); }
 .inbox-list { padding: 10px; border-right: 2px dashed var(--grid); max-height: 72vh; overflow-y: auto; }
+.inbox-panes.only-list { grid-template-columns: minmax(0, 1fr); }
+.only-list .inbox-list { border-right: 0; }
 .inbox-pane { padding: 16px 18px; min-width: 0; }
 
 /* message rows */

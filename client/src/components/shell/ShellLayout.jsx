@@ -1,5 +1,8 @@
+import { Suspense } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Taskbar from '../ui/Taskbar.jsx'
+import ErrorDialog from '../ui/ErrorDialog.jsx'
+import LoadingWindow from '../ui/LoadingWindow.jsx'
 import StartMenu from './StartMenu.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useCheckInsTask } from '../../context/CheckInsContext.jsx'
@@ -7,9 +10,10 @@ import { useAdminTask } from '../../context/AdminContext.jsx'
 import { TaskCountsProvider, useTaskCounts } from '../../context/TaskCountsContext.jsx'
 import { applicationsTaskLabel, inboxTaskLabel } from '../../utils/applications.js'
 import { messagesTaskLabel } from '../../utils/messages.js'
-import { firstName } from '../../utils/auth.js'
+import { displayName } from '../../utils/auth.js'
 import { profileTask, shelterPath } from '../../utils/shelters.js'
 import { rolePages } from '../../utils/shell.js'
+import { API_CONFIGURED } from '../../api/client.js'
 import './Shell.css'
 
 // The taskbar under every page: the Start menu, one task per place (the page you're on is a plain label),
@@ -61,7 +65,7 @@ function ShellTaskbar() {
     role === 'shelter' && { ...profileTask(user, navigate, { current: onOwnProfile }), hideOnSmall: !onOwnProfile },
     checkInsTask,
     user && task('msgs', messagesTaskLabel(counts.unread), '/messages', { current: on('/messages'), count: counts.unread }),
-    user && { id: 'me', label: `${firstName(user.name)} · ${user.role}`, hideOnSmall: true },
+    user && { id: 'me', label: `${displayName(user)} · ${user.role}`, hideOnSmall: true },
     user && { id: 'logout', label: 'Log out', onClick: logout, hideOnSmall: true },
     // nothing while a saved login is being checked, so "Log in" doesn't flash up
     !user && !loading && pathname !== '/login' && {
@@ -100,13 +104,32 @@ function ShellTaskbar() {
   )
 }
 
+// A production build made without VITE_API_URL can't reach any API (sample-pet mode doesn't need one)
+const API_MISSING = !API_CONFIGURED && import.meta.env.VITE_USE_MOCK !== 'true'
+
+// "Skip to content" moves focus to the page without touching the URL hash (tabs and #list use it)
+function skipToPage(e) {
+  e.preventDefault()
+  document.getElementById('page')?.focus()
+}
+
 // The layout route around every page: the page, then the shared taskbar.
 export default function ShellLayout() {
   return (
     <TaskCountsProvider>
+      <a className="skip-link" href="#page" onClick={skipToPage}>Skip to content</a>
       <div className="shell">
-        <div className="shell-page">
-          <Outlet />
+        <div className="shell-page" id="page" tabIndex={-1}>
+          {API_MISSING ? (
+            <div className="shell-wait">
+              <ErrorDialog message="API URL NOT CONFIGURED." onOk={() => window.location.reload()} />
+            </div>
+          ) : (
+            // lazy pages (main.jsx) load here; the taskbar below stays put meanwhile
+            <Suspense fallback={<div className="shell-wait"><LoadingWindow label="Opening the program" /></div>}>
+              <Outlet />
+            </Suspense>
+          )}
         </div>
         <div className="desk shell-bar">
           <ShellTaskbar />
