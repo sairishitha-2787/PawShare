@@ -4,6 +4,7 @@ import Taskbar from '../ui/Taskbar.jsx'
 import ErrorDialog from '../ui/ErrorDialog.jsx'
 import LoadingWindow from '../ui/LoadingWindow.jsx'
 import StartMenu from './StartMenu.jsx'
+import PawTrails from '../os/PawTrails.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useCheckInsTask } from '../../context/CheckInsContext.jsx'
 import { useAdminTask } from '../../context/AdminContext.jsx'
@@ -116,11 +117,13 @@ function skipToPage(e) {
   document.getElementById('page')?.focus()
 }
 
-// The layout route around every page: the page, then the shared taskbar; BOOT.EXE over both once per session.
+// The layout route around every page: the page, then the shared taskbar; BOOT.EXE over both once per session,
+// the walking paws under both.
 export default function ShellLayout() {
   return (
     <BootProvider skip={API_MISSING}>
     <TaskCountsProvider>
+      <PawTrails />
       <a className="skip-link" href="#page" onClick={skipToPage}>Skip to content</a>
       <div className="shell">
         <div className="shell-page" id="page" tabIndex={-1}>

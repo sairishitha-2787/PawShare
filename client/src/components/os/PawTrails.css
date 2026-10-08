@@ -1,0 +1,20 @@
+/* Walking paws: a fixed layer over the body's grid background and under everything else. z-index -1 in the root
+   stacking context paints it after the background and before any window, the map or a modal. */
+.paw-trails { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+
+/* placed by PawTrails.jsx at its spot on the path; it fades in over 200ms, stays ~2.5s, fades out (PRINT_MS) */
+.paw { position: absolute; display: block; opacity: 0; animation: paw-print 3000ms linear forwards; }
+.paw-trails.paused .paw { animation-play-state: paused; }
+.paw--dog g { fill: var(--ink); opacity: .12; }
+.paw--cat g { fill: var(--lav); opacity: .35; }
+
+@keyframes paw-print {
+  0% { opacity: 0; }
+  6.67% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paw-trails { display: none; }
+}

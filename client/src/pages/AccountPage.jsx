@@ -34,7 +34,7 @@ const ON_OFF = [
 
 // STARTUP.CFG: browser-only settings, applied at once (no Save)
 function StartupSettings() {
-  const { enabled, setEnabled, replay } = useBoot()
+  const { enabled, setEnabled, replay, paws, setPaws } = useBoot()
   return (
     <Window title="STARTUP.CFG" className="settings" aria-label="Startup settings">
       <div className="settings-body">
@@ -48,6 +48,13 @@ function StartupSettings() {
         <div className="settings-foot">
           <Button onClick={replay}>Replay boot screen</Button>
         </div>
+        <ChoiceField
+          label="Walking paws in background"
+          options={ON_OFF}
+          value={paws}
+          onChange={setPaws}
+          hint="Paw prints wander behind the windows. Always off when your device asks for reduced motion."
+        />
       </div>
     </Window>
   )
