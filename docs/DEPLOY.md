@@ -58,6 +58,12 @@ The two apps need each other's URLs, so do them in this order:
 | `CLIENT_URL` | **yes** | The frontend's exact origin, e.g. `https://pawshare.vercel.app`: `https`, no path, **no trailing slash**. See below. |
 | `NODE_ENV` | recommended | `production`. With it, a 500 error no longer sends the internal error message to the browser. |
 | `PORT` | no | Most hosts set it themselves; the server uses it, or 5000. |
+| `CLOUDINARY_CLOUD_NAME` | needed for photo upload | Server-side upload, `POST /api/upload`. Without all three Cloudinary variables it returns 500. (The React app uploads straight to Cloudinary with its own `VITE_` variables.) |
+| `CLOUDINARY_API_KEY` | needed for photo upload | From the Cloudinary dashboard. |
+| `CLOUDINARY_API_SECRET` | needed for photo upload | From the Cloudinary dashboard. A secret: API host only, never in Vercel. |
+| `EMAIL_USER` | needed for reminder emails | The Gmail address that sends check-in reminders (`server/runReminders.js`). |
+| `EMAIL_PASS` | needed for reminder emails | A Gmail **app password** for `EMAIL_USER`, not the account password. |
+| `GEOCODING_API_KEY` | needed for geocoding | OpenCage key for `GET /api/geocode?address=…`. Without it that endpoint returns 500. |
 
 ### `CLIENT_URL` does two jobs
 
@@ -102,6 +108,11 @@ npm run create-admin -- admin@demo.pawshare.test "PawShare@123" "Asha Admin"
 ```
 
 Use a stronger password if the site stays up after the review.
+
+## Known gaps
+
+- `server/runReminders.js` (sends the check-in reminder emails) has no npm script and nothing runs it on a
+  schedule. Ask Poojitha how it's meant to run (a Render cron job, or by hand with `node runReminders.js`).
 
 ## Checks after deploying
 

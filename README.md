@@ -17,7 +17,7 @@ Requirements: Node.js 20+ and a MongoDB database (a free MongoDB Atlas cluster w
 ```bash
 cd server
 npm install
-cp .env.example .env        # then fill in the values below
+# create server/.env with the variables below
 npm run create-admin -- admin@pawshare.com "change-me-123" "Admin"
 npm run dev                 # http://localhost:5000/api/health → {"status":"ok"}
 ```
@@ -26,10 +26,17 @@ npm run dev                 # http://localhost:5000/api/health → {"status":"ok
 
 | Variable | Required | Example | Purpose |
 |---|---|---|---|
-| `MONGODB_URI` | yes | `mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/pawshare` | Database connection |
+| `MONGODB_URI` | yes | `mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/pawshare` | Database connection. Without it nothing works: the server can't connect. |
 | `JWT_SECRET` | yes | any long random string | Signs login tokens. The server refuses to start without it. |
-| `PORT` | no | `5000` | API port |
-| `CLIENT_URL` | no | `http://localhost:5173` | Allowed CORS origin (the React app). Defaults to any origin. |
+| `NODE_ENV` | no | `production` | In production, a 500 error stops sending the internal error message to the browser. Unset, error details leak. |
+| `CLIENT_URL` | no | `http://localhost:5173` | Allowed CORS origin (the React app) and the base URL of the demo photos in `npm run seed:demo`. Unset, any origin may call the API and demo photos point at localhost. |
+| `PORT` | no | `5000` | API port. Unset, it uses 5000. |
+| `CLOUDINARY_CLOUD_NAME` | no | `pawshare` | Server-side photo upload (`POST /api/upload`). Without the three Cloudinary variables that endpoint returns 500. The React app uploads straight to Cloudinary with its own `VITE_` variables, so its forms still work. |
+| `CLOUDINARY_API_KEY` | no | from the Cloudinary dashboard | See `CLOUDINARY_CLOUD_NAME`. |
+| `CLOUDINARY_API_SECRET` | no | from the Cloudinary dashboard | See `CLOUDINARY_CLOUD_NAME`. Secret: never put it in a `VITE_` variable. |
+| `EMAIL_USER` | no | `pawshare.demo@gmail.com` | The Gmail account that sends check-in reminder emails (`server/runReminders.js`). Without it, every reminder fails to send. |
+| `EMAIL_PASS` | no | a Gmail app password | The app password for `EMAIL_USER` (not the normal login password). Without it, reminders fail to send. |
+| `GEOCODING_API_KEY` | no | an OpenCage API key | Turns an address into coordinates (`GET /api/geocode?address=…`). Without it that endpoint returns 500. |
 
 ### Scripts (run inside `server/`)
 
