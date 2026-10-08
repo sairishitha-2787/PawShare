@@ -851,6 +851,56 @@ Then do Part B items 1–8 as in the brief.
 
 ---
 
+## Session 21 — Boot screen
+
+```text
+git checkout main && git pull && git checkout -b feat/boot-screen
+
+Read CLAUDE.md and design/neighborhood-reference.html. Don't change server/.
+
+First, report (don't build yet): where the app root/layout lives, how Settings stores preferences, whether
+a health-check call to /api/health already exists in src/api, and whether anything already shows on first load.
+Wait for my OK.
+
+Then build src/components/os/BootScreen.jsx (+ .css):
+1. Full-screen overlay on the page grid background. Centered Window, title "BOOT.EXE", lavender bar.
+   Inside: "PAWSHARE OS" brand block (same as the header, SHARE in --hot), then 4 boot lines in Silkscreen
+   that appear one by one: "CHECKING SHELTERS... OK", "LOADING PETS... OK", "WAKING SERVER... OK",
+   "STARTING DESKTOP... OK". Plain text, no jokes (the ERROR window stays the only joke).
+2. Pixel progress bar: 12 square blocks in --mint with 2px ink borders, filling left to right.
+3. While it runs, call /api/health. Finish when the API answers (minimum 2.2s on screen, maximum 9s).
+   If it hasn't answered after 9s, show "WAKING SERVER... SLOW" and continue anyway. This hides
+   Render's cold start during the demo.
+4. Show once per browser session (sessionStorage "pawshare-booted", wrapped in try/catch). It keeps the
+   current route, so deep links still work after boot.
+5. "SKIP" Button in the window. Esc and Enter also skip. Focus goes to SKIP on open, then to the main
+   content after boot. role="dialog", aria-label "PawShare OS is starting".
+6. Reduced motion: no line-by-line or block animation; show the finished state for 0.6s, then continue.
+7. Settings: add a "Show boot screen" toggle (default on) and a "Replay boot screen" button. Add
+   "Restart PawShare OS" to the Start menu, which replays it too.
+8. Add a BootScreen preview button on /dev/kit.
+
+Done when: a fresh tab shows the boot screen once; refresh in the same tab skips it; SKIP/Esc/Enter work;
+with the server asleep it waits up to 9s then continues; reduced motion is respected; no console warnings;
+works at 400px; `npm run lint` and `npm run build` pass.
+Append this prompt to docs/claude-prompts.md under "Session 21 — Boot screen".
+Commit: "feat(os): boot screen".
+```
+
+Reply after the report:
+
+```text
+OK, build it with your plan. One change for reduced motion: still wait for the API like the normal
+path (min 0.6s, max 9s), but with no animation. Show all 4 boot lines and the full progress bar
+statically, with the "WAKING SERVER..." line reading "WAKING SERVER..." until the API answers, then "OK"
+(or "SLOW" after 9s). SKIP/Esc/Enter still work.
+Everything else as you planned: Settings window outside the profile form, "Restart PawShare OS" in the
+Start menu for everyone, BootContext replay(), abort the health call on finish/skip.
+Run npm test, lint and build when done.
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

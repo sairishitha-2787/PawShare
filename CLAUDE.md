@@ -55,9 +55,11 @@ client/src/
   api/          client.js, animals.js, auth.js, applications.js, uploads.js (Cloudinary photo + document upload), threads.js, checkins.js,
                 users.js (public profiles, reviews list, adoption history, updateMe), reviews.js, verification.js,
                 admin.js (shelter verification decisions, every animal / every review of a shelter, paged through)
+                health.js (GET /health, for the boot screen)
   components/
     ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar, Field, ChoiceField, LoadingWindow
     shell/      ShellLayout (the layout route around every page: the page, then the one shared taskbar), StartMenu
+    os/         BootScreen (BOOT.EXE: once per tab while GET /health wakes the API, 2.2s–9s; BootContext replays it)
     desktop/    DesktopIcons (the home page's hand-drawn icons, same 48×48 style as admin/PanelIcons)
     auth/       RequireAuth, FormError
     pets/       PetFace, House, Pin, PetCard, ProfileWindow
@@ -77,6 +79,7 @@ client/src/
                 CheckInsContext.jsx (the taskbar's check-ins count, polled every minute; useCheckInsTask),
                 AdminContext.jsx (admins: shelters waiting for verification, polled every minute; useAdminTask),
                 TaskCountsContext.jsx (the shell's numbers: pending applications + the three above; usePublishTaskCount)
+                BootContext.jsx (BOOT.EXE: replay(), the "Show boot screen" setting in localStorage `pawshare-boot`)
   hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js, usePolling.js, useLoad.js,
                 useAnimalSearch.js (the Adopt page's results, 50 at a time), useNearMe.js (browser location or area picker)
   data/         mockPets.js
