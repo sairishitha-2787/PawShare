@@ -42,6 +42,7 @@ export const BLOCKS = 12
 export const MIN_MS = 2200 // on screen at least this long
 export const MAX_MS = 9000 // stop waiting for the API after this ("WAKING SERVER... SLOW")
 export const REDUCED_MIN_MS = 600 // reduced motion: shortest time on screen
+export const REDUCED_HOLD_MS = 300 // reduced motion: the server line's OK / SLOW stays this long before closing
 
 const SERVER_LINE = 2
 const LINE_AT = [200, 700, 1200] // the first three lines; the last one follows the server's answer
@@ -53,7 +54,8 @@ const WAIT_BLOCKS = 9 // the bar stops here until the API answers
 
 // What the screen shows t ms after it opened. server: null while waiting, else { at (ms), status: 'ok'|'slow' }.
 // → { lines: [{ text, visible, status: 'ok'|'slow'|null }], blocks (filled, 0–12), done }
-// Reduced motion: every line and the full bar at once; only the server line changes, and it still waits for the API.
+// Reduced motion: every line and the full bar at once; only the server line changes, and it still waits for the API
+// (then holds its result for a moment so it can be read).
 export function bootFrame(t, server, { reduced = false } = {}) {
   const lineStatus = (i, resolved) => (i !== SERVER_LINE ? 'ok' : resolved ? server.status : null)
 
@@ -61,7 +63,7 @@ export function bootFrame(t, server, { reduced = false } = {}) {
     return {
       lines: BOOT_LINES.map((text, i) => ({ text, visible: true, status: lineStatus(i, server != null) })),
       blocks: BLOCKS,
-      done: server != null && t >= REDUCED_MIN_MS,
+      done: server != null && t >= Math.max(REDUCED_MIN_MS, server.at + REDUCED_HOLD_MS),
     }
   }
 

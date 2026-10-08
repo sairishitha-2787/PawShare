@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BLOCKS, MAX_MS, MIN_MS, REDUCED_MIN_MS, bootFrame } from './boot.js'
+import { BLOCKS, MAX_MS, MIN_MS, REDUCED_HOLD_MS, REDUCED_MIN_MS, bootFrame } from './boot.js'
 
 const visible = (frame) => frame.lines.filter((l) => l.visible).length
 const serverLine = (frame) => frame.lines[2]
@@ -51,5 +51,12 @@ describe('bootFrame', () => {
     expect(bootFrame(3000, null, { reduced: true }).done).toBe(false)
     expect(bootFrame(REDUCED_MIN_MS - 1, { at: 50, status: 'ok' }, { reduced: true }).done).toBe(false)
     expect(bootFrame(REDUCED_MIN_MS, { at: 50, status: 'ok' }, { reduced: true }).done).toBe(true)
+  })
+
+  it('reduced motion: holds a late OK long enough to read', () => {
+    const late = { at: 3000, status: 'ok' }
+    expect(serverLine(bootFrame(3000, late, { reduced: true })).status).toBe('ok')
+    expect(bootFrame(3000 + REDUCED_HOLD_MS - 1, late, { reduced: true }).done).toBe(false)
+    expect(bootFrame(3000 + REDUCED_HOLD_MS, late, { reduced: true }).done).toBe(true)
   })
 })
