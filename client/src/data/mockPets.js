@@ -1,4 +1,4 @@
-// The 9 pets from design/neighborhood-reference.html, in the frontend pet shape (see CLAUDE.md).
+// The 9 pets from design/neighborhood-reference.html plus 4 birds, in the frontend pet shape (see CLAUDE.md).
 // house is derived from species (houseTypeFor) and map positions come from the Neighborhood lot layout.
 export const mockPets = [
   {
@@ -63,6 +63,37 @@ export const mockPets = [
     blurb: 'Peanut is a Syrian hamster, so he lives on his own. He wakes up in the evening and runs laps on his wheel.',
     colors: { fur: '#F3DEC0', dark: '#A26A3B', bg: '#FFF3D6' },
     photoUrl: '/demo-pets/peanut.jpg',
+  },
+  // the birds (Session 23): with 13 pets the map has a second street
+  {
+    id: 'mango', name: 'Mango', species: 'bird', status: 'available', age: '7 yrs', breed: 'Blue-and-gold macaw', sex: 'Male', size: 'Large', shelter: 'Bengaluru Paws Collective', area: 'Bengaluru', vax: 'Not required',
+    tags: ['Talkative', 'Needs big aviary', 'Experienced owner', 'Registered exotic species'],
+    blurb: 'Mango says hello to everyone who walks in and has learned to copy the kettle. He needs a big aviary and an owner who has kept large parrots before.',
+    colors: { fur: '#8FC3F0', dark: '#3F3A4A', bg: '#FFE8C7' },
+    photoUrl: '/demo-pets/mango.jpg',
+  },
+  {
+    id: 'kiwi', name: 'Kiwi', species: 'bird', status: 'available', age: '1.5 yrs', breed: 'Budgie', sex: 'Female', size: 'Small', shelter: 'Bengaluru Paws Collective', area: 'Bengaluru', vax: 'Not required',
+    tags: ['Gentle', 'Good for beginners'],
+    blurb: 'Kiwi chirps along to the radio and steps onto a finger without any fuss. A lovely first bird for a calm home.',
+    colors: { fur: '#F4F1EC', dark: '#E8A94A', bg: '#DDF2E4', cheek: '#6E7FD6' },
+    photoUrl: '/demo-pets/kiwi.jpg',
+  },
+  {
+    id: 'pearl', name: 'Pearl', species: 'bird', status: 'pending', age: '6 yrs', breed: 'Umbrella cockatoo', sex: 'Female', size: 'Medium', shelter: 'Happy Tails Shelter', area: 'Koramangala', vax: 'Not required',
+    tags: ['Very social', 'Loud', 'Needs daily attention', 'Registered exotic species'],
+    blurb: 'Pearl raises her crest and calls out whenever someone she knows comes home. She loves company and already has an application in review.',
+    colors: { fur: '#FFFFFF', dark: '#3F3A4A', bg: '#E7DEFA' },
+    crest: true,
+    photoUrl: '/demo-pets/pearl.jpg',
+  },
+  {
+    id: 'sunny', name: 'Sunny', species: 'bird', status: 'urgent', age: '1 yr', breed: 'Cockatiel', sex: 'Male', size: 'Small', shelter: 'Bengaluru Paws Collective', area: 'Bengaluru', vax: 'Not required',
+    tags: ['Whistles', 'Hand-tame'],
+    blurb: 'Sunny whistles a full tune before breakfast and is happy riding on a shoulder. His foster home fell through, so he needs somewhere safe to stay soon.',
+    colors: { fur: '#F7DE7A', dark: '#C9A391', bg: '#FFE1EA', cheek: '#F28A3C' },
+    crest: true,
+    photoUrl: '/demo-pets/sunny.jpg',
   },
 ]
 

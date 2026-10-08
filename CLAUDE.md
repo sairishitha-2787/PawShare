@@ -41,7 +41,8 @@ borders, shadows and copy exactly. Don't "improve" or restyle it.
 - Buttons and chips: 2px ink border, `2px 2px 0` shadow that disappears on `:active` (pressed look).
 - Status colors (used as pin ring + pill): available `#A8D8B9`, urgent `#FF9EBB`, pending `#FFD873`.
 - House type = species: doghouse (coral roof `#F4877F`) for dogs, cat tower (blue ear-roof `#8FB8F0`) for cats,
-  birdhouse on a pole (lilac roof `#B8A6E0`) for birds, hutch (yellow roof `#FFD873`) for rabbits, guinea pigs and hamsters.
+  birdhouse for birds (bird: lavender scalloped roof, hanging from a branch; `design/birds/birdhouse-reference.jpeg`),
+  hutch (yellow roof `#FFD873`) for rabbits, guinea pigs and hamsters.
 - One joke only: the empty-results state is an `ERROR` window with an `OK` button. No other gags.
 - No emoji in UI. The only glyphs allowed are ♥ / ♡ on the favorite button.
 - Visible focus ring: `outline:3px solid var(--hot)`. Respect `prefers-reduced-motion` (turn off pin bob/hover lift).
@@ -136,10 +137,12 @@ sends it back with country and coordinates kept, then calls `updateUser` so the 
 { id, name, species: 'dog'|'cat'|'bird'|'bunny'|'guinea'|'hamster', status: 'available'|'urgent'|'pending',
   listingType: 'adoption'|'foster'|'both',
   age, breed, sex, size, shelter, shelterId, area, vax, tags: [], blurb,
-  colors: { fur, dark, bg }, photoUrl?: string, health?: [{ title, date?, vetName?, notes? }] }
+  colors: { fur, dark, bg, cheek? }, crest?: boolean, photoUrl?: string, health?: [{ title, date?, vetName?, notes? }] }
 ```
 `house` is derived from species (dog→dog, cat→cat, bird→bird, bunny/guinea/hamster→hutch). Map positions are **not** stored on the pet;
 they come from the lot layout in `Neighborhood` (see prompts).
+Birds only: `colors.cheek` draws a cheek patch (cockatiel orange, budgie blue spot) and `crest: true` three crest feathers
+(cockatoo, cockatiel); a bird without either gets two small head tufts. The API has neither field, and a photo overrides the face.
 Hamsters use the guinea cartoon face. The API has no hamster species: they are `other` with "hamster" in the breed
 (`mapSpecies` in `api/animals.js`; the listing form's Hamster chip saves it that way).
 Listing form state, validation and the API body live in `utils/listing.js`. Photos: `VITE_CLOUDINARY_CLOUD_NAME` +
@@ -150,7 +153,8 @@ Adopt search: every filter lives in the URL query string (`utils/search.js`: par
 filtered on the server; the map pages through 9 per street and loads 50 at a time. "Near me" (`?near=<area key>` or
 `lng,lat`, `&radius=5|10|25`) uses GET /animals/nearby, which sends no distances (the client computes them in
 `utils/geo.js`), has no paging (max 100) and can't take `q`, so the keyword is matched on the client there.
-The default order is listing order (API `sort=oldest`), so each pet keeps its house; "Oldest" in FIND_PETS.EXE is `eldest`.
+The default order is listing order (API `sort=oldest`), so each pet keeps its house (the demo's 4 birds are on street 2);
+the map shows "STREET n OF m", and with an `isDimmed` filter it jumps to the first street with a match (`utils/streets.js`); "Oldest" in FIND_PETS.EXE is `eldest`.
 FAVORITES/ still uses an unfiltered load so saved pets show whatever the search.
 
 Modals stack: only the top one answers Escape and traps Tab (REVIEW.EXE opens over <PET>.APP). The server has no

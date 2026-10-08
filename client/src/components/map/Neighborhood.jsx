@@ -3,15 +3,25 @@ import SceneBackdrop from './SceneBackdrop.jsx'
 import HouseMarker from '../pets/HouseMarker.jsx'
 import Button from '../ui/Button.jsx'
 import { LOTS } from './lots.js'
+import { streetWithMatch } from '../../utils/streets.js'
 import './Neighborhood.css'
 
 // The map: backdrop plus one house per pet. More pets than lots → page through "streets" of LOTS.length.
 // children render inside the map box, above the scene (the empty-results ERROR window).
 // total: how many pets there are in all, when only some are loaded; onMore() is called when the street
 // on screen needs pets that aren't loaded yet.
+// isDimmed(pet) greys out pets a client-side filter leaves out; when the filter changes and nothing on the
+// street matches, the map jumps to the first street that has a match.
 export default function Neighborhood({ pets, total = pets.length, onMore, isDimmed, onOpen, children }) {
   const [street, setStreet] = useState(0)
   const streets = Math.max(1, Math.ceil(Math.max(total, pets.length) / LOTS.length))
+  const matches = (pet) => !isDimmed?.(pet)
+  const matchKey = isDimmed ? pets.filter(matches).map((p) => p.id).join() : ''
+  const [seenKey, setSeenKey] = useState(matchKey)
+  if (matchKey !== seenKey) {
+    setSeenKey(matchKey)
+    setStreet(streetWithMatch(pets, matches, Math.min(street, streets - 1), LOTS.length))
+  }
   const current = Math.min(street, streets - 1)
   const needMore = pets.length < total && (current + 1) * LOTS.length > pets.length
 
@@ -39,6 +49,7 @@ export default function Neighborhood({ pets, total = pets.length, onMore, isDimm
           <Button onClick={() => setStreet(current - 1)} disabled={current === 0}>
             ← Previous street
           </Button>
+          <span className="street-no" aria-live="polite">STREET {current + 1} OF {streets}</span>
           <Button onClick={() => setStreet(current + 1)} disabled={current === streets - 1}>
             Next street →
           </Button>

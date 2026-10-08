@@ -1,6 +1,7 @@
-// Demo data for the frontend neighborhood map: one verified shelter per area and the 9 pets
-// from client/src/data/mockPets.js, plus two unverified shelters for the admin control panel:
-// Paws & Whiskers Foundation (verification pending) and Little Paws Home (not submitted yet).
+// Demo data for the frontend neighborhood map: one verified shelter per area and the 13 pets
+// from client/src/data/mockPets.js (the reference's 9, then 4 birds), plus two unverified shelters for
+// the admin control panel: Paws & Whiskers Foundation (verification pending) and Little Paws Home
+// (not submitted yet).
 // Usage (from the server folder):  npm run seed:demo
 //
 // Also one demo adopter (Ananya Rao) who adopted a 10th animal, Bruno, from Stray Hearts Trust 35 days
@@ -19,7 +20,7 @@
 // threads (with every message in them), reviews and check-ins. Ananya's seeded adoption of Bruno stays: its
 // application and review are kept (the review's rating and text put back), its later check-ins go back to
 // pending and any extra health updates are removed. The two unverified shelters go back to pending / not
-// submitted. Then the normal seed runs, which puts the 9 map pets back to their seeded status. Nothing else
+// submitted. Then the normal seed runs, which puts the 13 map pets back to their seeded status. Nothing else
 // is approved. Refuses to run when NODE_ENV=production or MONGODB_URI doesn't mention "pawshare".
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
@@ -140,6 +141,31 @@ const ANIMALS = [
     gender: "male", size: "small", vaccinated: false, listingType: "adoption", status: "available",
     temperament: ["Night owl", "Lives solo", "Cheek stuffer"],
     description: "Peanut is a Syrian hamster, so he lives on his own. He wakes up in the evening and runs laps on his wheel.",
+  },
+  // The birds, listed after the reference pets so those keep their houses; they fill the map's second street.
+  {
+    shelter: "bengaluru", name: "Mango", species: "bird", breed: "Blue-and-gold macaw", ageMonths: 84,
+    gender: "male", size: "large", vaccinated: false, listingType: "adoption", status: "available",
+    temperament: ["Talkative", "Needs big aviary", "Experienced owner", "Registered exotic species"],
+    description: "Mango says hello to everyone who walks in and has learned to copy the kettle. He needs a big aviary and an owner who has kept large parrots before.",
+  },
+  {
+    shelter: "bengaluru", name: "Kiwi", species: "bird", breed: "Budgie", ageMonths: 18,
+    gender: "female", size: "small", vaccinated: false, listingType: "adoption", status: "available",
+    temperament: ["Gentle", "Good for beginners"],
+    description: "Kiwi chirps along to the radio and steps onto a finger without any fuss. A lovely first bird for a calm home.",
+  },
+  {
+    shelter: "koramangala", name: "Pearl", species: "bird", breed: "Umbrella cockatoo", ageMonths: 72,
+    gender: "female", size: "medium", vaccinated: false, listingType: "adoption", status: "pending",
+    temperament: ["Very social", "Loud", "Needs daily attention", "Registered exotic species"],
+    description: "Pearl raises her crest and calls out whenever someone she knows comes home. She loves company and already has an application in review.",
+  },
+  {
+    shelter: "bengaluru", name: "Sunny", species: "bird", breed: "Cockatiel", ageMonths: 12,
+    gender: "male", size: "small", vaccinated: false, listingType: "foster", status: "available",
+    temperament: ["Whistles", "Hand-tame"],
+    description: "Sunny whistles a full tune before breakfast and is happy riding on a shoulder. His foster home fell through, so he needs somewhere safe to stay soon.",
   },
 ];
 
