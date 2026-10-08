@@ -60,6 +60,8 @@ client/src/
     ui/         Window, Chip, SegToggle, Button, Pill, ErrorDialog, Modal, Taskbar, Field, ChoiceField, LoadingWindow
     shell/      ShellLayout (the layout route around every page: the page, then the one shared taskbar), StartMenu
     os/         BootScreen (BOOT.EXE: once per tab while GET /health wakes the API, 2.2s–9s; BootContext replays it)
+                PawTrails (one dog + one cat trail walking behind every window: fixed z-index -1 layer, mounted in
+                ShellLayout; off during BOOT.EXE, with reduced motion, or when the setting is off; paused while the tab is hidden)
     desktop/    DesktopIcons (the home page's hand-drawn icons, same 48×48 style as admin/PanelIcons)
     auth/       RequireAuth, FormError
     pets/       PetFace, House, Pin, PetCard, ProfileWindow
@@ -79,7 +81,8 @@ client/src/
                 CheckInsContext.jsx (the taskbar's check-ins count, polled every minute; useCheckInsTask),
                 AdminContext.jsx (admins: shelters waiting for verification, polled every minute; useAdminTask),
                 TaskCountsContext.jsx (the shell's numbers: pending applications + the three above; usePublishTaskCount)
-                BootContext.jsx (BOOT.EXE: replay(), the "Show boot screen" setting in localStorage `pawshare-boot`)
+                BootContext.jsx (BOOT.EXE: replay(), booting, and STARTUP.CFG's two settings: "Show boot screen" in localStorage
+                `pawshare-boot`, "Walking paws in background" in `pawshare-paws`)
   hooks/        useApplicationList.js (shared), useMyApplications.js, useReceivedApplications.js, usePolling.js, useLoad.js,
                 useAnimalSearch.js (the Adopt page's results, 50 at a time), useNearMe.js (browser location or area picker)
   data/         mockPets.js
@@ -89,7 +92,8 @@ client/src/
                 /admin/:section), AccountPage.jsx (SETTINGS.EXE), NotFoundPage.jsx (FILE NOT FOUND), LoginPage.jsx,
                 SignupPage.jsx, DevKit.jsx (dev builds only)
   utils/        one file per area (pure helpers have a *.test.js next to them, run by `npm test` / Vitest) (search, geo, listing, applications, checkins, messages, shelters, ...); shell.js has the
-                Start menu's role pages and petOfTheDay
+                Start menu's role pages and petOfTheDay; boot.js has BOOT.EXE's storage helpers and timeline (bootFrame);
+                paws.js has the paws setting and the trail geometry (makeTrail, nextEdge)
   styles/       tokens.css, global.css
 ```
 

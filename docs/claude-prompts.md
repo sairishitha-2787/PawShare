@@ -901,6 +901,50 @@ Run npm test, lint and build when done.
 
 ---
 
+## Session 22 — Walking paw trails
+
+```text
+git checkout main && git pull && git checkout -b feat/paw-trails
+
+Read CLAUDE.md. Don't change server/.
+
+Build src/components/os/PawTrails.jsx (+ .css), a decorative background layer:
+1. position:fixed, full viewport, behind all windows (below content, above the body background),
+   pointer-events:none, aria-hidden="true". Mount it once in the app layout so it shows on every page.
+2. Two hand-written SVG prints (no icon packs):
+   - Dog: about 26px, round main pad + 4 round toes, small claw dots.
+   - Cat: about 18px, smaller rounded pad + 4 oval toes, no claws.
+   Fill var(--ink) at opacity .10–.14 (dog) and var(--lav) at .35 (cat), so they stay subtle on the grid.
+3. Walking: each trail starts off-screen at a random edge and walks a gentle curve across the screen.
+   Prints appear one at a time (dog every 420ms, cat every 300ms with shorter steps), alternate
+   left/right of the path, and rotate to face the direction of travel. Each print fades in over 200ms,
+   stays about 2.5s, then fades out, so you only ever see a short trail moving across.
+4. Exactly one dog trail and one cat trail. When a trail leaves the screen, wait 3–6s and start a new
+   one from another edge. Keep at most ~20 prints in the DOM; remove faded ones.
+5. Use CSS animations for the fade; JS only places prints. Pause when the tab is hidden
+   (visibilitychange). Don't run behind the boot screen.
+6. Reduced motion: render nothing.
+7. Settings: "Walking paws in background" toggle, default on, saved in localStorage "pawshare-paws"
+   (try/catch).
+8. Check it never sits on top of windows, the map or modals, and causes no page scroll at 400px.
+
+Done when: one dog and one cat trail cross the screen at a time and look like walking; they sit behind
+every window; the toggle and reduced motion turn them off; no layout shift, no console warnings;
+lint and build pass.
+Append this prompt to docs/claude-prompts.md under "Session 22 — Walking paw trails".
+Commit: "feat(os): walking paw trails background".
+```
+
+Sent with it:
+
+```text
+Session 21 added a STARTUP.CFG window on the Settings page and utils/boot.js; put the "Walking paws in
+background" toggle in that same window and follow the same localStorage pattern. Don't run paw trails
+while the boot screen is showing (use BootContext).
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."
