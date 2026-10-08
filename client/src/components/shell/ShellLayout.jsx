@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { useCheckInsTask } from '../../context/CheckInsContext.jsx'
 import { useAdminTask } from '../../context/AdminContext.jsx'
 import { TaskCountsProvider, useTaskCounts } from '../../context/TaskCountsContext.jsx'
+import { BootProvider, useBoot } from '../../context/BootContext.jsx'
 import { applicationsTaskLabel, inboxTaskLabel } from '../../utils/applications.js'
 import { messagesTaskLabel } from '../../utils/messages.js'
 import { displayName } from '../../utils/auth.js'
@@ -22,6 +23,7 @@ import './Shell.css'
 function ShellTaskbar() {
   const { user, loading, logout } = useAuth()
   const counts = useTaskCounts()
+  const { replay } = useBoot()
   const navigate = useNavigate()
   const location = useLocation()
   const { pathname } = location
@@ -94,6 +96,7 @@ function ShellTaskbar() {
     ],
     rolePages(user).map(place),
     loading && !user ? [] : account,
+    [{ id: 'restart', label: 'Restart PawShare OS', onSelect: replay }],
   ]
 
   return (
@@ -113,9 +116,10 @@ function skipToPage(e) {
   document.getElementById('page')?.focus()
 }
 
-// The layout route around every page: the page, then the shared taskbar.
+// The layout route around every page: the page, then the shared taskbar; BOOT.EXE over both once per session.
 export default function ShellLayout() {
   return (
+    <BootProvider skip={API_MISSING}>
     <TaskCountsProvider>
       <a className="skip-link" href="#page" onClick={skipToPage}>Skip to content</a>
       <div className="shell">
@@ -136,5 +140,6 @@ export default function ShellLayout() {
         </div>
       </div>
     </TaskCountsProvider>
+    </BootProvider>
   )
 }

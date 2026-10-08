@@ -2,8 +2,10 @@ import { useState } from 'react'
 import Window from '../components/ui/Window.jsx'
 import Button from '../components/ui/Button.jsx'
 import Field from '../components/ui/Field.jsx'
+import ChoiceField from '../components/ui/ChoiceField.jsx'
 import FormError from '../components/auth/FormError.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useBoot } from '../context/BootContext.jsx'
 import { updateMe } from '../api/users.js'
 import './AccountPage.css'
 
@@ -23,6 +25,32 @@ function validate({ name, phone, city, state }) {
   if (city.trim().length > 100) errors.city = 'Use 100 characters or fewer.'
   if (state.trim().length > 100) errors.state = 'Use 100 characters or fewer.'
   return errors
+}
+
+const ON_OFF = [
+  { value: true, label: 'On' },
+  { value: false, label: 'Off' },
+]
+
+// STARTUP.CFG: browser-only settings, applied at once (no Save)
+function StartupSettings() {
+  const { enabled, setEnabled, replay } = useBoot()
+  return (
+    <Window title="STARTUP.CFG" className="settings" aria-label="Startup settings">
+      <div className="settings-body">
+        <ChoiceField
+          label="Show boot screen"
+          options={ON_OFF}
+          value={enabled}
+          onChange={setEnabled}
+          hint="Plays once per browser session, while the server wakes up."
+        />
+        <div className="settings-foot">
+          <Button onClick={replay}>Replay boot screen</Button>
+        </div>
+      </div>
+    </Window>
+  )
 }
 
 // /account (behind RequireAuth): SETTINGS.EXE, PUT /users/me. Email can't be changed.
@@ -98,6 +126,7 @@ export default function AccountPage() {
           </div>
         </form>
       </Window>
+      <StartupSettings />
     </div>
   )
 }

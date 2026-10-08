@@ -11,6 +11,7 @@ import PetFace from '../components/pets/PetFace.jsx'
 import HouseMarker from '../components/pets/HouseMarker.jsx'
 import Neighborhood from '../components/map/Neighborhood.jsx'
 import { mockPets } from '../data/mockPets.js'
+import { useBoot } from '../context/BootContext.jsx'
 import './DevKit.css'
 
 const pet = (id) => mockPets.find((p) => p.id === id)
@@ -52,6 +53,7 @@ export default function DevKit() {
   // /dev/kit#modal opens the modal on load, handy for screenshots
   const [modalOpen, setModalOpen] = useState(() => window.location.hash === '#modal')
   const titleId = useId()
+  const { replay } = useBoot()
 
   return (
     <div className="desk">
@@ -89,6 +91,13 @@ export default function DevKit() {
           <Pill status="available" />
           <Pill status="urgent" />
           <Pill status="pending" />
+        </div>
+      </Window>
+
+      <h2 className="kit-h">BOOTSCREEN</h2>
+      <Window title="BOOT.EXE">
+        <div className="kit-row">
+          <Button onClick={replay}>Preview boot screen</Button>
         </div>
       </Window>
 

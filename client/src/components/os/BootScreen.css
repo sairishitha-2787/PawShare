@@ -1,0 +1,31 @@
+/* BOOT.EXE: covers the app on the page's own grid background (global.css body) */
+.boot {
+  position: fixed; inset: 0; z-index: 100; overflow: auto;
+  display: grid; place-items: center; padding: 20px 16px;
+  background-color: #F7EFFA;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(180deg, #D8F1EC 0%, #F7EFFA 40%, #FFF3DC 100%);
+  background-size: 28px 28px, 28px 28px, 100% 100%;
+}
+.boot-win { width: min(440px, 100%); }
+.boot-body { padding: 18px; display: grid; gap: 16px; }
+
+/* the header brand (reference .brand h1) */
+.boot-brand {
+  margin: 0; text-align: center; font-family: var(--pixel); font-weight: 700;
+  font-size: clamp(20px, 3.4vw, 28px); letter-spacing: .04em;
+}
+.boot-brand span { color: var(--hot); }
+
+.boot-lines { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-family: var(--pixel); font-size: 13px; line-height: 1.6; }
+/* lines not shown yet keep their space, so nothing jumps */
+.boot-lines .off { visibility: hidden; }
+
+/* 12 square blocks, filled left to right */
+.boot-bar { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
+.boot-bar i { display: block; aspect-ratio: 1; border: 2px solid var(--ink); border-radius: 3px; background: var(--paper); }
+.boot-bar i.on { background: var(--mint); }
+
+.boot-foot { display: flex; justify-content: flex-end; }
