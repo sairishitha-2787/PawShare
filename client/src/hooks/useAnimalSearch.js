@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getNearbyAnimals, searchAnimals } from '../api/animals.js'
-import { apiQuery, parseFilters } from '../utils/search.js'
+import { apiQuery, matchesKeyword, parseFilters } from '../utils/search.js'
 import { distanceKm } from '../utils/geo.js'
 import { matchesFilter } from '../utils/pets.js'
 import { mockPets } from '../data/mockPets.js'
@@ -15,12 +15,6 @@ const COMPARE = {
   newest: (a, b) => new Date(b.listedAt) - new Date(a.listedAt),
   youngest: (a, b) => a.ageMonths - b.ageMonths,
   eldest: (a, b) => b.ageMonths - a.ageMonths,
-}
-
-// The nearby endpoint can't take q, so the keyword is matched here: every word in the name, breed or description.
-function matchesKeyword(pet, q) {
-  const text = `${pet.name} ${pet.breed} ${pet.blurb}`.toLowerCase()
-  return q.toLowerCase().split(/\s+/).filter(Boolean).every((w) => text.includes(w))
 }
 
 // "Needs a foster urgently": the server's foster search includes "both" listings, whose pins say Available

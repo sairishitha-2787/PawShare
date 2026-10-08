@@ -100,6 +100,8 @@ function Inbox() {
   const counts = { all: forPet.length }
   for (const s of APP_STATUSES) counts[s] = forPet.filter((a) => a.status === s).length
   const shown = filter === 'all' ? forPet : forPet.filter((a) => a.status === filter)
+  // nothing to pick: the list takes the whole width, with no "pick an application" pane beside it
+  const onlyList = shown.length === 0 && !open && !missing
   usePublishTaskCount('inbox', status === 'ready' ? applications.filter((a) => a.status === 'pending').length : null)
 
   // the other pending applications for the same pet, which approving this one rejects
@@ -166,7 +168,7 @@ function Inbox() {
               )}
             </div>
           ) : (
-            <div className="inbox-panes">
+            <div className={onlyList ? 'inbox-panes only-list' : 'inbox-panes'}>
               <div className="inbox-list">
                 {shown.length === 0 ? (
                   <p className="inbox-empty">{emptyText(filter, petName)}</p>
@@ -179,6 +181,7 @@ function Inbox() {
                 )}
               </div>
 
+              {!onlyList && (
               <div className={open || missing ? 'inbox-pane' : 'inbox-pane idle'}>
                 {open ? (
                   <ReadingPane
@@ -206,6 +209,7 @@ function Inbox() {
                   <p className="pane-hint">Pick an application to read it.</p>
                 )}
               </div>
+              )}
             </div>
           )}
         </Window>

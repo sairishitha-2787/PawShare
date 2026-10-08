@@ -2,6 +2,17 @@
 .shell { min-height: calc(100vh - 48px); display: grid; grid-template-rows: 1fr auto; gap: 18px; }
 .shell-page { display: grid; min-width: 0; }
 .shell-page > * { min-width: 0; }
+.shell-page:focus { outline: none; }
+.shell-wait { position: relative; min-height: 60vh; }
+
+/* first Tab stop on every page; off screen until focused */
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 50; padding: 6px 12px;
+  background: var(--sun); color: var(--ink); text-decoration: none;
+  border: 2px solid var(--ink); border-radius: 10px; box-shadow: 2px 2px 0 var(--ink);
+  font-family: var(--pixel); font-size: 12px; letter-spacing: .03em;
+}
+.skip-link:focus { top: 10px; }
 
 /* the start button and its menu, which opens upwards from it */
 .start-wrap { position: relative; }

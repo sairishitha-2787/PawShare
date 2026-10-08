@@ -1,26 +1,11 @@
-import { StrictMode } from 'react'
+/* eslint-disable react/only-export-components -- the entry file exports nothing, so fast refresh doesn't apply */
+import { StrictMode, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './styles/tokens.css'
 import './styles/global.css'
 import AdoptPage from './pages/AdoptPage.jsx'
-import DevKit from './pages/DevKit.jsx'
-import ApplyPage from './pages/ApplyPage.jsx'
-import ApplicationsPage from './pages/ApplicationsPage.jsx'
-import ShelterInboxPage from './pages/ShelterInboxPage.jsx'
-import MyPetsPage from './pages/MyPetsPage.jsx'
-import PetEditorPage from './pages/PetEditorPage.jsx'
-import MessagesPage from './pages/MessagesPage.jsx'
-import CheckInsPage from './pages/CheckInsPage.jsx'
-import ShelterCheckInsPage from './pages/ShelterCheckInsPage.jsx'
-import LoginPage from './pages/LoginPage.jsx'
-import SignupPage from './pages/SignupPage.jsx'
-import ShelterProfilePage from './pages/ShelterProfilePage.jsx'
-import VerificationPage from './pages/VerificationPage.jsx'
-import AdminPage from './pages/AdminPage.jsx'
 import DesktopPage from './pages/DesktopPage.jsx'
-import AccountPage from './pages/AccountPage.jsx'
-import NotFoundPage from './pages/NotFoundPage.jsx'
 import ShellLayout from './components/shell/ShellLayout.jsx'
 import RequireAuth from './components/auth/RequireAuth.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
@@ -28,6 +13,25 @@ import { FavoritesProvider } from './context/FavoritesContext.jsx'
 import { UnreadProvider } from './context/UnreadContext.jsx'
 import { CheckInsProvider } from './context/CheckInsContext.jsx'
 import { AdminProvider } from './context/AdminContext.jsx'
+
+// The desktop and the neighborhood load with the app; every other page is fetched the first time it opens
+// (ShellLayout shows a LOADING... window meanwhile). The dev kit only exists in dev builds.
+const ApplyPage = lazy(() => import('./pages/ApplyPage.jsx'))
+const ApplicationsPage = lazy(() => import('./pages/ApplicationsPage.jsx'))
+const ShelterInboxPage = lazy(() => import('./pages/ShelterInboxPage.jsx'))
+const MyPetsPage = lazy(() => import('./pages/MyPetsPage.jsx'))
+const PetEditorPage = lazy(() => import('./pages/PetEditorPage.jsx'))
+const MessagesPage = lazy(() => import('./pages/MessagesPage.jsx'))
+const CheckInsPage = lazy(() => import('./pages/CheckInsPage.jsx'))
+const ShelterCheckInsPage = lazy(() => import('./pages/ShelterCheckInsPage.jsx'))
+const LoginPage = lazy(() => import('./pages/LoginPage.jsx'))
+const SignupPage = lazy(() => import('./pages/SignupPage.jsx'))
+const ShelterProfilePage = lazy(() => import('./pages/ShelterProfilePage.jsx'))
+const VerificationPage = lazy(() => import('./pages/VerificationPage.jsx'))
+const AdminPage = lazy(() => import('./pages/AdminPage.jsx'))
+const AccountPage = lazy(() => import('./pages/AccountPage.jsx'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'))
+const DevKit = import.meta.env.DEV ? lazy(() => import('./pages/DevKit.jsx')) : null
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -81,7 +85,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/account" element={<RequireAuth><AccountPage /></RequireAuth>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
-            <Route path="/dev/kit" element={<DevKit />} />
+            {DevKit && <Route path="/dev/kit" element={<DevKit />} />}
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
