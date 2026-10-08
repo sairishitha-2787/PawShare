@@ -162,7 +162,7 @@ export default function DevKit() {
           </Neighborhood>
         </div>
         <p className="kit-body">
-          The chips above (shared with CONTROLS.EXE) dim pets on the client; Birds jumps to street 2. Last opened: {opened ?? 'none'}.
+          The chips above (shared with CONTROLS.EXE) dim pets on the client; streets mix the house types, and Birds + Urgent only jumps to street 2 (Sunny). Last opened: {opened ?? 'none'}.
         </p>
       </Window>
 

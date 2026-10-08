@@ -11,11 +11,12 @@ const HOUSES = [
 ]
 
 // Mini house cropped to its roof, like keyRow() in the reference (house at 22,36).
+// The birdhouse's tree trunk sticks out to the right, so it sits further left to fit the same box.
 function MiniHouse({ type }) {
   const peak = peakY(type, 36)
   return (
     <svg viewBox={`-24 ${peak - 4} 92 ${36 - peak + 10}`} aria-hidden="true">
-      <House type={type} x={22} y={36} shadow={false} />
+      <House type={type} x={type === 'bird' ? 17 : 22} y={36} shadow={false} />
     </svg>
   )
 }

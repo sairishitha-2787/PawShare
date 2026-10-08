@@ -1019,6 +1019,32 @@ Run tests, lint and build, check in Chrome, push the branch and stop.
 
 ---
 
+## Session 23b — Mixed streets
+
+```text
+Branch fix/street-mix is already created from main. Read CLAUDE.md. Don't change server/.
+
+Problem: with "All" selected, 13 pets fill street 1 with dogs, cats and small pets, and all 4 birds
+land on street 2. I want every street to show a mix of house types.
+
+1. In the map's street paging (utils/streets.js / Neighborhood), before splitting into streets of 9,
+   order pets round-robin by house type: dog, cat, bird, hutch, dog, cat, bird, hutch... keeping each
+   type's own order stable. Apply this only to map placement; the list view and API order stay the same.
+2. With 13 pets, street 1 should contain at least one of each house type (expected: 3 dogs, 2 cats,
+   2 birds, 2 hutches), and the rest go on street 2.
+3. Make sure an open profile, deep link /adopt/:petId and the favourites panel still open the right pet
+   and jump to its street.
+4. The birdhouses look small next to the other houses: scale the birdhouse group up about 15% (keep the
+   pin above the branch, keep peakY in sync), and check it doesn't overlap neighbours on any lot.
+5. Add tests for the round-robin order.
+
+Done when: All shows a mix of every house type on street 1, filters still work, tests/lint/build pass.
+Append this prompt to docs/claude-prompts.md as "Session 23b — Mixed streets". Commit
+"fix(map): mix house types across streets", push, stop.
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

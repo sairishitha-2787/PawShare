@@ -159,8 +159,8 @@ export default function AdoptPage() {
         <ActiveFilters filters={filters} onChange={setFilters} onClearAll={clearAll} />
 
         <div className="main" hidden={view !== 'map'}>
-          {/* keyed by the search, so a new search starts on the first street */}
-          <Neighborhood key={searchKey} pets={pets} total={total} onMore={loadMore} onOpen={showPet}>
+          {/* keyed by the search, so a new search starts on the first street (or the open pet's) */}
+          <Neighborhood key={searchKey} pets={pets} total={total} onMore={loadMore} openId={petId} onOpen={showPet}>
             {view === 'map' && searchStatus}
           </Neighborhood>
           <aside className="side">

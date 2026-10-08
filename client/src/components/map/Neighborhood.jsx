@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import SceneBackdrop from './SceneBackdrop.jsx'
 import HouseMarker from '../pets/HouseMarker.jsx'
 import Button from '../ui/Button.jsx'
 import { LOTS } from './lots.js'
-import { streetWithMatch } from '../../utils/streets.js'
+import { mixHouses, streetOf, streetWithMatch } from '../../utils/streets.js'
 import './Neighborhood.css'
 
 // The map: backdrop plus one house per pet. More pets than lots → page through "streets" of LOTS.length.
@@ -12,7 +12,10 @@ import './Neighborhood.css'
 // on screen needs pets that aren't loaded yet.
 // isDimmed(pet) greys out pets a client-side filter leaves out; when the filter changes and nothing on the
 // street matches, the map jumps to the first street that has a match.
-export default function Neighborhood({ pets, total = pets.length, onMore, isDimmed, onOpen, children }) {
+// Houses are placed in mixHouses order (dog, cat, bird, hutch, ...) so every street gets a mix of types.
+// openId: the pet whose profile is open; when it changes (or its pet loads), the map shows that pet's street.
+export default function Neighborhood({ pets: listed, total = listed.length, onMore, isDimmed, openId, onOpen, children }) {
+  const pets = useMemo(() => mixHouses(listed), [listed])
   const [street, setStreet] = useState(0)
   const streets = Math.max(1, Math.ceil(Math.max(total, pets.length) / LOTS.length))
   const matches = (pet) => !isDimmed?.(pet)
@@ -21,6 +24,12 @@ export default function Neighborhood({ pets, total = pets.length, onMore, isDimm
   if (matchKey !== seenKey) {
     setSeenKey(matchKey)
     setStreet(streetWithMatch(pets, matches, Math.min(street, streets - 1), LOTS.length))
+  }
+  const openStreet = openId ? streetOf(pets, openId, LOTS.length) : -1
+  const [seenOpen, setSeenOpen] = useState(null)
+  if ((openId ?? null) !== seenOpen && (openStreet !== -1 || !openId)) {
+    setSeenOpen(openId ?? null)
+    if (openStreet !== -1) setStreet(openStreet)
   }
   const current = Math.min(street, streets - 1)
   const needMore = pets.length < total && (current + 1) * LOTS.length > pets.length

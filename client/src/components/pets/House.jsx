@@ -49,39 +49,37 @@ function Hutch({ x, y }) {
 const ROOF_DOTS = [[-12, 66, '#FFFFFF'], [-4, 72, '#FF9EBB'], [5, 67, '#FFFFFF'], [13, 64, '#FF9EBB'], [-1, 63, '#FFFFFF'], [-17, 62, '#FF9EBB']]
 const BODY_DOTS = [[-11, 54, '#FF9EBB'], [11, 52, '#A8D8B9'], [-9, 36, '#A8D8B9'], [12, 37, '#FF9EBB']]
 
+// the hanging house is drawn 15% larger than its sketch, scaled about the twine's knot on the branch, so it
+// doesn't look small next to the other houses while the branch (and so the pin) stays at the same height
+const BIRD_SCALE = 1.15
+const KNOT = 99
+
 // a birdhouse hanging on twine from a branch of a short tree (design/birds/birdhouse-reference.jpeg):
 // sun bead, scalloped lilac cone roof, round cream body with an entry hole and perch, mint base disc.
+// Drawn around (0, 0); strokes inside the scaled house are divided by the scale to stay 2px like the other houses.
 // The branch top over x is the peak, 110 above the ground.
 function Birdhouse({ x, y }) {
+  const sw = { ...SW, strokeWidth: 2 / BIRD_SCALE }
+  const thin = 1.5 / BIRD_SCALE
   let scallops = ''
   for (let i = 0; i < 4; i++) scallops += 'q-6.5 6 -13 0'
   return (
-    <>
-      <path
-        d={`M${x + 32} ${y - 92} L${x - 27} ${y - 103} Q${x - 33} ${y - 106} ${x - 28} ${y - 110} L${x + 32} ${y - 103} Z`}
-        fill="#B98552"
-        {...SW}
-      />
-      <path
-        d={`M${x + 22} ${y} Q${x + 28} ${y - 3} ${x + 28} ${y - 14} V${y - 108} Q${x + 34} ${y - 115} ${x + 40} ${y - 108} V${y - 14} Q${x + 40} ${y - 3} ${x + 46} ${y} Z`}
-        fill="#B98552"
-        {...SW}
-      />
-      <path d={`M${x + 34} ${y - 30}v12M${x + 33} ${y - 70}v10`} stroke={INK} strokeWidth="1.5" strokeLinecap="round" opacity=".45" />
-      <path d={`M${x} ${y - 99}V${y - 84}`} stroke="#C9A66B" strokeWidth="2" strokeLinecap="round" />
-      <rect x={x - 18} y={y - 66} width="36" height="40" rx="14" fill="#FFF6E3" {...SW} />
-      {BODY_DOTS.map(([dx, dy, fill]) => <circle key={`${dx},${dy}`} cx={x + dx} cy={y - dy} r="2" fill={fill} />)}
-      <circle cx={x} cy={y - 48} r="6" fill={INK} />
-      <rect x={x - 5} y={y - 39} width="10" height="3" rx="1.5" fill="#B98552" stroke={INK} strokeWidth="1.5" />
-      <ellipse cx={x} cy={y - 25} rx="24" ry="4" fill="#A8D8B9" {...SW} />
-      <path
-        d={`M${x - 26} ${y - 61} L${x - 3} ${y - 80} Q${x} ${y - 82} ${x + 3} ${y - 80} L${x + 26} ${y - 61} ${scallops} Z`}
-        fill="#B8A6E0"
-        {...SW}
-      />
-      {ROOF_DOTS.map(([dx, dy, fill]) => <circle key={`${dx},${dy}`} cx={x + dx} cy={y - dy} r="1.6" fill={fill} />)}
-      <circle cx={x} cy={y - 84} r="4" fill="#FFD873" {...SW} />
-    </>
+    <g transform={`translate(${x} ${y})`}>
+      <path d="M37 -92 L-27 -103 Q-33 -106 -28 -110 L37 -103 Z" fill="#B98552" {...SW} />
+      <path d="M29 0 Q33 -3 33 -14 V-108 Q39 -115 45 -108 V-14 Q45 -3 49 0 Z" fill="#B98552" {...SW} />
+      <path d="M39 -30v12M38 -70v10" stroke={INK} strokeWidth="1.5" strokeLinecap="round" opacity=".45" />
+      <g transform={`translate(0 ${-KNOT}) scale(${BIRD_SCALE}) translate(0 ${KNOT})`}>
+        <path d="M0 -99V-84" stroke="#C9A66B" strokeWidth={2 / BIRD_SCALE} strokeLinecap="round" />
+        <rect x="-18" y="-66" width="36" height="40" rx="14" fill="#FFF6E3" {...sw} />
+        {BODY_DOTS.map(([dx, dy, fill]) => <circle key={`${dx},${dy}`} cx={dx} cy={-dy} r="2" fill={fill} />)}
+        <circle cx="0" cy="-48" r="6" fill={INK} />
+        <rect x="-5" y="-39" width="10" height="3" rx="1.5" fill="#B98552" stroke={INK} strokeWidth={thin} />
+        <ellipse cx="0" cy="-25" rx="24" ry="4" fill="#A8D8B9" {...sw} />
+        <path d={`M-26 -61 L-3 -80 Q0 -82 3 -80 L26 -61 ${scallops} Z`} fill="#B8A6E0" {...sw} />
+        {ROOF_DOTS.map(([dx, dy, fill]) => <circle key={`${dx},${dy}`} cx={dx} cy={-dy} r="1.6" fill={fill} />)}
+        <circle cx="0" cy="-84" r="4" fill="#FFD873" {...sw} />
+      </g>
+    </g>
   )
 }
 
@@ -92,8 +90,8 @@ export default function House({ type, x, y, shadow = true }) {
   const Shape = SHAPES[type] ?? Hutch
   return (
     <g>
-      {/* the birdhouse hangs, so its shadow falls under the trunk */}
-      {shadow && <ellipse cx={type === 'bird' ? x + 22 : x} cy={y + 2} rx={type === 'bird' ? 34 : 48} ry="7" fill={INK} opacity=".14" />}
+      {/* the birdhouse hangs, so its shadow falls under the house and the trunk */}
+      {shadow && <ellipse cx={type === 'bird' ? x + 24 : x} cy={y + 2} rx={type === 'bird' ? 38 : 48} ry="7" fill={INK} opacity=".14" />}
       <Shape x={x} y={y} />
     </g>
   )
