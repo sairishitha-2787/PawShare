@@ -76,7 +76,8 @@ export function toPet(a) {
     // the owner's user id, for links to /shelters/:id (the owner is populated as { _id, name, ... })
     shelterId: a.owner?._id || null,
     area: a.location?.city || '',
-    vax: a.vaccinated ? 'Up to date' : 'Not yet',
+    // pet birds don't need routine vaccines, so an unvaccinated bird isn't "Not yet"
+    vax: a.vaccinated ? 'Up to date' : a.species === 'bird' ? 'Not required' : 'Not yet',
     // the API stores temperament lowercased; show it in sentence case like the reference
     tags: (a.temperament || []).map(capitalize),
     blurb: a.description || '',

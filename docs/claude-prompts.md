@@ -945,6 +945,80 @@ while the boot screen is showing (use BootContext).
 
 ---
 
+## Session 23 — Birds
+
+```text
+git checkout main && git pull && git checkout -b feat/birds
+
+Read CLAUDE.md and design/neighborhood-reference.html. Look at the images in design/birds/.
+
+First, REPORT ONLY (don't build). For birds, tell me what exists and what's missing in:
+- server Animal model species enum/validation; demo seed and local seed (any birds?); where seeded pet
+  photos live and how their URLs are built (CLIENT_URL?)
+- client: SPECIES_LABEL, houseTypeFor, PetFace, House (birdhouse?), peakY, Legend, species chips,
+  PetCard title bar colour, toPet mapper (birds mapped to 'guinea'?), nearby/search filters,
+  listing create/edit form, apply wizard, check-ins.
+Wait for my OK.
+
+Then build only what's missing:
+1. Species 'bird' end to end, house type 'bird'.
+2. Birdhouse SVG, based on design/birds/birdhouse-reference.jpg but in our flat style (2px ink strokes,
+   no gradients, same scale as the hutch):
+   - a short brown tree trunk with one branch reaching sideways; the birdhouse hangs from the branch
+     on a twine line (#C9A66B)
+   - cone roof in --lav with a wavy/scalloped bottom edge and small white + --pink speckle dots,
+     a round --sun bead on top
+   - round cream (#FFF6E3) body with a few tiny pink/mint flower dots, a dark round entry hole and a
+     small perch peg under it
+   - a flat --mint base disc under the body; shadow ellipse on the ground under the trunk
+   Export peakY for 'bird' so the pin sits above the branch, not on the twine.
+   Add "bird: lavender scalloped roof, hanging from a branch" to the house colours in CLAUDE.md.
+3. PetFace bird, 60x60, same style as the other faces: round head in colors.fur, curved beak in
+   colors.dark, eye dot, optional colors.cheek patch (cockatiel orange, budgie blue spot) and
+   optional crest (pet.crest true → 3 pointed feathers on top, for cockatoo and cockatiel).
+   Add cheek/crest as optional fields to the pet shape in CLAUDE.md. Photo still overrides the face.
+4. "Birds" species chip, Legend row "Birdhouse – parrots, budgies, cockatiels", PetCard title bar
+   in --mint, filters, listing form option, toPet mapper (birds stay birds).
+5. Photos: copy the 4 bird photos from design/birds/ to wherever the other seeded pet photos live,
+   resized/compressed the same way, and use the same URL pattern.
+6. Server changes allowed ONLY: add 'bird' to the Animal species enum if missing, and add these 4 to
+   the demo seed in existing verified shelters/areas (same fields as the other pets):
+   - Mango, blue-and-gold macaw, adult, large, available. Tags: talkative, needs big aviary,
+     experienced owner. Tag "Registered exotic species".
+   - Kiwi, budgie, young, small, available. Tags: gentle, good for beginners.
+   - Pearl, umbrella cockatoo, adult, medium, adoption pending. Tags: very social, loud, needs daily
+     attention. Tag "Registered exotic species".
+   - Sunny, cockatiel, young, small, URGENT foster. Tags: whistles, hand-tame.
+   Write short, kind blurbs. List every server file you changed.
+7. /dev/kit: bird faces (with/without crest) and a birdhouse with a pin.
+8. Map pagination still works with the extra pets.
+
+Done when: birdhouses show on the map, in the list, legend counts and the Birds filter; Birds + urgent
+shows Sunny; profiles show the photos; apply and listing forms accept birds; tests, lint and build pass;
+no console warnings.
+Append this prompt to docs/claude-prompts.md under "Session 23 — Birds".
+Commit: "feat(pets): add birds".
+```
+
+Sent after the report:
+
+```text
+OK, go ahead with your plan. Answers:
+- birdhouse-reference.jpg is now in design/birds/ — match its shapes (bead, scalloped speckled roof,
+  round body, perch, base disc, hanging twine) in our flat style and palette from my spec.
+- Shelters as you proposed (Mango, Kiwi, Sunny → Bengaluru Paws Collective; Pearl → Happy Tails).
+- Yes, add the 4 birds to mockPets.js too.
+- Keep the old face's look as the default for any bird without cheek/crest, but use the new style.
+- Second street: when a species filter or "urgent" is on and nothing matches on the current street,
+  jump to the first street that has a match (and show which street, e.g. "STREET 2 OF 2"), so clicking
+  Birds shows the birdhouses instead of a fully dimmed street. Only show the ERROR when nothing matches
+  on any street. Add a test for this.
+- Check `npm run seed:demo -- --reset` runs cleanly against local "pawshare" after the change.
+Run tests, lint and build, check in Chrome, push the branch and stop.
+```
+
+---
+
 ## Tips
 
 - If Claude Code starts using Tailwind, a component library or emoji, say "Follow CLAUDE.md, remove that."

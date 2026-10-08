@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { formatAge, mapSpecies, toPet } from './animals.js'
+import { mockPets } from '../data/mockPets.js'
 
 // an animal as GET /api/animals sends it
 const apiAnimal = (overrides = {}) => ({
@@ -67,6 +68,18 @@ describe('toPet', () => {
     const pet = toPet(apiAnimal({ owner: undefined, location: undefined, temperament: undefined, photos: [], gender: 'unknown', listingType: undefined, vaccinated: false }))
     expect(pet).toMatchObject({ shelter: 'Unknown shelter', shelterId: null, area: '', tags: [], sex: 'Unknown', listingType: 'both', vax: 'Not yet', coords: null })
     expect(pet.photoUrl).toBeUndefined()
+  })
+
+  it('shows vaccines as not required for unvaccinated birds', () => {
+    expect(toPet(apiAnimal({ species: 'bird', vaccinated: false })).vax).toBe('Not required')
+    expect(toPet(apiAnimal({ species: 'bird', vaccinated: true })).vax).toBe('Up to date')
+    expect(toPet(apiAnimal({ species: 'cat', vaccinated: false })).vax).toBe('Not yet')
+  })
+
+  it('has every mock bird as not required', () => {
+    const birds = mockPets.filter((p) => p.species === 'bird')
+    expect(birds).toHaveLength(4)
+    for (const b of birds) expect(b.vax).toBe('Not required')
   })
 })
 

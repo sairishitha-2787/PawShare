@@ -11,12 +11,14 @@ import PetFace from '../components/pets/PetFace.jsx'
 import HouseMarker from '../components/pets/HouseMarker.jsx'
 import Neighborhood from '../components/map/Neighborhood.jsx'
 import { mockPets } from '../data/mockPets.js'
+import { matchesFilter } from '../utils/pets.js'
 import { useBoot } from '../context/BootContext.jsx'
 import './DevKit.css'
 
 const pet = (id) => mockPets.find((p) => p.id === id)
-// one cartoon face per face shape, photos left off; peanut is a hamster, which uses the guinea face
-const FACES = ['biscuit', 'mochi', 'clover', 'peanut'].map((id) => ({ ...pet(id), photoUrl: undefined }))
+// one cartoon face per face shape, photos left off; peanut is a hamster, which uses the guinea face.
+// Birds: Mango has neither cheek nor crest (the default tufts), Kiwi a cheek, Pearl a crest, Sunny both.
+const FACES = ['biscuit', 'mochi', 'clover', 'peanut', 'mango', 'kiwi', 'pearl', 'sunny'].map((id) => ({ ...pet(id), photoUrl: undefined }))
 // a stand-in photo so the photoUrl branch (clipped to the same circle) is visible without a network call
 const PHOTO_PET = {
   ...pet('luna'),
@@ -30,28 +32,29 @@ const HOUSES = [
   { id: 'mochi', x: 230 },
   { id: 'clover', x: 370 },
   { id: 'pepper', x: 510, dimmed: true },
+  { id: 'sunny', x: 650 },
 ]
 
-// 12 pets = one full street of 9 plus 3 on the next, so Next / Previous street show up
-const STREET_PETS = [
-  ...mockPets,
-  ...['biscuit', 'mochi', 'clover'].map((id) => ({ ...pet(id), id: `${id}-2` })),
-]
+// 13 pets = the reference's 9 on street 1 and the 4 birds on street 2, so Next / Previous street show up
+const STREET_PETS = mockPets
 
 const SPECIES = [
   { value: 'all', label: 'All' },
   { value: 'dog', label: 'Dogs' },
   { value: 'cat', label: 'Cats' },
+  { value: 'bird', label: 'Birds' },
   { value: 'small', label: 'Small pets' },
 ]
 
 export default function DevKit() {
   const [species, setSpecies] = useState('all')
+  const [urgent, setUrgent] = useState(false)
   const [view, setView] = useState('map')
   const [showError, setShowError] = useState(true)
   const [opened, setOpened] = useState(null)
   // /dev/kit#modal opens the modal on load, handy for screenshots
   const [modalOpen, setModalOpen] = useState(() => window.location.hash === '#modal')
+  const filter = { species, urgent }
   const titleId = useId()
   const { replay } = useBoot()
 
@@ -132,21 +135,35 @@ export default function DevKit() {
           <PetFace pet={PHOTO_PET} size={64} />
         </div>
         <div className="kit-houses">
-          <svg viewBox="0 0 600 225" role="group" aria-label="House types">
+          <svg viewBox="0 0 740 235" role="group" aria-label="House types">
             {HOUSES.map((h) => (
-              <HouseMarker key={h.id} pet={pet(h.id)} x={h.x} y={185} dimmed={h.dimmed} onOpen={setOpened} />
+              <HouseMarker key={h.id} pet={pet(h.id)} x={h.x} y={195} dimmed={h.dimmed} onOpen={setOpened} />
             ))}
           </svg>
         </div>
         <p className="kit-body">Last opened: {opened ?? 'none'}. Hover or Tab to lift a pin; Mochi (urgent) bobs.</p>
       </Window>
 
-      <h2 className="kit-h">NEIGHBORHOOD · 12 PETS (STREET PAGING)</h2>
+      <h2 className="kit-h">NEIGHBORHOOD · 13 PETS (STREET PAGING)</h2>
       <Window title={`STREETS.EXE — ${STREET_PETS.length} pets`}>
-        <div className="kit-map">
-          <Neighborhood pets={STREET_PETS} onOpen={setOpened} />
+        <div className="kit-row" role="group" aria-label="Dim by species">
+          {SPECIES.map((s) => (
+            <Chip key={s.value} pressed={species === s.value} onClick={() => setSpecies(s.value)}>{s.label}</Chip>
+          ))}
+          <label className="kit-body">
+            <input type="checkbox" checked={urgent} onChange={(e) => setUrgent(e.target.checked)} /> Urgent only
+          </label>
         </div>
-        <p className="kit-body">Street 2 holds Biscuit, Mochi and Clover again (ids biscuit-2, mochi-2, clover-2). Last opened: {opened ?? 'none'}.</p>
+        <div className="kit-map">
+          <Neighborhood pets={STREET_PETS} isDimmed={(p) => !matchesFilter(p, filter)} onOpen={setOpened}>
+            {!STREET_PETS.some((p) => matchesFilter(p, filter)) && (
+              <ErrorDialog message="NO PETS MATCH." onOk={() => { setSpecies('all'); setUrgent(false) }} />
+            )}
+          </Neighborhood>
+        </div>
+        <p className="kit-body">
+          The chips above (shared with CONTROLS.EXE) dim pets on the client; Birds jumps to street 2. Last opened: {opened ?? 'none'}.
+        </p>
       </Window>
 
       <h2 className="kit-h">TASKBAR</h2>

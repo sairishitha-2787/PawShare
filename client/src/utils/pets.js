@@ -16,7 +16,7 @@ export function houseTypeFor(species) {
 export function peakY(type, y) {
   if (type === 'dog') return y - 80
   if (type === 'cat') return y - 106
-  if (type === 'bird') return y - 100
+  if (type === 'bird') return y - 110 // the branch, so the pin sits above it rather than on the twine
   return y - 72
 }
 

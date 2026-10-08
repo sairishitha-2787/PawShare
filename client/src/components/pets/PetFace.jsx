@@ -12,7 +12,39 @@ function Eyes() {
   )
 }
 
-function Features({ species, fur: f, dark: d }) {
+// crest: 3 pointed feathers (cockatoo, cockatiel); without it, the two small dark head tufts.
+// cheek: a round patch over the blush (cockatiel orange, budgie blue spot).
+function Bird({ fur: f, dark: d, cheek, crest }) {
+  return (
+    <>
+      {crest ? (
+        <path
+          d="M23 24L19 6L28 21L30 3L32 21L41 6L37 24Z"
+          fill={f}
+          stroke={d}
+          strokeWidth="1"
+          strokeLinejoin="round"
+        />
+      ) : (
+        <>
+          <ellipse cx="27" cy="14" rx="3" ry="9" fill={d} transform="rotate(-20 27 14)" />
+          <ellipse cx="33" cy="13" rx="3" ry="10" fill={d} transform="rotate(12 33 13)" />
+        </>
+      )}
+      <circle cx="30" cy="35" r="15" fill={f} />
+      <Eyes />
+      {cheek && (
+        <>
+          <circle cx="19.5" cy="40" r="4" fill={cheek} />
+          <circle cx="40.5" cy="40" r="4" fill={cheek} />
+        </>
+      )}
+      <path d="M26.5 37Q30 35 33.5 37Q33.5 42 30 45.5Q30.5 41 26.5 37Z" fill={d} stroke={INK} strokeWidth="1" strokeLinejoin="round" />
+    </>
+  )
+}
+
+function Features({ species, fur: f, dark: d, cheek, crest }) {
   if (species === 'dog') {
     return (
       <>
@@ -53,17 +85,7 @@ function Features({ species, fur: f, dark: d }) {
       </>
     )
   }
-  if (species === 'bird') {
-    return (
-      <>
-        <ellipse cx="27" cy="14" rx="3" ry="9" fill={d} transform="rotate(-20 27 14)" />
-        <ellipse cx="33" cy="13" rx="3" ry="10" fill={d} transform="rotate(12 33 13)" />
-        <circle cx="30" cy="35" r="15" fill={f} />
-        <Eyes />
-        <path d="M26.5 37.5h7l-3.5 6z" fill="#F4A340" stroke={INK} strokeWidth="1" strokeLinejoin="round" />
-      </>
-    )
-  }
+  if (species === 'bird') return <Bird fur={f} dark={d} cheek={cheek} crest={crest} />
   // guinea (hamsters use the guinea face for now)
   return (
     <>
@@ -81,7 +103,7 @@ function Features({ species, fur: f, dark: d }) {
 // so it also works nested inside another svg (see Pin).
 export default function PetFace({ pet, size = 60, ...rest }) {
   const clipId = `face-${useId().replace(/:/g, '')}`
-  const { fur, dark, bg } = pet.colors
+  const { fur, dark, bg, cheek } = pet.colors
   return (
     <svg viewBox="0 0 60 60" width={size} height={size} aria-hidden="true" {...rest}>
       <defs>
@@ -91,7 +113,7 @@ export default function PetFace({ pet, size = 60, ...rest }) {
         <rect width="60" height="60" fill={bg} />
         {pet.photoUrl
           ? <image href={pet.photoUrl} width="60" height="60" preserveAspectRatio="xMidYMid slice" />
-          : <Features species={pet.species} fur={fur} dark={dark} />}
+          : <Features species={pet.species} fur={fur} dark={dark} cheek={cheek} crest={pet.crest} />}
       </g>
     </svg>
   )
